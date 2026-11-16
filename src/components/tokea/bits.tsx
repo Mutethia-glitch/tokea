@@ -119,10 +119,13 @@ export function SessionCard({ session }: { session: Session }) {
         <div className="flex min-w-0 items-start gap-3">
           <Avatar person={host} size={44} />
           <div className="min-w-0 flex-1">
-            <p className="truncate font-semibold leading-5">{mine ? "Your session" : session.mode === "group" ? `${host?.name ?? "Someone"} & friends` : (host?.name ?? "Someone")}</p>
-            <p className="mt-1 truncate text-xs text-muted-foreground">{session.category}{session.drink ? ` · ${session.drink}` : ""}</p>
+            <p className="font-semibold leading-5">{mine ? "Your session" : session.mode === "group" ? `${host?.name ?? "Someone"} & friends` : (host?.name ?? "Someone")}</p>
+            <div className="mt-1 flex flex-wrap items-center gap-1.5">
+              <p className="min-w-0 truncate text-xs text-muted-foreground">{session.category}{session.drink ? ` · ${session.drink}` : ""}</p>
+              <MyRequestPill sessionId={session.id} />
+            </div>
           </div>
-          <div className="flex max-w-[44%] shrink-0 flex-wrap justify-end gap-1"><MyRequestPill sessionId={session.id} /><StatusPill session={session} /></div>
+          <div className="shrink-0"><StatusPill session={session} /></div>
         </div>
         <p className="mt-3 min-h-12 overflow-hidden text-[15px] leading-6 line-clamp-2">{session.vibe}</p>
         <div className="mt-auto border-t border-border/70 pt-3">

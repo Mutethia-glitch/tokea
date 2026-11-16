@@ -59,7 +59,10 @@
 - Added profile-photo selection, image type/size validation, center-crop to 320px square, JPEG compression, browser-local persistence, change/remove controls and avatar rendering throughout the demo.
 - No backend, cloud image upload, or personal data transfer was added; production avatar storage/consent/deletion remain unresolved.
 - Extended Chromium E2E coverage for drink mapping, exactly 16px vertical card gaps, photo persistence, custom hosted session category and narrow viewport behavior.
-- **Pending:** build, typecheck, tests, browser screenshot review and final merge.
+- First CI run: Bun install, TypeScript, build, and unit tests passed; Chromium passed card gaps, banner mapping, profile photo upload and viewport checks, but the newest hosted session test failed because the Discover comparator did not preserve multiple owned sessions in insertion order.
+- Fixed the owned-session stable sorting rule and made the browser test wait for local-storage persistence before reloading Discover.
+- Screenshot review: verified six distinct soft category banners and consistent card gaps; improved group host-name visibility by moving the request badge below the name.
+- **Pending:** second CI run and final merge.
 
 
 ### 2026-11-17 — Browser smoke suite verified

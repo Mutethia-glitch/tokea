@@ -126,6 +126,14 @@ try {
   );
   await page.getByRole("button", { name: "Publish session" }).click();
   await page.getByRole("heading", { name: "Your session", exact: true }).waitFor();
+  // Wait for the local-state write before a hard navigation; this mirrors
+  // a user returning to Discover after creating the new session.
+  await page.waitForFunction(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem("tokea-demo-v1") ?? "{}");
+      return saved.sessions?.some((s) => s.hostId === "me" && s.category === "Coffee");
+    } catch { return false; }
+  });
   await visit("/", "Who's out nearby?");
   const newest = page.locator('[data-testid="session-card"]').first();
   assert.equal(await newest.getAttribute("data-category"), "Coffee");

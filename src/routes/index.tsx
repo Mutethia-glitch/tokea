@@ -49,7 +49,14 @@ function Discover() {
     .filter((s) => s.hostId === "me" || s.distanceKm <= f.maxKm)
     .filter((s) => f.mode === "all" || s.mode === f.mode)
     .filter((s) => f.cats.length === 0 || f.cats.includes(s.category))
-    .sort((a, b) => (a.hostId === "me" ? -1 : b.hostId === "me" ? 1 : a.distanceKm - b.distanceKm)),
+    .sort((a, b) => {
+      // A stable sort preserves newest-first insertion order for the user's own sessions.
+      const myA = a.hostId === "me";
+      const myB = b.hostId === "me";
+      if (myA !== myB) return myA ? -1 : 1;
+      if (myA && myB) return 0;
+      return a.distanceKm - b.distanceKm;
+    }),
   [state, f]);
 
   const active = f.hood !== "All" || f.maxKm !== 50 || f.mode !== "all" || f.cats.length > 0;
