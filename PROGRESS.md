@@ -2,7 +2,7 @@
 
 **Project:** Tokea (formerly named Explore in early blueprint)  
 **Last updated:** 2026-11-17  
-**Current milestone:** M1 — React frontend build and automated route/session checks verified; hosted preview still pending  
+**Current milestone:** M1 — React frontend verified in CI; hosted demo READY (browser E2E outstanding)  
 **Repository:** https://github.com/Mutethia-glitch/tokea  
 **Design source:** https://lovable.dev/projects/20ff86c9-03b7-4e00-b80f-9560791ddbfb
 
@@ -24,6 +24,7 @@
 | Profile + appearance | Prototype | Profile edits, system/light/dark options, privacy/terms previews |
 | Safety | Preliminary | Block/report demo controls; no server-side enforcement |
 | React web build | **Verified in CI** | Bun install, TypeScript, Vite/Nitro production build and 16 Vitest tests passed in GitHub Actions run #8 (2026-11-17) |
+| Hosted web demo | **Vercel deployment READY** | https://tokea-demo.vercel.app · SSO protection enabled · browser routes not yet independently smoke-tested |
 | Production backend | Not started | No real API, database, OTP, maps, push notifications or admin |
 | Native iOS/Android | Not started | Expo/React Native planned later |
 | Kenya legal review | Required | Final age assurance, privacy policies, licensing/alcohol considerations |
@@ -33,7 +34,8 @@
 - [x] Verify Bun dependency install, TypeScript check, production build and automated tests in CI (16/16 tests passed).
 - [x] Verify TanStack Router routes (`/requests`, `/chats`, `/chats/$id`, `/profile`) with smoke tests.
 - [ ] Perform browser-level React end-to-end and narrow-device visual checks on the integrated build; current automated tests are routing and logic only.
-- [ ] Publish a limited-scope hosted demo preview (not the production app) and smoke-test public routes.
+- [x] Publish a limited-scope hosted web demo through Vercel; deployment reached READY state (original merged commit `bbf0a6e`).
+- [ ] Check every route in the deployed browser and verify mobile interactions; Vercel sign-in protection is currently enabled.
 - [x] Add regression tests for capacity, approval restrictions, blocking and private chat access.
 - [ ] Approve production requirements and infrastructure choices before adding backend services.
 
@@ -47,6 +49,14 @@
 - Draft privacy and terms effective date: **November 16, 2026**; no public support email yet.
 
 ## Changelog
+
+### 2026-11-17 — Vercel Git deployment connected
+- Created Vercel project `tokea-demo`, linked to `Mutethia-glitch/tokea` production branch `main`.
+- Hosted demo: https://tokea-demo.vercel.app (Vercel deployment `dpl_BcmCDwjUNskThxyVh4f2aHRcCPxP`, READY).
+- Build logs confirm TanStack Start/Vite/Nitro outputs deployed successfully.
+- Vercel SSO protection is enabled; this is not confirmed to be publicly accessible without signing in.
+- End-to-end live browser and mobile tests still pending; no real user, SMS, location, or message services.
+
 
 ### 2026-11-17 — Frontend stabilization verified in GitHub Actions
 - CI run: https://github.com/Mutethia-glitch/tokea/actions/runs/43980671907
