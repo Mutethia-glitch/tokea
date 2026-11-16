@@ -2,7 +2,7 @@
 
 **Project:** Tokea (formerly named Explore in early blueprint)  
 **Last updated:** 2026-11-17  
-**Current milestone:** M1 — browser smoke test implementation in progress (PR; verification pending)  
+**Current milestone:** M1 — React frontend tested in CI and Chromium; visual polish scheduled  
 **Repository:** https://github.com/Mutethia-glitch/tokea  
 **Design source:** https://lovable.dev/projects/20ff86c9-03b7-4e00-b80f-9560791ddbfb
 
@@ -33,9 +33,11 @@
 
 - [x] Verify Bun dependency install, TypeScript check, production build and automated tests in CI (16/16 tests passed).
 - [x] Verify TanStack Router routes (`/requests`, `/chats`, `/chats/$id`, `/profile`) with smoke tests.
-- [ ] Perform browser-level React end-to-end and narrow-device visual checks on the integrated build; current automated tests are routing and logic only.
+- [x] Perform Chromium E2E checks for onboarding, navigation, chat, profile and hosting; passed on 2026-11-17 (CI run #14).
+- [ ] Polish Discover cards for consistent gaps, metadata wrapping, fixed navigation overlap, and responsive category banners.
 - [x] Publish a limited-scope hosted web demo through Vercel; deployment reached READY state (original merged commit `bbf0a6e`).
-- [ ] Check every route in the deployed browser and verify mobile interactions; Vercel sign-in protection is currently enabled.
+- [x] Chromium successfully checked the integrated React app at 320, 390, 448 and 768px without page-level horizontal overflow.
+- [ ] Check the protected Vercel domain directly in a browser; CI E2E verified a local dev server, not the deployed URL.
 - [x] Add regression tests for capacity, approval restrictions, blocking and private chat access.
 - [ ] Approve production requirements and infrastructure choices before adding backend services.
 
@@ -49,6 +51,13 @@
 - Draft privacy and terms effective date: **November 16, 2026**; no public support email yet.
 
 ## Changelog
+
+### 2026-11-17 — Browser smoke suite verified
+- CI run: https://github.com/Mutethia-glitch/tokea/actions/runs/43982458445
+- **PASS:** Bun install, strict TypeScript, production build, 16 Vitest tests and Chromium browser smoke checks.
+- Browser exercised onboarding, tab navigation, profile edit, chat message, host session creation, and no horizontal overflow at 320/390/448/768px.
+- Screenshot artifact recorded for review; visual review identified Discover metadata/card refinements for next milestone.
+- Current browser test is against Vite development server while CI independently checks the production build; hosted Vercel browser checks remain separate.
 
 ### 2026-11-17 — Browser smoke suite added (not yet verified)
 - Added Playwright browser checks to GitHub Actions for demo onboarding, navigation, profile editing, session chat, creating a session, and overflow at 320/390/448/768px.
