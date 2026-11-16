@@ -54,7 +54,8 @@
 - Added Playwright browser checks to GitHub Actions for demo onboarding, navigation, profile editing, session chat, creating a session, and overflow at 320/390/448/768px.
 - Automated screenshot artifact is generated from mock data for mobile UI review.
 - First browser CI attempt stopped before running tests: Playwright 1.58.2 cannot install Chromium on GitHub's Ubuntu 26.04 image.
-- Pinned the workflow to supported Ubuntu 24.04; rerun pending.
+- Pinned the workflow to supported Ubuntu 24.04; Chromium installation now succeeds.
+- Browser CI then found `vite preview` incompatible with the Lovable TanStack/Nitro output (`dist/server/server.js` absent). Use the local Vite **development server** for browser smoke testing, while CI separately verifies the production build; rerun pending.
 - **Pending:** complete browser CI run and investigate any runtime/UI failures before marking the browser QA checklist complete.
 
 
