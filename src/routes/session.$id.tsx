@@ -45,7 +45,7 @@ function Detail() {
             {s.status !== "ended" && <Button variant="ghost" className="text-destructive" onClick={() => { updateSession(s.id, { status: "ended" }); toast("Session ended"); }}>End early</Button>}
           </div>
         ) : myReq?.status === "pending" ? (
-          <div className="grid gap-2"><p className="text-center text-sm text-muted-foreground">Request pending — waiting for {host.name}.</p><Button variant="outline" onClick={() => { cancelRequest(myReq.id); toast("Request cancelled"); }}>Cancel request</Button></div>
+          <div className="grid gap-2"><p className="text-center text-sm text-muted-foreground">Request pending — waiting for {host?.name ?? "Someone"}.</p><Button variant="outline" onClick={() => { cancelRequest(myReq.id); toast("Request cancelled"); }}>Cancel request</Button></div>
         ) : myReq?.status === "accepted" ? (
           <Button variant="brand" onClick={() => nav({ to: "/chats/$id", params: { id: s.id } })}>Open chat</Button>
         ) : (

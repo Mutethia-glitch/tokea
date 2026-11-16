@@ -56,6 +56,7 @@
 - First PR CI run reached install, but npm 10 crashed inside its dependency resolver: `Cannot read properties of null (reading 'edgesOut')`. Typecheck/build/tests did not run.
 - Switched CI installation to Bun and restored Lovable's original `bun.lock`; CI dependency install now **passes**.
 - The next CI run reported strict TypeScript errors in nullable profile lookups, optional properties and array indexing, some inherited from the Lovable base. Patched these cases while preserving the approved UI.
+- Type-check rerun narrowed errors from dozens to **one** remaining session-details fallback; corrected the final nullable host name.
 - **Not yet verified:** Bun CI install/typecheck/build/tests, real device rendering and live preview; resolve any failures before marking M1 complete.
 
 
