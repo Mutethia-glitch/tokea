@@ -2,7 +2,7 @@
 
 **Project:** Tokea (formerly named Explore in early blueprint)  
 **Last updated:** 2026-11-17  
-**Current milestone:** M2 — Discover card design, automatic drink banners and local profile photo (verification pending)  
+**Current milestone:** M2 — Discover card design, drink banners and local profile photos verified in CI/Chromium  
 **Repository:** https://github.com/Mutethia-glitch/tokea  
 **Design source:** https://lovable.dev/projects/20ff86c9-03b7-4e00-b80f-9560791ddbfb
 
@@ -16,12 +16,12 @@
 | --- | --- | --- |
 | Blueprint and scope | Reviewed | Adults-only Kenya social discovery; no dating, alcohol commerce, payments, or AI matching |
 | Visual design | Approved | Preserve original Lovable tokens, fonts, 448px mobile canvas, 64px nav/header, 20px card padding, 12px card gap |
-| Discover + filters | Visual update in review | Original Lovable theme retained; 16px uniform card gaps, improved metadata layout and category backgrounds to be verified in CI |
+| Discover + filters | **M2 verified** | Approved Lovable tokens retained; 16px card gaps and consistent widths tested, mobile layout and six automatic category banners verified in Chromium |
 | Onboarding + profile | Prototype | Demo-only self declaration and mock OTP; no actual verification |
 | Host/create session | Prototype | Client-side creation/edit/pause/end |
 | Join requests | Prototype | Local simulated acceptance/decline and capacity checks |
 | Session chats | Prototype | Demo-only; access shown after approval, no real messages delivered |
-| Profile + appearance | Prototype | Profile edits, local profile-photo picker, system/light/dark options, privacy/terms previews; photo upload UI pending E2E verification |
+| Profile + appearance | **M2 photo UX verified** | Browser-local cropped profile photo choose/change/remove, photo persistence and avatar rendering; no server upload |
 | Safety | Preliminary | Block/report demo controls; no server-side enforcement |
 | React web build | **Verified in CI** | Bun install, TypeScript, Vite/Nitro production build and 16 Vitest tests passed in GitHub Actions run #8 (2026-11-17) |
 | Hosted web demo | **Vercel deployment READY** | https://tokea-demo.vercel.app · SSO protection enabled · browser routes not yet independently smoke-tested |
@@ -34,10 +34,11 @@
 - [x] Verify Bun dependency install, TypeScript check, production build and automated tests in CI (16/16 tests passed).
 - [x] Verify TanStack Router routes (`/requests`, `/chats`, `/chats/$id`, `/profile`) with smoke tests.
 - [x] Perform Chromium E2E checks for onboarding, navigation, chat, profile and hosting; passed on 2026-11-17 (CI run #14).
-- [ ] Verify Discover cards have consistent 16px gaps, uncluttered metadata, no overlapping Host button, and responsive drink-specific artwork (code added; CI pending).
+- [x] Verify Discover has 16px card gaps, stable widths, uncluttered metadata, no floating Host CTA and responsive category backgrounds (Chromium CI #18 passed).
 - [x] Publish a limited-scope hosted web demo through Vercel; deployment reached READY state (original merged commit `bbf0a6e`).
 - [x] Chromium successfully checked the integrated React app at 320, 390, 448 and 768px without page-level horizontal overflow.
 - [ ] Check the protected Vercel domain directly in a browser; CI E2E verified a local dev server, not the deployed URL.
+- [ ] Decide photo storage, consent/moderation and deletion for production accounts; demo photos remain on the user's browser only.
 - [x] Add regression tests for capacity, approval restrictions, blocking and private chat access.
 - [ ] Approve production requirements and infrastructure choices before adding backend services.
 
@@ -62,7 +63,9 @@
 - First CI run: Bun install, TypeScript, build, and unit tests passed; Chromium passed card gaps, banner mapping, profile photo upload and viewport checks, but the newest hosted session test failed because the Discover comparator did not preserve multiple owned sessions in insertion order.
 - Fixed the owned-session stable sorting rule and made the browser test wait for local-storage persistence before reloading Discover.
 - Screenshot review: verified six distinct soft category banners and consistent card gaps; improved group host-name visibility by moving the request badge below the name.
-- **Pending:** second CI run and final merge.
+- **Verified:** CI run https://github.com/Mutethia-glitch/tokea/actions/runs/43983666817 passed Bun install, strict TypeScript, production build, 16 unit tests and Chromium browser smoke.
+- Browser assertions passed: six drink categories, 16px vertical gaps, equal-width cards, local photo compression/persistence, new Coffee session sorting, hosted category selection, no page overflow at 320/390/448/768px.
+- Screenshots were reviewed from the CI artifact. No real cloud photo storage or production backend; visuals remain a demo.
 
 
 ### 2026-11-17 — Browser smoke suite verified
