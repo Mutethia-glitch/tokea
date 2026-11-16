@@ -53,7 +53,9 @@
 - Added smoke tests for all seven URLs and session-rule regression tests.
 - Strengthened demo approval and message guards (host ownership, session status, blocked applicants and approved chat participants).
 - Configured TypeScript typechecking in CI before build/test.
-- **Not yet verified:** CI build/typecheck/tests, real device rendering and live preview; resolve any failures before marking M1 complete.
+- First PR CI run reached install, but npm 10 crashed inside its dependency resolver: `Cannot read properties of null (reading 'edgesOut')`. Typecheck/build/tests did not run.
+- Switched CI installation to Bun and restored Lovable's original `bun.lock` so the next run can install deterministically.
+- **Not yet verified:** Bun CI install/typecheck/build/tests, real device rendering and live preview; resolve any failures before marking M1 complete.
 
 
 ### 2026-11-17 — Repository quality checks
