@@ -2,7 +2,7 @@
 
 **Project:** Tokea (formerly named Explore in early blueprint)  
 **Last updated:** 2026-11-17  
-**Current milestone:** M1 — frontend stabilization work in progress (PR; not verified)  
+**Current milestone:** M1 — React frontend build and automated route/session checks verified; hosted preview still pending  
 **Repository:** https://github.com/Mutethia-glitch/tokea  
 **Design source:** https://lovable.dev/projects/20ff86c9-03b7-4e00-b80f-9560791ddbfb
 
@@ -23,17 +23,18 @@
 | Session chats | Prototype | Demo-only; access shown after approval, no real messages delivered |
 | Profile + appearance | Prototype | Profile edits, system/light/dark options, privacy/terms previews |
 | Safety | Preliminary | Block/report demo controls; no server-side enforcement |
-| React web build | **Verification pending** | Route-tree snapshot updated; typecheck/build/tests scheduled in CI for the stabilization pull request |
+| React web build | **Verified in CI** | Bun install, TypeScript, Vite/Nitro production build and 16 Vitest tests passed in GitHub Actions run #8 (2026-11-17) |
 | Production backend | Not started | No real API, database, OTP, maps, push notifications or admin |
 | Native iOS/Android | Not started | Expo/React Native planned later |
 | Kenya legal review | Required | Final age assurance, privacy policies, licensing/alcohol considerations |
 
 ## Immediate next steps
 
-- [ ] Verify `npm install`, `npm run build`, and `npm test` against the full integrated repository.
-- [ ] Verify generated TanStack Router routes (`/requests`, `/chats`, `/chats/$id`, `/profile`).
-- [ ] Exercise demo flows end to end and recheck screen layout on narrow devices.
-- [ ] Add robust regression tests for capacity limits, blocking and private chat access.
+- [x] Verify Bun dependency install, TypeScript check, production build and automated tests in CI (16/16 tests passed).
+- [x] Verify TanStack Router routes (`/requests`, `/chats`, `/chats/$id`, `/profile`) with smoke tests.
+- [ ] Perform browser-level React end-to-end and narrow-device visual checks on the integrated build; current automated tests are routing and logic only.
+- [ ] Publish a limited-scope hosted demo preview (not the production app) and smoke-test public routes.
+- [x] Add regression tests for capacity, approval restrictions, blocking and private chat access.
 - [ ] Approve production requirements and infrastructure choices before adding backend services.
 
 ## Important architectural decisions
@@ -46,6 +47,11 @@
 - Draft privacy and terms effective date: **November 16, 2026**; no public support email yet.
 
 ## Changelog
+
+### 2026-11-17 — Frontend stabilization verified in GitHub Actions
+- CI run: https://github.com/Mutethia-glitch/tokea/actions/runs/43980671907
+- **PASS:** Bun dependency install, TypeScript strict check, Vite/Nitro production build, 2 test files and **16 tests**.
+- React source compile and automated route/session logic checks are confirmed; browser E2E, mobile rendering and hosted demo remain outstanding.
 
 ### 2026-11-17 — Frontend stabilization (verification pending)
 - Updated the generated route-tree snapshot for Requests, Chats, nested Chat Details and Profile; the TanStack plugin remains the authoritative generator at build time.

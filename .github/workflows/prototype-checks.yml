@@ -2,7 +2,7 @@ name: Tokea prototype checks
 
 on:
   push:
-    branches: [main, fix/frontend-stabilization]
+    branches: [main]
   pull_request:
 
 jobs:
