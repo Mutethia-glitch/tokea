@@ -10,13 +10,13 @@ export const ME = "me";
 
 export type Person = { id: string; name: string; neighbourhood: string; bio: string; hue: number };
 export type Session = {
-  id: string; hostId: string; vibe: string; category: Category; drink?: string;
+  id: string; hostId: string; vibe: string; category: Category; drink?: string | undefined;
   mode: "solo" | "group"; groupSize: number; capacity: number; openTo: OpenTo;
   neighbourhood: string; distanceKm: number; start: string; end: string; status: SessionStatus;
 };
 export type JoinRequest = { id: string; sessionId: string; userId: string; partySize: number; intro: string; status: RequestStatus; at: number };
 export type Message = { id: string; sessionId: string; userId: string; text: string; at: number };
-export type Notice = { id: string; text: string; at: number; read: boolean; link?: string };
+export type Notice = { id: string; text: string; at: number; read: boolean; link?: string | undefined };
 export type Theme = "system" | "light" | "dark";
 
 export type DemoState = {
@@ -97,12 +97,25 @@ export function joinError(state: Pick<DemoState, "sessions" | "requests" | "bloc
   return null;
 }
 
-export function acceptError(state: Pick<DemoState, "sessions" | "requests">, requestId: string): string | null {
+export function acceptError(state: Pick<DemoState, "sessions" | "requests" | "blocked">, requestId: string): string | null {
   const r = state.requests.find((x) => x.id === requestId);
   if (!r || r.status !== "pending") return "Request is no longer pending.";
-  const s = state.sessions.find((x) => x.id === r.sessionId)!;
+  const s = state.sessions.find((x) => x.id === r.sessionId);
+  if (!s) return "Session not found.";
+  if (s.hostId !== ME) return "Only the session host can accept requests.";
+  if (s.status !== "open") return "This session is no longer accepting requests.";
+  if (state.blocked.includes(r.userId)) return "This person is blocked.";
   const left = seatsLeft(s, state.requests);
-  if (r.partySize > left) return `Not enough seats — ${left} left, request is for ${r.partySize}.`;
+  if (r.partySize < 1 || r.partySize > left) return `Not enough seats — ${left} left, request is for ${r.partySize}.`;
+  return null;
+}
+
+/** Pure demo rule. Production authorization must be enforced server-side. */
+export function messageError(state: Pick<DemoState, "sessions" | "requests" | "blocked">, sessionId: string, userId = ME): string | null {
+  const session = state.sessions.find((s) => s.id === sessionId);
+  if (!session || session.status === "ended") return "Session chat is unavailable.";
+  if (state.blocked.includes(session.hostId) || state.blocked.includes(userId)) return "This chat is blocked.";
+  if (!canChat(session, state.requests, userId)) return "Chat is only available to accepted participants.";
   return null;
 }
 
@@ -131,13 +144,15 @@ function useProvideStore() {
     return () => mq.removeEventListener("change", apply);
   }, [state.theme]);
 
+  const currentPerson = (s: DemoState): Person => s.people[ME] ?? { id: ME, name: s.profile.name, neighbourhood: s.neighbourhood, bio: s.profile.bio, hue: 290 };
+
   const notify = (s: DemoState, text: string, link?: string): Notice[] => [{ id: uid("n"), text, at: now(), read: false, link }, ...s.notices];
 
   const actions = {
-    onboard: (name: string, neighbourhood: string) => setState((s) => ({ ...s, onboarded: true, neighbourhood, profile: { ...s.profile, name: name || "Alex" }, people: { ...s.people, [ME]: { ...s.people[ME], name: name || "Alex", neighbourhood } }, sessions: s.sessions.map((x) => (x.id === "mine" ? { ...x, neighbourhood } : x)) })),
+    onboard: (name: string, neighbourhood: string) => setState((s) => ({ ...s, onboarded: true, neighbourhood, profile: { ...s.profile, name: name || "Alex" }, people: { ...s.people, [ME]: { ...currentPerson(s), name: name || "Alex", neighbourhood } }, sessions: s.sessions.map((x) => (x.id === "mine" ? { ...x, neighbourhood } : x)) })),
     setNeighbourhood: (n: string) => setState((s) => ({ ...s, neighbourhood: n })),
     setTheme: (theme: Theme) => setState((s) => ({ ...s, theme })),
-    setProfile: (p: { name: string; bio: string }) => setState((s) => ({ ...s, profile: p, people: { ...s.people, [ME]: { ...s.people[ME], name: p.name } } })),
+    setProfile: (p: { name: string; bio: string }) => setState((s) => ({ ...s, profile: p, people: { ...s.people, [ME]: { ...currentPerson(s), name: p.name } } })),
     requestJoin: (sessionId: string, partySize: number, intro: string): string | null => {
       const err = joinError(state, sessionId, partySize);
       if (err) return err;
@@ -155,7 +170,7 @@ function useProvideStore() {
         return {
           ...s,
           requests: s.requests.map((x) => (x.id === id ? { ...x, status: "accepted" } : x)),
-          notices: isMine ? notify(s, `${host.name} accepted your request (demo simulation). Chat is open.`, `/chats/${r.sessionId}`) : s.notices,
+          notices: isMine ? notify(s, `${host?.name ?? "Host"} accepted your request (demo simulation). Chat is open.`, `/chats/${r.sessionId}`) : s.notices,
         };
       });
       return null;
@@ -167,7 +182,7 @@ function useProvideStore() {
       const pool = ["amani", "otieno", "njeri", "kiprono"].filter((p) => !s.blocked.includes(p) && !s.requests.some((r) => r.sessionId === mine.id && r.userId === p && r.status !== "cancelled"));
       const who = pool[0];
       if (!who) return s;
-      return { ...s, requests: [...s.requests, { id: uid("r"), sessionId: mine.id, userId: who, partySize: 1, intro: "Saw your post — mind if I join?", status: "pending", at: now() }], notices: notify(s, `${s.people[who].name} requested to join your session (demo).`, "/requests") };
+      return { ...s, requests: [...s.requests, { id: uid("r"), sessionId: mine.id, userId: who, partySize: 1, intro: "Saw your post — mind if I join?", status: "pending", at: now() }], notices: notify(s, `${s.people[who]?.name ?? "Someone"} requested to join your session (demo).`, "/requests") };
     }),
     createSession: (data: Omit<Session, "id" | "hostId" | "status" | "distanceKm">) => {
       const id = uid("s");
@@ -175,7 +190,11 @@ function useProvideStore() {
       return id;
     },
     updateSession: (id: string, data: Partial<Session>) => setState((s) => ({ ...s, sessions: s.sessions.map((x) => (x.id === id ? { ...x, ...data } : x)) })),
-    sendMessage: (sessionId: string, text: string) => setState((s) => ({ ...s, messages: [...s.messages, { id: uid("m"), sessionId, userId: ME, text, at: now() }] })),
+    sendMessage: (sessionId: string, text: string) => setState((s) => {
+      const safeText = text.trim().slice(0, 500);
+      if (!safeText || messageError(s, sessionId)) return s;
+      return { ...s, messages: [...s.messages, { id: uid("m"), sessionId, userId: ME, text: safeText, at: now() }] };
+    }),
     block: (userId: string) => setState((s) => ({ ...s, blocked: [...new Set([...s.blocked, userId])], requests: s.requests.map((r) => (r.userId === userId && r.status === "pending" ? { ...r, status: "declined" } : r)) })),
     unblock: (userId: string) => setState((s) => ({ ...s, blocked: s.blocked.filter((b) => b !== userId) })),
     report: () => setState((s) => ({ ...s, reports: s.reports + 1 })),
@@ -196,7 +215,9 @@ export function useDemo() {
 }
 
 export function fmtTime(t: string) {
-  const [h, m] = t.split(":").map(Number);
+  const [hours = "0", minutes = "0"] = t.split(":");
+  const h = Number(hours);
+  const m = Number(minutes);
   const ap = h >= 12 ? "pm" : "am";
   return `${((h + 11) % 12) + 1}${m ? ":" + String(m).padStart(2, "0") : ""}${ap}`;
 }

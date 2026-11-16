@@ -30,9 +30,9 @@ function Detail() {
 
   return (
     <div>
-      <PageHeader title={mine ? "Your session" : `${host.name}'s session`} back />
+      <PageHeader title={mine ? "Your session" : `${host?.name ?? "Someone"}'s session`} back />
       <div className="space-y-6 p-5">
-        <div className="flex items-center gap-3"><Avatar person={host} size={56} /><div className="flex-1"><p className="font-medium">{host.name}{s.mode === "group" && " & friends"}</p><p className="text-sm text-muted-foreground">{host.bio || "No bio yet."}</p></div><StatusPill session={s} /></div>
+        <div className="flex items-center gap-3"><Avatar person={host} size={56} /><div className="flex-1"><p className="font-medium">{host?.name ?? "Someone"}{s.mode === "group" && " & friends"}</p><p className="text-sm text-muted-foreground">{host?.bio || "No bio yet."}</p></div><StatusPill session={s} /></div>
         <p className="text-lg leading-relaxed">{s.vibe}</p>
         <div className="rounded-3xl border border-border p-4 space-y-3"><p className="text-sm">{s.category}{s.drink ? ` · ${s.drink}` : ""} · Open to {s.openTo === "both" ? "individuals & groups" : s.openTo}</p><SessionMeta session={s} /><p className="text-xs text-muted-foreground">Approximate area only. Exact venue is agreed in chat after approval.</p></div>
         <div><p className="mb-2 text-sm font-medium">Going ({s.groupSize + accepted.reduce((a, r) => a + r.partySize, 0)})</p><div className="flex -space-x-2"><Avatar person={host} size={36} />{accepted.map((r) => <Avatar key={r.id} person={state.people[r.userId]} size={36} />)}</div></div>
@@ -45,7 +45,7 @@ function Detail() {
             {s.status !== "ended" && <Button variant="ghost" className="text-destructive" onClick={() => { updateSession(s.id, { status: "ended" }); toast("Session ended"); }}>End early</Button>}
           </div>
         ) : myReq?.status === "pending" ? (
-          <div className="grid gap-2"><p className="text-center text-sm text-muted-foreground">Request pending — waiting for {host.name}.</p><Button variant="outline" onClick={() => { cancelRequest(myReq.id); toast("Request cancelled"); }}>Cancel request</Button></div>
+          <div className="grid gap-2"><p className="text-center text-sm text-muted-foreground">Request pending — waiting for {host?.name ?? "Someone"}.</p><Button variant="outline" onClick={() => { cancelRequest(myReq.id); toast("Request cancelled"); }}>Cancel request</Button></div>
         ) : myReq?.status === "accepted" ? (
           <Button variant="brand" onClick={() => nav({ to: "/chats/$id", params: { id: s.id } })}>Open chat</Button>
         ) : (

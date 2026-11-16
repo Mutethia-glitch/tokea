@@ -9,7 +9,7 @@ import { PageHeader } from "@/components/tokea/bits";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/host")({
-  validateSearch: (s: Record<string, unknown>) => ({ edit: typeof s.edit === "string" ? s.edit : undefined }),
+  validateSearch: (s: Record<string, unknown>) => ({ edit: typeof s["edit"] === "string" ? s["edit"] : undefined }),
   head: () => ({ meta: [{ title: "Host a drink — tokea demo" }, { name: "description", content: "Post a casual drink session in the Tokea demo." }, { property: "og:title", content: "Host a drink — tokea demo" }, { property: "og:description", content: "Post a casual drink session." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: Host,
 });
@@ -58,7 +58,7 @@ function Host() {
           <Input placeholder="Specific drink (optional)" value={drink} onChange={(e) => setDrink(e.target.value)} className="mt-3 h-11 rounded-xl" /></section>
         <section><p className="mb-2 text-sm font-medium">Vibe *</p><Textarea maxLength={160} placeholder="e.g. Low-key after-work chat, happy to meet new people." value={vibe} onChange={(e) => setVibe(e.target.value)} /></section>
         <section className="flex items-center justify-between text-sm"><span className="font-medium">Seats to offer</span><Input type="number" min={1} max={10} value={capacity} onChange={(e) => setCapacity(+e.target.value)} className="h-11 w-20 rounded-xl" /></section>
-        <section><p className="mb-2 text-sm font-medium">Open to</p><div className="flex gap-2">{(["individuals", "groups", "both"] as const).map((o) => <Opt key={o} on={openTo === o} onClick={() => setOpenTo(o)}>{o[0].toUpperCase() + o.slice(1)}</Opt>)}</div></section>
+        <section><p className="mb-2 text-sm font-medium">Open to</p><div className="flex gap-2">{(["individuals", "groups", "both"] as const).map((o) => <Opt key={o} on={openTo === o} onClick={() => setOpenTo(o)}>{o.charAt(0).toUpperCase() + o.slice(1)}</Opt>)}</div></section>
         <section><p className="mb-2 text-sm font-medium">General area</p><div className="flex flex-wrap gap-2">{NEIGHBOURHOODS.map((n) => <Opt key={n} on={hood === n} onClick={() => setHood(n)}>{n}</Opt>)}</div><p className="mt-2 text-xs text-muted-foreground">No exact addresses. Agree on a public venue in chat.</p></section>
         <section className="grid grid-cols-2 gap-3 text-sm"><label>From<Input type="time" value={start} onChange={(e) => setStart(e.target.value)} className="mt-1 h-11 rounded-xl" /></label><label>Until<Input type="time" value={end} onChange={(e) => setEnd(e.target.value)} className="mt-1 h-11 rounded-xl" /></label></section>
         {errs.length > 0 && <ul role="alert" className="rounded-2xl bg-destructive/10 p-4 text-sm text-destructive">{errs.map((e) => <li key={e}>{e}</li>)}</ul>}

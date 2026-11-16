@@ -14,6 +14,6 @@ On **every major feature, UX change, architectural decision, meaningful bug fix,
 4. Keep the file factual and concise so the next contributor can resume where work stopped.
 
 ## Before merging
-- Run `npm run build` and `npm test` where available, or clearly record why they could not run.
+- Run `bun run typecheck`, `bun run build` and `bun run test` where available, or clearly record why they could not run.
 - Check that mobile screens share the original Lovable spacing, header and bottom-nav dimensions, and that interactions have no dead controls.
 - Keep request-to-chat authorization and capacity rules in mind. Demo client-side enforcement is **not** adequate for production.

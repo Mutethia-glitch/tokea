@@ -5,11 +5,11 @@ Approved mobile-first social discovery web prototype for adults in Kenya, preser
 ## Local development
 
 ```bash
-npm install
-npm run dev
+bun install --frozen-lockfile
+bun run dev
 ```
 
-`npm run build` verifies the app; `npm test` runs available tests. The project is an interactive frontend-only demo with seeded sessions and local browser storage — no production accounts, real OTP/age verification, GPS, real messaging service or database.
+`bun run typecheck` validates TypeScript, `bun run build` builds the app, and `bun run test` runs automated tests. GitHub Actions runs these on pull requests. The project is an interactive frontend-only demo with seeded sessions and local browser storage — no production accounts, real OTP/age verification, GPS, real messaging service or database.
 
 Visual reference: original `src/styles.css` tokens and shared components, Instrument Sans / Instrument Serif, 448px mobile shell, 64px header/navigation, 20px content/card padding, 12px card spacing, 44px+ tap targets.
 

@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useLocation } from "@tanstack/react-router";
 import { MessageCircle, ChevronRight, ShieldCheck } from "lucide-react";
 import { useDemo, canChat, ago, ME } from "@/lib/demo-store";
 import { Avatar, PageHeader, Empty } from "@/components/tokea/bits";
@@ -9,12 +9,16 @@ export const Route = createFileRoute("/chats")({
 });
 
 function Chats() {
+  const { pathname } = useLocation();
   const { state } = useDemo();
   const sessions = state.sessions.filter(s => s.status !== "ended" && !state.blocked.includes(s.hostId) && canChat(s, state.requests));
   const ordered = [...sessions].sort((a,b) => {
     const latest = (id: string) => Math.max(0, ...state.messages.filter(m => m.sessionId === id).map(m => m.at));
     return latest(b.id)-latest(a.id);
   });
+  // The detail route is nested under /chats; render only the detail screen there.
+  if (pathname.startsWith("/chats/")) return <Outlet />;
+
   return (
     <div>
       <PageHeader title="Chats" />
@@ -30,7 +34,7 @@ function Chats() {
                 <Avatar person={host} size={48} />
                 <div className="min-w-0 flex-1">
                   <div className="flex items-start justify-between gap-2">
-                    <p className="font-medium">{s.hostId === ME ? "Your session" : `${host.name}${s.mode === "group" ? " & friends" : ""}`}</p>
+                    <p className="font-medium">{s.hostId === ME ? "Your session" : `${host?.name ?? "Someone"}${s.mode === "group" ? " & friends" : ""}`}</p>
                     <span className="shrink-0 text-xs text-muted-foreground">{last ? ago(last.at) : "New"}</span>
                   </div>
                   <p className="text-sm text-muted-foreground">{s.category} · {s.neighbourhood}</p>

@@ -30,7 +30,7 @@ function Chat() {
   function submit(e: FormEvent) { e.preventDefault(); if (!text.trim()) return; sendMessage(id, text.trim().slice(0, 500)); setText(""); }
   return (
     <div className="flex min-h-screen flex-col">
-      <PageHeader back title={s.hostId === ME ? "Your session" : `${host.name}'s session`} right={<button className="inline-flex size-11 items-center justify-center rounded-full hover:bg-accent" onClick={() => setShowOptions(true)} aria-label="Session options"><MoreHorizontal className="size-5" /></button>} />
+      <PageHeader back title={s.hostId === ME ? "Your session" : `${host?.name ?? "Someone"}'s session`} right={<button className="inline-flex size-11 items-center justify-center rounded-full hover:bg-accent" onClick={() => setShowOptions(true)} aria-label="Session options"><MoreHorizontal className="size-5" /></button>} />
       <div className="flex-1 space-y-5 p-5 pb-6">
         <p className="text-sm text-muted-foreground">{s.category} · {s.neighbourhood} · {ids.length} participants · demo chat</p>
         <p className="flex gap-2 rounded-2xl bg-muted p-4 text-sm"><ShieldCheck className="size-4 shrink-0 text-brand" /> Agree on a safe public meeting place. No real messages are delivered in this prototype.</p>
