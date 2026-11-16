@@ -2,7 +2,7 @@
 
 **Project:** Tokea (formerly named Explore in early blueprint)  
 **Last updated:** 2026-11-17  
-**Current milestone:** M1 — React frontend verified in CI; hosted demo READY (browser E2E outstanding)  
+**Current milestone:** M1 — browser smoke test implementation in progress (PR; verification pending)  
 **Repository:** https://github.com/Mutethia-glitch/tokea  
 **Design source:** https://lovable.dev/projects/20ff86c9-03b7-4e00-b80f-9560791ddbfb
 
@@ -49,6 +49,12 @@
 - Draft privacy and terms effective date: **November 16, 2026**; no public support email yet.
 
 ## Changelog
+
+### 2026-11-17 — Browser smoke suite added (not yet verified)
+- Added Playwright browser checks to GitHub Actions for demo onboarding, navigation, profile editing, session chat, creating a session, and overflow at 320/390/448/768px.
+- Automated screenshot artifact is generated from mock data for mobile UI review.
+- **Pending:** complete browser CI run and investigate any runtime/UI failures before marking the browser QA checklist complete.
+
 
 ### 2026-11-17 — Vercel Git deployment connected
 - Created Vercel project `tokea-demo`, linked to `Mutethia-glitch/tokea` production branch `main`.
