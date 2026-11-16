@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useLocation } from "@tanstack/react-router";
 import { MessageCircle, ChevronRight, ShieldCheck } from "lucide-react";
 import { useDemo, canChat, ago, ME } from "@/lib/demo-store";
 import { Avatar, PageHeader, Empty } from "@/components/tokea/bits";
@@ -9,12 +9,16 @@ export const Route = createFileRoute("/chats")({
 });
 
 function Chats() {
+  const { pathname } = useLocation();
   const { state } = useDemo();
   const sessions = state.sessions.filter(s => s.status !== "ended" && !state.blocked.includes(s.hostId) && canChat(s, state.requests));
   const ordered = [...sessions].sort((a,b) => {
     const latest = (id: string) => Math.max(0, ...state.messages.filter(m => m.sessionId === id).map(m => m.at));
     return latest(b.id)-latest(a.id);
   });
+  // The detail route is nested under /chats; render only the detail screen there.
+  if (pathname.startsWith("/chats/")) return <Outlet />;
+
   return (
     <div>
       <PageHeader title="Chats" />

@@ -97,12 +97,25 @@ export function joinError(state: Pick<DemoState, "sessions" | "requests" | "bloc
   return null;
 }
 
-export function acceptError(state: Pick<DemoState, "sessions" | "requests">, requestId: string): string | null {
+export function acceptError(state: Pick<DemoState, "sessions" | "requests" | "blocked">, requestId: string): string | null {
   const r = state.requests.find((x) => x.id === requestId);
   if (!r || r.status !== "pending") return "Request is no longer pending.";
-  const s = state.sessions.find((x) => x.id === r.sessionId)!;
+  const s = state.sessions.find((x) => x.id === r.sessionId);
+  if (!s) return "Session not found.";
+  if (s.hostId !== ME) return "Only the session host can accept requests.";
+  if (s.status !== "open") return "This session is no longer accepting requests.";
+  if (state.blocked.includes(r.userId)) return "This person is blocked.";
   const left = seatsLeft(s, state.requests);
-  if (r.partySize > left) return `Not enough seats — ${left} left, request is for ${r.partySize}.`;
+  if (r.partySize < 1 || r.partySize > left) return `Not enough seats — ${left} left, request is for ${r.partySize}.`;
+  return null;
+}
+
+/** Pure demo rule. Production authorization must be enforced server-side. */
+export function messageError(state: Pick<DemoState, "sessions" | "requests" | "blocked">, sessionId: string, userId = ME): string | null {
+  const session = state.sessions.find((s) => s.id === sessionId);
+  if (!session || session.status === "ended") return "Session chat is unavailable.";
+  if (state.blocked.includes(session.hostId) || state.blocked.includes(userId)) return "This chat is blocked.";
+  if (!canChat(session, state.requests, userId)) return "Chat is only available to accepted participants.";
   return null;
 }
 
@@ -175,7 +188,11 @@ function useProvideStore() {
       return id;
     },
     updateSession: (id: string, data: Partial<Session>) => setState((s) => ({ ...s, sessions: s.sessions.map((x) => (x.id === id ? { ...x, ...data } : x)) })),
-    sendMessage: (sessionId: string, text: string) => setState((s) => ({ ...s, messages: [...s.messages, { id: uid("m"), sessionId, userId: ME, text, at: now() }] })),
+    sendMessage: (sessionId: string, text: string) => setState((s) => {
+      const safeText = text.trim().slice(0, 500);
+      if (!safeText || messageError(s, sessionId)) return s;
+      return { ...s, messages: [...s.messages, { id: uid("m"), sessionId, userId: ME, text: safeText, at: now() }] };
+    }),
     block: (userId: string) => setState((s) => ({ ...s, blocked: [...new Set([...s.blocked, userId])], requests: s.requests.map((r) => (r.userId === userId && r.status === "pending" ? { ...r, status: "declined" } : r)) })),
     unblock: (userId: string) => setState((s) => ({ ...s, blocked: s.blocked.filter((b) => b !== userId) })),
     report: () => setState((s) => ({ ...s, reports: s.reports + 1 })),

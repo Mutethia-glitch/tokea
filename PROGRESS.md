@@ -2,7 +2,7 @@
 
 **Project:** Tokea (formerly named Explore in early blueprint)  
 **Last updated:** 2026-11-17  
-**Current milestone:** M0 — approved UX prototype consolidated in GitHub; continuous checks configured  
+**Current milestone:** M1 — frontend stabilization work in progress (PR; not verified)  
 **Repository:** https://github.com/Mutethia-glitch/tokea  
 **Design source:** https://lovable.dev/projects/20ff86c9-03b7-4e00-b80f-9560791ddbfb
 
@@ -23,7 +23,7 @@
 | Session chats | Prototype | Demo-only; access shown after approval, no real messages delivered |
 | Profile + appearance | Prototype | Profile edits, system/light/dark options, privacy/terms previews |
 | Safety | Preliminary | Block/report demo controls; no server-side enforcement |
-| React web build | **Checks configured; results pending** | GitHub Actions will run install, build, tests on pushes/PRs; no verified result recorded yet |
+| React web build | **Verification pending** | Route-tree snapshot updated; typecheck/build/tests scheduled in CI for the stabilization pull request |
 | Production backend | Not started | No real API, database, OTP, maps, push notifications or admin |
 | Native iOS/Android | Not started | Expo/React Native planned later |
 | Kenya legal review | Required | Final age assurance, privacy policies, licensing/alcohol considerations |
@@ -46,6 +46,15 @@
 - Draft privacy and terms effective date: **November 16, 2026**; no public support email yet.
 
 ## Changelog
+
+### 2026-11-17 — Frontend stabilization (verification pending)
+- Updated the generated route-tree snapshot for Requests, Chats, nested Chat Details and Profile; the TanStack plugin remains the authoritative generator at build time.
+- Render nested chat content in its parent route without duplicating the Chats list.
+- Added smoke tests for all seven URLs and session-rule regression tests.
+- Strengthened demo approval and message guards (host ownership, session status, blocked applicants and approved chat participants).
+- Configured TypeScript typechecking in CI before build/test.
+- **Not yet verified:** CI build/typecheck/tests, real device rendering and live preview; resolve any failures before marking M1 complete.
+
 
 ### 2026-11-17 — Repository quality checks
 - Added a GitHub Actions workflow to run a Node.js install, production build and tests on pushes and pull requests.
