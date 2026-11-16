@@ -70,7 +70,7 @@ function Profile() {
           <div className="space-y-4 px-4 pb-6">
             <label className="block text-sm font-medium">First name<Input className="mt-2 h-11 rounded-xl" value={name} maxLength={35} onChange={(e) => setName(e.target.value)} /></label>
             <label className="block text-sm font-medium">Short bio<Textarea className="mt-2" maxLength={160} value={bio} onChange={(e) => setBio(e.target.value)} /></label>
-            <Button variant="brand" className="w-full" onClick={() => { if (!name.trim()) return toast.error("Add a first name"); setProfile({ name: name.trim(), bio: bio.trim() }); setEditOpen(false); toast.success("Profile saved (demo)"); }}>Save changes</Button>
+            <Button variant="brand" className="w-full" onClick={() => { if (!name.trim()) { toast.error("Add a first name"); return; } setProfile({ name: name.trim(), bio: bio.trim() }); setEditOpen(false); toast.success("Profile saved (demo)"); }}>Save changes</Button>
           </div>
         </SheetContent>
       </Sheet>

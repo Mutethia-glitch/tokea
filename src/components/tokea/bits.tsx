@@ -16,7 +16,7 @@ export function Logo({ className }: { className?: string }) {
   );
 }
 
-export function Avatar({ person, size = 40, className }: { person?: Person; size?: number; className?: string }) {
+export function Avatar({ person, size = 40, className }: { person?: Person | undefined; size?: number; className?: string }) {
   const initials = person?.name.slice(0, 1) ?? "?";
   return (
     <span
@@ -79,7 +79,7 @@ export function SessionCard({ session }: { session: Session }) {
         <Avatar person={host} size={44} />
         <div className="min-w-0 flex-1">
           <div className="flex items-center justify-between gap-2">
-            <p className="font-medium">{mine ? "Your session" : session.mode === "group" ? `${host.name} & friends` : host.name}</p>
+            <p className="font-medium">{mine ? "Your session" : session.mode === "group" ? `${host?.name ?? "Someone"} & friends` : (host?.name ?? "Someone")}</p>
             <div className="flex gap-1.5"><MyRequestPill sessionId={session.id} /><StatusPill session={session} /></div>
           </div>
           <p className="text-sm text-muted-foreground">{session.category}{session.drink ? ` · ${session.drink}` : ""}</p>

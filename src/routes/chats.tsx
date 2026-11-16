@@ -34,7 +34,7 @@ function Chats() {
                 <Avatar person={host} size={48} />
                 <div className="min-w-0 flex-1">
                   <div className="flex items-start justify-between gap-2">
-                    <p className="font-medium">{s.hostId === ME ? "Your session" : `${host.name}${s.mode === "group" ? " & friends" : ""}`}</p>
+                    <p className="font-medium">{s.hostId === ME ? "Your session" : `${host?.name ?? "Someone"}${s.mode === "group" ? " & friends" : ""}`}</p>
                     <span className="shrink-0 text-xs text-muted-foreground">{last ? ago(last.at) : "New"}</span>
                   </div>
                   <p className="text-sm text-muted-foreground">{s.category} · {s.neighbourhood}</p>

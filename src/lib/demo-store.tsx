@@ -10,13 +10,13 @@ export const ME = "me";
 
 export type Person = { id: string; name: string; neighbourhood: string; bio: string; hue: number };
 export type Session = {
-  id: string; hostId: string; vibe: string; category: Category; drink?: string;
+  id: string; hostId: string; vibe: string; category: Category; drink?: string | undefined;
   mode: "solo" | "group"; groupSize: number; capacity: number; openTo: OpenTo;
   neighbourhood: string; distanceKm: number; start: string; end: string; status: SessionStatus;
 };
 export type JoinRequest = { id: string; sessionId: string; userId: string; partySize: number; intro: string; status: RequestStatus; at: number };
 export type Message = { id: string; sessionId: string; userId: string; text: string; at: number };
-export type Notice = { id: string; text: string; at: number; read: boolean; link?: string };
+export type Notice = { id: string; text: string; at: number; read: boolean; link?: string | undefined };
 export type Theme = "system" | "light" | "dark";
 
 export type DemoState = {
@@ -144,13 +144,15 @@ function useProvideStore() {
     return () => mq.removeEventListener("change", apply);
   }, [state.theme]);
 
+  const currentPerson = (s: DemoState): Person => s.people[ME] ?? { id: ME, name: s.profile.name, neighbourhood: s.neighbourhood, bio: s.profile.bio, hue: 290 };
+
   const notify = (s: DemoState, text: string, link?: string): Notice[] => [{ id: uid("n"), text, at: now(), read: false, link }, ...s.notices];
 
   const actions = {
-    onboard: (name: string, neighbourhood: string) => setState((s) => ({ ...s, onboarded: true, neighbourhood, profile: { ...s.profile, name: name || "Alex" }, people: { ...s.people, [ME]: { ...s.people[ME], name: name || "Alex", neighbourhood } }, sessions: s.sessions.map((x) => (x.id === "mine" ? { ...x, neighbourhood } : x)) })),
+    onboard: (name: string, neighbourhood: string) => setState((s) => ({ ...s, onboarded: true, neighbourhood, profile: { ...s.profile, name: name || "Alex" }, people: { ...s.people, [ME]: { ...currentPerson(s), name: name || "Alex", neighbourhood } }, sessions: s.sessions.map((x) => (x.id === "mine" ? { ...x, neighbourhood } : x)) })),
     setNeighbourhood: (n: string) => setState((s) => ({ ...s, neighbourhood: n })),
     setTheme: (theme: Theme) => setState((s) => ({ ...s, theme })),
-    setProfile: (p: { name: string; bio: string }) => setState((s) => ({ ...s, profile: p, people: { ...s.people, [ME]: { ...s.people[ME], name: p.name } } })),
+    setProfile: (p: { name: string; bio: string }) => setState((s) => ({ ...s, profile: p, people: { ...s.people, [ME]: { ...currentPerson(s), name: p.name } } })),
     requestJoin: (sessionId: string, partySize: number, intro: string): string | null => {
       const err = joinError(state, sessionId, partySize);
       if (err) return err;
@@ -168,7 +170,7 @@ function useProvideStore() {
         return {
           ...s,
           requests: s.requests.map((x) => (x.id === id ? { ...x, status: "accepted" } : x)),
-          notices: isMine ? notify(s, `${host.name} accepted your request (demo simulation). Chat is open.`, `/chats/${r.sessionId}`) : s.notices,
+          notices: isMine ? notify(s, `${host?.name ?? "Host"} accepted your request (demo simulation). Chat is open.`, `/chats/${r.sessionId}`) : s.notices,
         };
       });
       return null;
@@ -180,7 +182,7 @@ function useProvideStore() {
       const pool = ["amani", "otieno", "njeri", "kiprono"].filter((p) => !s.blocked.includes(p) && !s.requests.some((r) => r.sessionId === mine.id && r.userId === p && r.status !== "cancelled"));
       const who = pool[0];
       if (!who) return s;
-      return { ...s, requests: [...s.requests, { id: uid("r"), sessionId: mine.id, userId: who, partySize: 1, intro: "Saw your post — mind if I join?", status: "pending", at: now() }], notices: notify(s, `${s.people[who].name} requested to join your session (demo).`, "/requests") };
+      return { ...s, requests: [...s.requests, { id: uid("r"), sessionId: mine.id, userId: who, partySize: 1, intro: "Saw your post — mind if I join?", status: "pending", at: now() }], notices: notify(s, `${s.people[who]?.name ?? "Someone"} requested to join your session (demo).`, "/requests") };
     }),
     createSession: (data: Omit<Session, "id" | "hostId" | "status" | "distanceKm">) => {
       const id = uid("s");
@@ -213,7 +215,9 @@ export function useDemo() {
 }
 
 export function fmtTime(t: string) {
-  const [h, m] = t.split(":").map(Number);
+  const [hours = "0", minutes = "0"] = t.split(":");
+  const h = Number(hours);
+  const m = Number(minutes);
   const ap = h >= 12 ? "pm" : "am";
   return `${((h + 11) % 12) + 1}${m ? ":" + String(m).padStart(2, "0") : ""}${ap}`;
 }
