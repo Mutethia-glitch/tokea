@@ -1,7 +1,16 @@
 # Tokea
 
-Mobile-first social discovery prototype. Approved UX design sourced from Lovable.
+Approved mobile-first social discovery web prototype for adults in Kenya, preserving the [original Lovable project design](https://lovable.dev/projects/20ff86c9-03b7-4e00-b80f-9560791ddbfb).
 
-This repository is a **frontend-only prototype**, not a production app. It uses demo data and browser storage, not real accounts, phone verification, GPS, messaging servers or age assurance.
+## Local development
 
-The original [Lovable project](https://lovable.dev/projects/20ff86c9-03b7-4e00-b80f-9560791ddbfb) is the visual reference. Production architecture decisions remain separate.
+```bash
+npm install
+npm run dev
+```
+
+`npm run build` verifies the app; `npm test` runs available tests. The project is an interactive frontend-only demo with seeded sessions and local browser storage — no production accounts, real OTP/age verification, GPS, real messaging service or database.
+
+Visual reference: original `src/styles.css` tokens and shared components, Instrument Sans / Instrument Serif, 448px mobile shell, 64px header/navigation, 20px content/card padding, 12px card spacing, 44px+ tap targets.
+
+Production architecture remains separately specified: Expo/React Native + Node.js + PostgreSQL/PostGIS, without Supabase. Kenyan privacy/alcohol law review is required before launch.
