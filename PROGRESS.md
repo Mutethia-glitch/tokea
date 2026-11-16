@@ -2,7 +2,7 @@
 
 **Project:** Tokea (formerly named Explore in early blueprint)  
 **Last updated:** 2026-11-17  
-**Current milestone:** M0 — approved UX prototype consolidated in GitHub  
+**Current milestone:** M0 — approved UX prototype consolidated in GitHub; continuous checks configured  
 **Repository:** https://github.com/Mutethia-glitch/tokea  
 **Design source:** https://lovable.dev/projects/20ff86c9-03b7-4e00-b80f-9560791ddbfb
 
@@ -23,7 +23,7 @@
 | Session chats | Prototype | Demo-only; access shown after approval, no real messages delivered |
 | Profile + appearance | Prototype | Profile edits, system/light/dark options, privacy/terms previews |
 | Safety | Preliminary | Block/report demo controls; no server-side enforcement |
-| React web build | **Not yet independently verified after integration** | Run install, router generation, build, tests and mobile UI checks |
+| React web build | **Checks configured; results pending** | GitHub Actions will run install, build, tests on pushes/PRs; no verified result recorded yet |
 | Production backend | Not started | No real API, database, OTP, maps, push notifications or admin |
 | Native iOS/Android | Not started | Expo/React Native planned later |
 | Kenya legal review | Required | Final age assurance, privacy policies, licensing/alcohol considerations |
@@ -46,6 +46,11 @@
 - Draft privacy and terms effective date: **November 16, 2026**; no public support email yet.
 
 ## Changelog
+
+### 2026-11-17 — Repository quality checks
+- Added a GitHub Actions workflow to run a Node.js install, production build and tests on pushes and pull requests.
+- Added contributor/agent instructions requiring PROGRESS.md updates for major changes.
+- Verification remains outstanding until checks actually run successfully; this is a setup milestone, not a production release.
 
 ### 2026-11-17 — Initial GitHub consolidation
 - Created the GitHub repository foundation, using original Lovable source files and design tokens.
