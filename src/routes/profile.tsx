@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useRef, useState, type ChangeEvent } from "react";
 import { toast } from "sonner";
-import { UserRound, ChevronRight } from "lucide-react";
+import { UserRound, ChevronRight, Camera, Trash2 } from "lucide-react";
 import { useDemo, ME, type Theme } from "@/lib/demo-store";
 import { Avatar, PageHeader, SessionCard, Empty } from "@/components/tokea/bits";
 import { Button } from "@/components/ui/button";
@@ -15,28 +15,96 @@ export const Route = createFileRoute("/profile")({
   component: Profile,
 });
 
+/** Photos are resized, cropped and stored in browser state only. No upload service is used. */
+async function prepareProfilePhoto(file: File): Promise<string> {
+  if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+    throw new Error("Choose a JPG, PNG or WebP image.");
+  }
+  if (file.size > 5 * 1024 * 1024) throw new Error("Choose an image smaller than 5 MB.");
+  const url = URL.createObjectURL(file);
+  try {
+    const image = new Image();
+    image.src = url;
+    await image.decode();
+    if (!image.naturalWidth || !image.naturalHeight) throw new Error("Unable to read this picture.");
+    const canvas = document.createElement("canvas");
+    const side = 320;
+    canvas.width = side;
+    canvas.height = side;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) throw new Error("Your browser can't process this picture.");
+    const crop = Math.min(image.naturalWidth, image.naturalHeight);
+    const sx = (image.naturalWidth - crop) / 2;
+    const sy = (image.naturalHeight - crop) / 2;
+    ctx.drawImage(image, sx, sy, crop, crop, 0, 0, side, side);
+    const resized = canvas.toDataURL("image/jpeg", 0.78);
+    if (!resized.startsWith("data:image/jpeg;base64,") || resized.length > 500_000) {
+      throw new Error("This photo is too large to save on this device.");
+    }
+    return resized;
+  } finally {
+    URL.revokeObjectURL(url);
+  }
+}
+
 function Profile() {
-  const { state, setProfile, setTheme, unblock, reset } = useDemo();
+  const { state, setProfile, setPhoto, setTheme, unblock, reset } = useDemo();
+  const photoInput = useRef<HTMLInputElement>(null);
+  const [photoBusy, setPhotoBusy] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [name, setName] = useState(state.profile.name);
   const [bio, setBio] = useState(state.profile.bio);
   const [sheet, setSheet] = useState<"privacy" | "terms" | "blocked" | null>(null);
   const mySessions = state.sessions.filter((s) => s.hostId === ME);
+  async function onPhotoSelected(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.currentTarget.files?.[0];
+    event.currentTarget.value = "";
+    if (!file) return;
+    setPhotoBusy(true);
+    try {
+      const photo = await prepareProfilePhoto(file);
+      setPhoto(photo);
+      toast.success("Profile picture updated (on this device)");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Unable to use this photo.");
+    } finally {
+      setPhotoBusy(false);
+    }
+  }
   return (
     <div>
       <PageHeader title="Profile" />
       <div className="space-y-6 p-5">
         <section className="rounded-3xl border border-border bg-card p-5">
           <div className="flex items-center gap-3">
-            <Avatar person={state.people[ME]} size={64} />
+            <Avatar person={state.people[ME]} size={72} />
             <div className="min-w-0 flex-1">
               <h2 className="text-xl font-semibold">{state.profile.name}</h2>
               <p className="text-sm text-muted-foreground">{state.neighbourhood} · Demo profile</p>
               <p className="text-xs text-muted-foreground">Identity and age not verified</p>
             </div>
           </div>
+          <div className="mt-4 flex flex-wrap items-center gap-2">
+            <input
+              ref={photoInput}
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              aria-label="Upload profile picture"
+              className="sr-only"
+              onChange={onPhotoSelected}
+            />
+            <Button variant="outline" disabled={photoBusy} onClick={() => photoInput.current?.click()}>
+              <Camera className="size-4" /> {photoBusy ? "Processing…" : state.profile.photo ? "Change photo" : "Add photo"}
+            </Button>
+            {state.profile.photo && (
+              <Button variant="ghost" onClick={() => { setPhoto(undefined); toast("Profile picture removed"); }}>
+                <Trash2 className="size-4" /> Remove
+              </Button>
+            )}
+            <Button variant="outline" onClick={() => { setName(state.profile.name); setBio(state.profile.bio); setEditOpen(true); }}>Edit profile</Button>
+          </div>
+          <p className="mt-2 text-xs leading-relaxed text-muted-foreground">JPG, PNG or WebP · 5 MB max. Your photo stays in this browser for the demo; it is never uploaded.</p>
           <p className="mt-4 text-sm">{state.profile.bio || "No bio yet."}</p>
-          <Button variant="outline" className="mt-4" onClick={() => { setName(state.profile.name); setBio(state.profile.bio); setEditOpen(true); }}>Edit profile</Button>
         </section>
         <section>
           <h3 className="mb-3 text-sm font-medium">My sessions ({mySessions.length})</h3>

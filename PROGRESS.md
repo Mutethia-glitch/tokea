@@ -2,7 +2,7 @@
 
 **Project:** Tokea (formerly named Explore in early blueprint)  
 **Last updated:** 2026-11-17  
-**Current milestone:** M1 — React frontend tested in CI and Chromium; visual polish scheduled  
+**Current milestone:** M2 — Discover card design, automatic drink banners and local profile photo (verification pending)  
 **Repository:** https://github.com/Mutethia-glitch/tokea  
 **Design source:** https://lovable.dev/projects/20ff86c9-03b7-4e00-b80f-9560791ddbfb
 
@@ -16,12 +16,12 @@
 | --- | --- | --- |
 | Blueprint and scope | Reviewed | Adults-only Kenya social discovery; no dating, alcohol commerce, payments, or AI matching |
 | Visual design | Approved | Preserve original Lovable tokens, fonts, 448px mobile canvas, 64px nav/header, 20px card padding, 12px card gap |
-| Discover + filters | Prototype | Seeded demo data and manual neighbourhood selection |
+| Discover + filters | Visual update in review | Original Lovable theme retained; 16px uniform card gaps, improved metadata layout and category backgrounds to be verified in CI |
 | Onboarding + profile | Prototype | Demo-only self declaration and mock OTP; no actual verification |
 | Host/create session | Prototype | Client-side creation/edit/pause/end |
 | Join requests | Prototype | Local simulated acceptance/decline and capacity checks |
 | Session chats | Prototype | Demo-only; access shown after approval, no real messages delivered |
-| Profile + appearance | Prototype | Profile edits, system/light/dark options, privacy/terms previews |
+| Profile + appearance | Prototype | Profile edits, local profile-photo picker, system/light/dark options, privacy/terms previews; photo upload UI pending E2E verification |
 | Safety | Preliminary | Block/report demo controls; no server-side enforcement |
 | React web build | **Verified in CI** | Bun install, TypeScript, Vite/Nitro production build and 16 Vitest tests passed in GitHub Actions run #8 (2026-11-17) |
 | Hosted web demo | **Vercel deployment READY** | https://tokea-demo.vercel.app · SSO protection enabled · browser routes not yet independently smoke-tested |
@@ -34,7 +34,7 @@
 - [x] Verify Bun dependency install, TypeScript check, production build and automated tests in CI (16/16 tests passed).
 - [x] Verify TanStack Router routes (`/requests`, `/chats`, `/chats/$id`, `/profile`) with smoke tests.
 - [x] Perform Chromium E2E checks for onboarding, navigation, chat, profile and hosting; passed on 2026-11-17 (CI run #14).
-- [ ] Polish Discover cards for consistent gaps, metadata wrapping, fixed navigation overlap, and responsive category banners.
+- [ ] Verify Discover cards have consistent 16px gaps, uncluttered metadata, no overlapping Host button, and responsive drink-specific artwork (code added; CI pending).
 - [x] Publish a limited-scope hosted web demo through Vercel; deployment reached READY state (original merged commit `bbf0a6e`).
 - [x] Chromium successfully checked the integrated React app at 320, 390, 448 and 768px without page-level horizontal overflow.
 - [ ] Check the protected Vercel domain directly in a browser; CI E2E verified a local dev server, not the deployed URL.
@@ -51,6 +51,16 @@
 - Draft privacy and terms effective date: **November 16, 2026**; no public support email yet.
 
 ## Changelog
+
+### 2026-11-17 — M2 Discover cards and profile photos (verification pending)
+- Restyled Discover cards with consistent 16px grid gaps, 20px card content padding, aligned lower metadata, minimum card content height and cleaner action links.
+- Added six automatic lightweight gradient-and-icon category banners: Beer, Wine, Cocktails, Coffee, Soft drinks and Tea. Banner appearance derives from the host's chosen category and updates on edit.
+- Removed the floating Host CTA that overlapped session content in the mobile screenshot; retained the action inline at the top of Discover.
+- Added profile-photo selection, image type/size validation, center-crop to 320px square, JPEG compression, browser-local persistence, change/remove controls and avatar rendering throughout the demo.
+- No backend, cloud image upload, or personal data transfer was added; production avatar storage/consent/deletion remain unresolved.
+- Extended Chromium E2E coverage for drink mapping, exactly 16px vertical card gaps, photo persistence, custom hosted session category and narrow viewport behavior.
+- **Pending:** build, typecheck, tests, browser screenshot review and final merge.
+
 
 ### 2026-11-17 — Browser smoke suite verified
 - CI run: https://github.com/Mutethia-glitch/tokea/actions/runs/43982458445

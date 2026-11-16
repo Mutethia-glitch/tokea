@@ -1,5 +1,5 @@
 import { Link, Outlet, useLocation } from "@tanstack/react-router";
-import { Compass, Inbox, MessageCircle, UserRound, Plus } from "lucide-react";
+import { Compass, Inbox, MessageCircle, UserRound } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useDemo, canChat, ME } from "@/lib/demo-store";
 import { Onboarding } from "./onboarding";
@@ -31,12 +31,6 @@ export function AppShell() {
             <main className={cn("flex-1", !hideNav && "pb-24")}><Outlet /></main>
             {!hideNav && (
               <>
-                {pathname === "/" && (
-                  <Link to="/host" search={{ edit: undefined }} aria-label="Host a drink"
-                    className="fixed bottom-24 z-30 inline-flex h-14 items-center gap-2 rounded-full bg-brand px-5 font-medium text-brand-foreground shadow-lg shadow-brand/20 transition-transform hover:scale-[1.02] right-[max(1rem,calc(50vw-14rem+1rem))]">
-                    <Plus className="size-5" /> Host a drink
-                  </Link>
-                )}
                 <nav aria-label="Main" className="fixed bottom-0 z-30 grid w-full max-w-md grid-cols-4 border-t border-border bg-background/95 pb-[env(safe-area-inset-bottom)] backdrop-blur">
                   {tabs.map(({ to, label, icon: Icon }) => {
                     const active = to === "/" ? pathname === "/" || pathname.startsWith("/session") : pathname.startsWith(to);
