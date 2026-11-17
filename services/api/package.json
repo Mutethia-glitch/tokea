@@ -1,0 +1,27 @@
+{
+  "name": "@tokea/api",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --config ./vitest.config.mts",
+    "start": "node dist/server.js"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "jose": "^6.1.0",
+    "pg": "^8.16.3",
+    "zod": "^4.1.9"
+  },
+  "devDependencies": {
+    "@types/node": "^22.16.5",
+    "@types/pg": "^8.15.5",
+    "tsx": "^4.20.5",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.10"
+  }
+}

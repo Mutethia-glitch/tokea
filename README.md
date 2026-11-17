@@ -1,5 +1,15 @@
 # Tokea
 
+## Final product: native mobile app
+
+**Tokea is an iOS and Android application, not a website.** The original Lovable/TanStack web app in `src/` is a **design reference and archived frontend prototype** only. Active production development happens in:
+
+- [`apps/mobile/`](apps/mobile/) — Expo/React Native app with native notification support
+- [`services/api/`](services/api/) — standalone Node.js/TypeScript API and PostgreSQL migration
+
+Invitation accepted/declined events must create a durable in-app inbox item, and queue a native phone push for registered/opted-in devices. Production requires external OTP/age assurance, a trusted JWT issuer, deployment, FCM/APNs credentials and a real native build. See individual READMEs.
+
+
 **Hosted demo:** https://tokea-demo.vercel.app (Vercel sign-in may be required; prototype only, not production). The demo deploys from the GitHub `main` branch.
 
 Approved mobile-first social discovery web prototype for adults in Kenya, preserving the [original Lovable project design](https://lovable.dev/projects/20ff86c9-03b7-4e00-b80f-9560791ddbfb).

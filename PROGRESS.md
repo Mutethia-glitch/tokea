@@ -2,7 +2,7 @@
 
 **Project:** Tokea (formerly named Explore in early blueprint)  
 **Last updated:** 2026-11-17  
-**Current milestone:** M3 — Expanded Kenyan and international drink catalogue verified in CI/Chromium  
+**Current milestone:** M4 — native Expo and PostgreSQL notification API foundation verified in CI (not deployed)  
 **Repository:** https://github.com/Mutethia-glitch/tokea  
 **Design source:** https://lovable.dev/projects/20ff86c9-03b7-4e00-b80f-9560791ddbfb
 
@@ -25,8 +25,9 @@
 | Safety | Preliminary | Block/report demo controls; no server-side enforcement |
 | React web build | **Verified in CI** | Bun install, TypeScript, Vite/Nitro production build and 16 Vitest tests passed in GitHub Actions run #8 (2026-11-17) |
 | Hosted web demo | **Vercel deployment READY** | https://tokea-demo.vercel.app · SSO protection enabled · browser routes not yet independently smoke-tested |
-| Production backend | Not started | No real API, database, OTP, maps, push notifications or admin |
-| Native iOS/Android | Not started | Expo/React Native planned later |
+| Production backend | **M4 source verified in CI** | Node 22/TypeScript API, PostgreSQL migration, host-only transactional decisions, in-app notifications and device push queue. 8 API tests pass (including PostgreSQL integration); not deployed |
+| Native push notifications | **M4 code verified, delivery unverified** | Explicit opt-in and Expo token registration, in-app inbox and native notification tap handling; push needs EAS ID, APNs/FCM credentials, real authentication and device testing |
+| Native iOS/Android | **Typecheck + Android JS export passed** | Expo SDK 58 / React Native 0.88 / Expo Router shell in `apps/mobile`; not an installed native build or complete feature UI |
 | Kenya legal review | Required | Final age assurance, privacy policies, licensing/alcohol considerations |
 
 ## Immediate next steps
@@ -40,7 +41,11 @@
 - [ ] Check the protected Vercel domain directly in a browser; CI E2E verified a local dev server, not the deployed URL.
 - [ ] Decide photo storage, consent/moderation and deletion for production accounts; demo photos remain on the user's browser only.
 - [x] Add regression tests for capacity, approval restrictions, blocking and private chat access.
-- [ ] Approve production requirements and infrastructure choices before adding backend services.
+- [ ] Confirm hosting/managed PostgreSQL provider, production URLs, OTP/age assurance vendor and EAS project/Apple/Google developer accounts before deployment.
+- [ ] Provision and migrate a private PostgreSQL database; deploy the independent API with a trusted JWT issuer.
+- [ ] Complete native account authentication, live sessions, invitations and private messaging screens; current native shell is only a starting point.
+- [ ] Configure FCM/APNs credentials, build/install Tokea on Android and iOS devices, and verify accepted/declined requests generate OS + in-app notifications.
+- [ ] Implement push receipt checks, delivery monitoring, preferences, user blocking, moderation and safe sign-out/device revocation.
 
 ## Important architectural decisions
 
@@ -52,6 +57,30 @@
 - Draft privacy and terms effective date: **November 16, 2026**; no public support email yet.
 
 ## Changelog
+
+### 2026-11-17 — M4 foundation checks verified (still not production-ready)
+- CI: https://github.com/Mutethia-glitch/tokea/actions/runs/43990223625
+- All 3 GitHub Actions jobs **PASSED**: legacy web build/Chromium, Expo native TypeScript + Android JS bundling, and API TypeScript/compile/tests.
+- API: **8 tests passed**, including an isolated PostgreSQL 17 integration test that simultaneously approves two competing applicants for one remaining seat, confirms one acceptance only, verifies accepted/declined inbox entries and pending per-device push jobs, and tests read state.
+- Native: code compiles and exports an Android JavaScript bundle; **not** a signed or installed Android/iOS app, not a verified notification bar delivery.
+- Adjusted native opt-in logic to verify EAS project ID, secure API URL and signed-in account **before** requesting OS notification permission; added gitignore rules for credentials and generated native artifacts.
+- Added notification-event design checklist to `docs/notifications.md`, with additional triggers beyond invitation decisions identified as future work.
+- Remaining production blockers: real OTP and age assurance, external JWT issuer/credentials, managed database and API deployment, mobile session/login UX, Expo/EAS project ownership and FCM/APNs credentials, real device push receipts, monitoring/rate limits.
+
+
+### 2026-11-17 — M4 Native mobile and notification API foundation (unverified)
+- Reaffirmed native **Expo iOS/Android app** as the product target; Lovable web preview is visual reference/legacy prototype only, not the user-facing product.
+- Added `apps/mobile` with native navigation, notification inbox, permission-on-opt-in, Expo token registration, native notification handlers, secure token storage helpers and notification tap routing.
+- Added `services/api` independent Node.js/TypeScript API with PostgreSQL schema for users, sessions, join requests, blocks, notifications, opted-in device tokens and retryable per-device push deliveries.
+- Server decision flow uses a session row lock to enforce capacity and host-only acceptance/decline, writing a durable inbox notice and push-delivery rows in the same transaction.
+- Real JWT validation via trusted JWKS, issuer and audience; no mock auth bypass, and unverified adults cannot call protected endpoints.
+- Included API domain tests, isolated API build job and native TypeScript/Android bundling job.
+- First CI run: native SDK 58 dependencies installed, native TypeScript passed, and Expo Android JS bundle exported successfully. Web build + Chromium tests passed. API TypeScript/compile passed; API tests initially failed to start because Vitest loaded the root web config; fixed with an isolated test config.
+- Second CI run confirmed **native TypeScript, Expo Android JS bundle, API TypeScript, API compile and API rule tests all pass**.
+- Added PostgreSQL 17 service and real database integration tests for simultaneous approvals, capacity enforcement, durable in-app notifications, per-device push queue and read/unread state; rerun pending.
+- **Still pending:** API test rerun, live PostgreSQL migration/integration tests, external authentication, native device build and actual OS push notification delivery. Do not treat this as a feature-complete app.
+- Open decisions: EAS project ID, push credentials (FCM/APNs), identity/age provider, deployment environment, SMS provider and database vendor/region.
+
 
 ### 2026-11-17 — Onboarding and Profile copy cleanup (verification pending)
 - Removed the visible Profile note `JPG, PNG or WebP · 5 MB max. Your photo stays in this browser for the demo; it is never uploaded.`; the file validation, cropping, local demo-only persistence and error feedback remain unchanged.
