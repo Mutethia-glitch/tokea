@@ -36,3 +36,5 @@ Copy `.env.example` to a locally controlled secrets environment. API intentional
 ## Transaction integration test
 
 GitHub Actions starts an isolated PostgreSQL 17 container, applies `db/0001_initial.sql`, and exercises concurrent approvals. The test asserts that only one of two competing requests can fill the last seat, then verifies accepted/declined inbox messages, push-delivery queue records and read state. This is integration coverage **without** real Expo/APNs/FCM delivery.
+
+See [notification requirements](../../docs/notifications.md) for the full event matrix and production delivery checklist.

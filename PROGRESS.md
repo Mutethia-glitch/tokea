@@ -2,7 +2,7 @@
 
 **Project:** Tokea (formerly named Explore in early blueprint)  
 **Last updated:** 2026-11-17  
-**Current milestone:** M4 — native Expo + PostgreSQL API notification foundation (source added, validation pending)  
+**Current milestone:** M4 — native Expo and PostgreSQL notification API foundation verified in CI (not deployed)  
 **Repository:** https://github.com/Mutethia-glitch/tokea  
 **Design source:** https://lovable.dev/projects/20ff86c9-03b7-4e00-b80f-9560791ddbfb
 
@@ -25,9 +25,9 @@
 | Safety | Preliminary | Block/report demo controls; no server-side enforcement |
 | React web build | **Verified in CI** | Bun install, TypeScript, Vite/Nitro production build and 16 Vitest tests passed in GitHub Actions run #8 (2026-11-17) |
 | Hosted web demo | **Vercel deployment READY** | https://tokea-demo.vercel.app · SSO protection enabled · browser routes not yet independently smoke-tested |
-| Production backend | **M4 scaffold in review** | Independent Node 22 TypeScript API, PostgreSQL migration and transactional invitation decisions with persistent in-app notification records and per-device push delivery queue; not deployed |
-| Native push notifications | **M4 scaffold in review** | iOS/Android app registration on explicit opt-in, OS notification handler, inbox screen and notification-tap routing; physical device delivery not yet tested |
-| Native iOS/Android | **Source foundation created** | Expo SDK 58 / React Native 0.88 / Expo Router shell in `apps/mobile`, web UI remains visual reference, not the final product |
+| Production backend | **M4 source verified in CI** | Node 22/TypeScript API, PostgreSQL migration, host-only transactional decisions, in-app notifications and device push queue. 8 API tests pass (including PostgreSQL integration); not deployed |
+| Native push notifications | **M4 code verified, delivery unverified** | Explicit opt-in and Expo token registration, in-app inbox and native notification tap handling; push needs EAS ID, APNs/FCM credentials, real authentication and device testing |
+| Native iOS/Android | **Typecheck + Android JS export passed** | Expo SDK 58 / React Native 0.88 / Expo Router shell in `apps/mobile`; not an installed native build or complete feature UI |
 | Kenya legal review | Required | Final age assurance, privacy policies, licensing/alcohol considerations |
 
 ## Immediate next steps
@@ -57,6 +57,15 @@
 - Draft privacy and terms effective date: **November 16, 2026**; no public support email yet.
 
 ## Changelog
+
+### 2026-11-17 — M4 foundation checks verified (still not production-ready)
+- CI: https://github.com/Mutethia-glitch/tokea/actions/runs/43990223625
+- All 3 GitHub Actions jobs **PASSED**: legacy web build/Chromium, Expo native TypeScript + Android JS bundling, and API TypeScript/compile/tests.
+- API: **8 tests passed**, including an isolated PostgreSQL 17 integration test that simultaneously approves two competing applicants for one remaining seat, confirms one acceptance only, verifies accepted/declined inbox entries and pending per-device push jobs, and tests read state.
+- Native: code compiles and exports an Android JavaScript bundle; **not** a signed or installed Android/iOS app, not a verified notification bar delivery.
+- Added notification-event design checklist to `docs/notifications.md`, with additional triggers beyond invitation decisions identified as future work.
+- Remaining production blockers: real OTP and age assurance, external JWT issuer/credentials, managed database and API deployment, mobile session/login UX, Expo/EAS project ownership and FCM/APNs credentials, real device push receipts, monitoring/rate limits.
+
 
 ### 2026-11-17 — M4 Native mobile and notification API foundation (unverified)
 - Reaffirmed native **Expo iOS/Android app** as the product target; Lovable web preview is visual reference/legacy prototype only, not the user-facing product.

@@ -25,3 +25,5 @@ The backend stores all accepted/declined invitation events in an in-app notifica
 **Current status:** native shell, notification registration and inbox flows are a source-code foundation only. Real identity, device build, API deployment, physical push delivery, receipts, and complete session screens are NOT finished or verified.
 
 Always update the repository's `PROGRESS.md` with major milestones.
+
+See [notification requirements](../../docs/notifications.md) for planned alerts, platform testing and user preferences.
