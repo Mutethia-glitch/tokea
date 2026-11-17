@@ -103,7 +103,6 @@ function Profile() {
             )}
             <Button variant="outline" onClick={() => { setName(state.profile.name); setBio(state.profile.bio); setEditOpen(true); }}>Edit profile</Button>
           </div>
-          <p className="mt-2 text-xs leading-relaxed text-muted-foreground">JPG, PNG or WebP · 5 MB max. Your photo stays in this browser for the demo; it is never uploaded.</p>
           <p className="mt-4 text-sm">{state.profile.bio || "No bio yet."}</p>
         </section>
         <section>

@@ -31,7 +31,6 @@ export function Onboarding() {
           <p className="mt-4 text-muted-foreground">See who's out for a casual drink nearby, ask to join, and meet somewhere public.</p>
           <div className="mt-8 rounded-2xl border border-border bg-card p-4 text-sm">
             <p className="font-medium">For adults 18+ only</p>
-            <p className="mt-1 text-muted-foreground">This is a UX prototype with sample data. Nothing is sent anywhere, and nobody's age, phone or identity is verified.</p>
           </div>
           <div className="mt-8 space-y-3">
             <Button variant="brand" size="lg" className="w-full" onClick={() => setStep(1)}>Get started <ArrowRight /></Button>

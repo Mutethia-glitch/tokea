@@ -40,6 +40,10 @@ try {
   // The intro uses a multi-line serif heading, so use the stable intro button instead.
   await page.getByRole("button", { name: "Skip sign-in — Enter demo" }).waitFor({ timeout: 15000 });
 }
+assert.equal(await page.getByText("For adults 18+ only", { exact: true }).count(), 1,
+  "Adult-only statement must remain on the intro");
+assert.equal(await page.getByText("This is a UX prototype with sample data.", { exact: false }).count(), 0,
+  "Removed prototype paragraph must not appear on the intro");
 try {
   await page.getByRole("button", { name: "Skip sign-in — Enter demo" }).click();
   await page.getByRole("heading", { name: "A little about you" }).waitFor();
@@ -101,6 +105,8 @@ try {
   await page.getByRole("textbox", { name: "First name" }).fill("Taylor");
   await page.getByRole("button", { name: "Save changes" }).click();
   await page.getByRole("heading", { name: "Taylor" }).waitFor();
+  assert.equal(await page.getByText("Your photo stays in this browser", { exact: false }).count(), 0,
+    "Removed photo-help paragraph must not appear on Profile");
   // Use a genuine screenshot PNG as a fixture; photo processing should center-crop,
   // compress, and persist it in local browser state without a network upload.
   const testImage = await page.screenshot();
