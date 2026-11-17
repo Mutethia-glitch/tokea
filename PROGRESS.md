@@ -65,7 +65,8 @@
 - Server decision flow uses a session row lock to enforce capacity and host-only acceptance/decline, writing a durable inbox notice and push-delivery rows in the same transaction.
 - Real JWT validation via trusted JWKS, issuer and audience; no mock auth bypass, and unverified adults cannot call protected endpoints.
 - Included API domain tests, isolated API build job and native TypeScript/Android bundling job.
-- **Verification pending:** API CI, native CI/SDK dependency compatibility, live PostgreSQL migration, external authentication, native device build and actual OS push notification delivery. Do not treat this as a feature-complete app.
+- First CI run: native SDK 58 dependencies installed, native TypeScript passed, and Expo Android JS bundle exported successfully. Web build + Chromium tests also passed. API TypeScript/compile passed; API tests failed to start because Vitest accidentally loaded the root web config. Added an isolated API Vitest config and rerunning.
+- **Still pending:** API test rerun, live PostgreSQL migration/integration tests, external authentication, native device build and actual OS push notification delivery. Do not treat this as a feature-complete app.
 - Open decisions: EAS project ID, push credentials (FCM/APNs), identity/age provider, deployment environment, SMS provider and database vendor/region.
 
 
