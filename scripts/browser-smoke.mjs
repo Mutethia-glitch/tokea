@@ -72,6 +72,20 @@ try {
   }
   assert.ok(new Set(cardLayout.map((card) => card.category)).size >= 4,
     "Distinct categories should produce category-specific banners");
+  assert.ok(cardLayout.some((card) => card.category === "Muratina"),
+    "Fresh demo data should include a Muratina session");
+  assert.ok(cardLayout.some((card) => card.category === "Whiskey"),
+    "Fresh demo data should include a Whiskey session");
+
+  await page.getByRole("button", { name: "Muratina", exact: true }).click();
+  const filtered = page.locator('[data-testid="discover-card-list"] [data-testid="session-card"]');
+  assert.ok(await filtered.count() >= 1, "The Muratina category filter must find seeded sessions");
+  assert.deepEqual(
+    await filtered.evaluateAll((items) => items.map((el) => el.getAttribute("data-category"))),
+    Array(await filtered.count()).fill("Muratina"),
+    "The Muratina filter must exclude other drink types"
+  );
+  await page.getByRole("button", { name: "Muratina", exact: true }).click();
 
   const tabs = [
     { path: "/requests", title: "Requests" },
@@ -120,6 +134,11 @@ try {
   await visit("/", "Who's out nearby?");
   await page.locator('a[aria-label="Host a drink"]').click();
   await page.getByRole("heading", { name: "Host a drink", exact: true }).waitFor();
+  const newChoices = ["Muratina", "Whiskey", "Vodka", "Gin", "Rum", "Tequila", "Brandy", "Spirits"];
+  for (const drink of newChoices) {
+    assert.equal(await page.getByRole("button", { name: drink, exact: true }).count(), 1,
+      `Missing hosting drink choice: ${drink}`);
+  }
   await page.getByRole("button", { name: "Coffee", exact: true }).click();
   await page.getByPlaceholder("e.g. Low-key after-work chat, happy to meet new people.").fill(
     "Easy morning coffee and conversations with new friends."

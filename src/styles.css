@@ -220,3 +220,44 @@
   background-image: radial-gradient(circle at 86% 8%, oklch(0.99 0.04 130), transparent 44%), linear-gradient(110deg, oklch(0.965 0.026 138), oklch(0.89 0.065 151));
 }
 
+
+/* Expanded Kenyan and international drink categories, using local CSS artwork. */
+.drink-banner[data-drink="Muratina"] {
+  color: oklch(0.35 0.065 95);
+  background-image: radial-gradient(circle at 85% 8%, oklch(0.975 0.075 90), transparent 44%), linear-gradient(110deg, oklch(0.974 0.04 92), oklch(0.905 0.085 90));
+}
+
+.drink-banner[data-drink="Whiskey"] {
+  color: oklch(0.37 0.075 55);
+  background-image: radial-gradient(circle at 85% 8%, oklch(0.995 0.075 63), transparent 44%), linear-gradient(110deg, oklch(0.97 0.03 66), oklch(0.89 0.075 55));
+}
+
+.drink-banner[data-drink="Vodka"] {
+  color: oklch(0.36 0.065 243);
+  background-image: radial-gradient(circle at 85% 8%, oklch(0.99 0.045 219), transparent 44%), linear-gradient(110deg, oklch(0.972 0.018 235), oklch(0.90 0.045 243));
+}
+
+.drink-banner[data-drink="Gin"] {
+  color: oklch(0.32 0.07 149);
+  background-image: radial-gradient(circle at 85% 8%, oklch(0.985 0.045 147), transparent 44%), linear-gradient(110deg, oklch(0.975 0.027 149), oklch(0.89 0.07 154));
+}
+
+.drink-banner[data-drink="Rum"] {
+  color: oklch(0.36 0.065 61);
+  background-image: radial-gradient(circle at 85% 8%, oklch(0.99 0.063 70), transparent 44%), linear-gradient(110deg, oklch(0.97 0.037 68), oklch(0.88 0.09 62));
+}
+
+.drink-banner[data-drink="Tequila"] {
+  color: oklch(0.33 0.07 181);
+  background-image: radial-gradient(circle at 85% 8%, oklch(0.985 0.057 170), transparent 44%), linear-gradient(110deg, oklch(0.967 0.034 174), oklch(0.895 0.076 178));
+}
+
+.drink-banner[data-drink="Brandy"] {
+  color: oklch(0.38 0.085 34);
+  background-image: radial-gradient(circle at 85% 8%, oklch(0.985 0.055 35), transparent 44%), linear-gradient(110deg, oklch(0.975 0.035 44), oklch(0.89 0.065 33));
+}
+
+.drink-banner[data-drink="Spirits"] {
+  color: oklch(0.35 0.072 282);
+  background-image: radial-gradient(circle at 85% 8%, oklch(0.985 0.052 292), transparent 44%), linear-gradient(110deg, oklch(0.967 0.028 287), oklch(0.897 0.069 285));
+}

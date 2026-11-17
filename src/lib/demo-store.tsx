@@ -1,7 +1,12 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 
 export const NEIGHBOURHOODS = ["Westlands", "Kilimani", "Kileleshwa", "Lavington", "Karen", "CBD", "Parklands", "Upper Hill"] as const;
-export const CATEGORIES = ["Beer", "Wine", "Cocktails", "Coffee", "Soft drinks", "Tea"] as const;
+/** Shared catalogue: keeping these lists central makes hosting, filters and banners agree. */
+export const ALCOHOLIC_CATEGORIES = [
+  "Beer", "Wine", "Cocktails", "Muratina", "Whiskey", "Vodka", "Gin", "Rum", "Tequila", "Brandy", "Spirits",
+] as const;
+export const NON_ALCOHOLIC_CATEGORIES = ["Coffee", "Soft drinks", "Tea"] as const;
+export const CATEGORIES = [...ALCOHOLIC_CATEGORIES, ...NON_ALCOHOLIC_CATEGORIES] as const;
 export type Category = (typeof CATEGORIES)[number];
 export type OpenTo = "individuals" | "groups" | "both";
 export type SessionStatus = "open" | "paused" | "ended";
@@ -48,6 +53,8 @@ export function makeSeed(): DemoState {
     { id: "s3", hostId: "otieno", vibe: "Quick coffee before heading home. Board games welcome.", category: "Coffee", mode: "solo", groupSize: 1, capacity: 1, openTo: "individuals", neighbourhood: "CBD", distanceKm: 4.8, start: "17:30", end: "19:00", status: "open" },
     { id: "s4", hostId: "njeri", vibe: "Slow cocktails at a garden venue. Two of us, room for a few more.", category: "Cocktails", mode: "group", groupSize: 2, capacity: 4, openTo: "both", neighbourhood: "Karen", distanceKm: 9.5, start: "16:00", end: "20:00", status: "open" },
     { id: "s5", hostId: "kiprono", vibe: "Not drinking alcohol tonight — mocktails and the late match.", category: "Soft drinks", mode: "solo", groupSize: 1, capacity: 3, openTo: "both", neighbourhood: "Kileleshwa", distanceKm: 0.8, start: "20:00", end: "23:00", status: "open" },
+    { id: "s6", hostId: "zawadi", vibe: "Discovering Nairobi traditions with a relaxed chat over Muratina at a public venue.", category: "Muratina", mode: "solo", groupSize: 1, capacity: 3, openTo: "both", neighbourhood: "Kileleshwa", distanceKm: 1.2, start: "18:30", end: "21:00", status: "open" },
+    { id: "s7", hostId: "achieng", vibe: "Whiskey tasting conversation at a public venue, slow pace and good company.", category: "Whiskey", mode: "group", groupSize: 2, capacity: 2, openTo: "individuals", neighbourhood: "Lavington", distanceKm: 3.7, start: "19:00", end: "21:30", status: "open" },
     { id: "mine", hostId: ME, vibe: "Quiet drink, new-ish to the area. Up for swapping neighbourhood tips.", category: "Beer", mode: "solo", groupSize: 1, capacity: 3, openTo: "both", neighbourhood: "Kileleshwa", distanceKm: 0, start: "18:30", end: "21:30", status: "open" },
   ];
   const requests: JoinRequest[] = [

@@ -2,7 +2,7 @@
 
 **Project:** Tokea (formerly named Explore in early blueprint)  
 **Last updated:** 2026-11-17  
-**Current milestone:** M2 — Discover card design, drink banners and local profile photos verified in CI/Chromium  
+**Current milestone:** M3 — Expanded Kenyan and international drink catalogue (verification pending)  
 **Repository:** https://github.com/Mutethia-glitch/tokea  
 **Design source:** https://lovable.dev/projects/20ff86c9-03b7-4e00-b80f-9560791ddbfb
 
@@ -16,7 +16,7 @@
 | --- | --- | --- |
 | Blueprint and scope | Reviewed | Adults-only Kenya social discovery; no dating, alcohol commerce, payments, or AI matching |
 | Visual design | Approved | Preserve original Lovable tokens, fonts, 448px mobile canvas, 64px nav/header, 20px card padding, 12px card gap |
-| Discover + filters | **M2 verified** | Approved Lovable tokens retained; 16px card gaps and consistent widths tested, mobile layout and six automatic category banners verified in Chromium |
+| Discover + filters | **M3 update pending CI** | Added Muratina, Whiskey, Vodka, Gin, Rum, Tequila, Brandy and Spirits, with automatic matching banners and grouped filters; prior M2 mobile spacing verified |
 | Onboarding + profile | Prototype | Demo-only self declaration and mock OTP; no actual verification |
 | Host/create session | Prototype | Client-side creation/edit/pause/end |
 | Join requests | Prototype | Local simulated acceptance/decline and capacity checks |
@@ -52,6 +52,16 @@
 - Draft privacy and terms effective date: **November 16, 2026**; no public support email yet.
 
 ## Changelog
+
+### 2026-11-17 — M3 Expanded drink options (verification pending)
+- Added 8 drink categories: **Muratina**, **Whiskey**, **Vodka**, **Gin**, **Rum**, **Tequila**, **Brandy**, and **Spirits**, retaining Beer, Wine, Cocktails, Coffee, Soft drinks and Tea (14 total).
+- Shared the catalogue between session hosting, quick filters and full Discover filters, grouped as alcoholic/non-alcoholic for easier selection.
+- Added light, locally rendered category-specific banner colors and matching icons for all new choices; no third-party artwork is loaded.
+- Added Muratina and Whiskey sample sessions in fresh demo data. Previously saved browser demos retain local state; resetting the demo restores updated samples.
+- Made the larger Discover filter sheet scrollable on small phones.
+- Added browser checks for Muratina/Whiskey samples, Muratina filtering, and all new host form choices, plus catalogue/banner unit tests.
+- **Pending:** CI typecheck, build, unit tests and browser smoke; don't merge until confirmed.
+
 
 ### 2026-11-17 — M2 Discover cards and profile photos (verification pending)
 - Restyled Discover cards with consistent 16px grid gaps, 20px card content padding, aligned lower metadata, minimum card content height and cleaner action links.

@@ -6,7 +6,7 @@ Approved mobile-first social discovery web prototype for adults in Kenya, preser
 
 ## Visual behavior
 
-Discover cards use a consistent 16px vertical grid gap and 20px internal padding. Each session automatically renders a subtle banner based on its drink category (Beer, Wine, Cocktails, Coffee, Soft drinks or Tea). The Host action is inline to avoid covering mobile content. Profile pictures are resized and persisted **only in the local browser** for this demo; no upload service is enabled.
+Discover cards use a consistent 16px vertical grid gap and 20px internal padding. Each session automatically renders a subtle banner based on its drink category. Supported drinks: Beer, Wine, Cocktails, **Muratina**, Whiskey, Vodka, Gin, Rum, Tequila, Brandy, Spirits, Coffee, Soft drinks and Tea. The Host action is inline to avoid covering mobile content. Profile pictures are resized and persisted **only in the local browser** for this demo; no upload service is enabled.
 
 ## Local development
 

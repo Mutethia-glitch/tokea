@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { CATEGORIES, NEIGHBOURHOODS, useDemo, type Category, type OpenTo } from "@/lib/demo-store";
+import { ALCOHOLIC_CATEGORIES, NON_ALCOHOLIC_CATEGORIES, NEIGHBOURHOODS, useDemo, type Category, type OpenTo } from "@/lib/demo-store";
 import { PageHeader } from "@/components/tokea/bits";
 import { cn } from "@/lib/utils";
 
@@ -54,7 +54,12 @@ function Host() {
       <div className="space-y-6 p-5">
         <section><p className="mb-2 text-sm font-medium">Going</p><div className="flex gap-2"><Opt on={mode === "solo"} onClick={() => setMode("solo")}>Just me</Opt><Opt on={mode === "group"} onClick={() => { setMode("group"); setGroupSize(Math.max(2, groupSize)); }}>With friends</Opt></div>
           {mode === "group" && <label className="mt-3 flex items-center justify-between text-sm">Group size now<Input type="number" min={2} max={10} value={groupSize} onChange={(e) => setGroupSize(+e.target.value)} className="h-11 w-20 rounded-xl" /></label>}</section>
-        <section><p className="mb-2 text-sm font-medium">Drink *</p><div className="flex flex-wrap gap-2">{CATEGORIES.map((c) => <Opt key={c} on={category === c} onClick={() => setCategory(c)}>{c}</Opt>)}</div>
+        <section>
+          <p className="mb-2 text-sm font-medium">Drink *</p>
+          <p className="mb-2 text-xs font-medium text-muted-foreground">Alcoholic</p>
+          <div className="flex flex-wrap gap-2">{ALCOHOLIC_CATEGORIES.map((c) => <Opt key={c} on={category === c} onClick={() => setCategory(c)}>{c}</Opt>)}</div>
+          <p className="mb-2 mt-4 text-xs font-medium text-muted-foreground">Non-alcoholic</p>
+          <div className="flex flex-wrap gap-2">{NON_ALCOHOLIC_CATEGORIES.map((c) => <Opt key={c} on={category === c} onClick={() => setCategory(c)}>{c}</Opt>)}</div>
           <Input placeholder="Specific drink (optional)" value={drink} onChange={(e) => setDrink(e.target.value)} className="mt-3 h-11 rounded-xl" /></section>
         <section><p className="mb-2 text-sm font-medium">Vibe *</p><Textarea maxLength={160} placeholder="e.g. Low-key after-work chat, happy to meet new people." value={vibe} onChange={(e) => setVibe(e.target.value)} /></section>
         <section className="flex items-center justify-between text-sm"><span className="font-medium">Seats to offer</span><Input type="number" min={1} max={10} value={capacity} onChange={(e) => setCapacity(+e.target.value)} className="h-11 w-20 rounded-xl" /></section>
