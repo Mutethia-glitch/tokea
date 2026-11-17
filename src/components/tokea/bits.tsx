@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { ChevronLeft, MapPin, Clock, Users, User, Beer, Wine, Martini, Coffee, CupSoda, Leaf } from "lucide-react";
+import { ChevronLeft, MapPin, Clock, Users, User, Beer, Wine, Martini, Coffee, CupSoda, Leaf, GlassWater } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { fmtTime, seatsLeft, useDemo, type Category, type Person, type Session } from "@/lib/demo-store";
 
@@ -38,6 +38,14 @@ export const DRINK_VISUALS: Record<Category, {
   Coffee: { icon: Coffee, label: "Coffee", detail: "Time to catch up" },
   "Soft drinks": { icon: CupSoda, label: "Soft drinks", detail: "Good company, your way" },
   Tea: { icon: Leaf, label: "Tea", detail: "Slow down together" },
+  Muratina: { icon: Leaf, label: "Muratina", detail: "Local traditions, good company" },
+  Whiskey: { icon: GlassWater, label: "Whiskey", detail: "Easy conversations" },
+  Vodka: { icon: GlassWater, label: "Vodka", detail: "Make new connections" },
+  Gin: { icon: Martini, label: "Gin", detail: "Meet for a chat" },
+  Rum: { icon: GlassWater, label: "Rum", detail: "Stay for the company" },
+  Tequila: { icon: Martini, label: "Tequila", detail: "Catch up together" },
+  Brandy: { icon: Wine, label: "Brandy", detail: "Slow conversations" },
+  Spirits: { icon: GlassWater, label: "Spirits", detail: "Your choice, your company" },
 };
 
 export function DrinkBanner({ category }: { category: Category }) {

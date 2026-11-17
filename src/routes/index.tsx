@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import { Bell, ChevronDown, SlidersHorizontal, SearchX, MapPin, ShieldCheck, Plus } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { CATEGORIES, NEIGHBOURHOODS, ago, useDemo } from "@/lib/demo-store";
+import { CATEGORIES, ALCOHOLIC_CATEGORIES, NON_ALCOHOLIC_CATEGORIES, NEIGHBOURHOODS, ago, useDemo } from "@/lib/demo-store";
 import { Logo, SessionCard, Empty, DemoTag } from "@/components/tokea/bits";
 import { cn } from "@/lib/utils";
 
@@ -115,7 +115,7 @@ function Discover() {
       </div>
 
       <Sheet open={filterOpen} onOpenChange={setFilterOpen}>
-        <SheetContent side="bottom" className="mx-auto max-w-md rounded-t-3xl">
+        <SheetContent side="bottom" className="mx-auto max-h-[90dvh] max-w-md overflow-y-auto rounded-t-3xl">
           <SheetHeader><SheetTitle>Filters</SheetTitle></SheetHeader>
           <div className="space-y-6 px-4 pb-6">
             <div>
@@ -132,7 +132,10 @@ function Discover() {
             </div>
             <div>
               <p className="mb-2 text-sm font-medium">Drink</p>
-              <div className="flex flex-wrap gap-2">{CATEGORIES.map((c) => <Chip key={c} active={f.cats.includes(c)} onClick={() => toggleCat(c)}>{c}</Chip>)}</div>
+              <p className="mb-2 text-xs font-medium text-muted-foreground">Alcoholic</p>
+              <div className="flex flex-wrap gap-2">{ALCOHOLIC_CATEGORIES.map((c) => <Chip key={c} active={f.cats.includes(c)} onClick={() => toggleCat(c)}>{c}</Chip>)}</div>
+              <p className="mb-2 mt-4 text-xs font-medium text-muted-foreground">Non-alcoholic</p>
+              <div className="flex flex-wrap gap-2">{NON_ALCOHOLIC_CATEGORIES.map((c) => <Chip key={c} active={f.cats.includes(c)} onClick={() => toggleCat(c)}>{c}</Chip>)}</div>
             </div>
             <div className="flex gap-2">
               <Button variant="outline" className="flex-1" onClick={() => setF(DEFAULT)}>Reset</Button>
