@@ -2,7 +2,7 @@
 
 **Project:** Tokea (formerly named Explore in early blueprint)  
 **Last updated:** 2026-11-17  
-**Current milestone:** M3 — Expanded Kenyan and international drink catalogue (verification pending)  
+**Current milestone:** M3 — Expanded Kenyan and international drink catalogue verified in CI/Chromium  
 **Repository:** https://github.com/Mutethia-glitch/tokea  
 **Design source:** https://lovable.dev/projects/20ff86c9-03b7-4e00-b80f-9560791ddbfb
 
@@ -16,7 +16,7 @@
 | --- | --- | --- |
 | Blueprint and scope | Reviewed | Adults-only Kenya social discovery; no dating, alcohol commerce, payments, or AI matching |
 | Visual design | Approved | Preserve original Lovable tokens, fonts, 448px mobile canvas, 64px nav/header, 20px card padding, 12px card gap |
-| Discover + filters | **M3 update pending CI** | Added Muratina, Whiskey, Vodka, Gin, Rum, Tequila, Brandy and Spirits, with automatic matching banners and grouped filters; prior M2 mobile spacing verified |
+| Discover + filters | **M3 verified** | 14 drink categories including Muratina and spirits; grouped hosting/filter controls, themed card banners and mobile browser checks passed |
 | Onboarding + profile | Prototype | Demo-only self declaration and mock OTP; no actual verification |
 | Host/create session | Prototype | Client-side creation/edit/pause/end |
 | Join requests | Prototype | Local simulated acceptance/decline and capacity checks |
@@ -60,7 +60,9 @@
 - Added Muratina and Whiskey sample sessions in fresh demo data. Previously saved browser demos retain local state; resetting the demo restores updated samples.
 - Made the larger Discover filter sheet scrollable on small phones.
 - Added browser checks for Muratina/Whiskey samples, Muratina filtering, and all new host form choices, plus catalogue/banner unit tests.
-- **Pending:** CI typecheck, build, unit tests and browser smoke; don't merge until confirmed.
+- **Verified:** GitHub Actions run https://github.com/Mutethia-glitch/tokea/actions/runs/43984920825 passed Bun install, strict TypeScript, production build, **20 Vitest tests across 3 files**, and Chromium browser smoke.
+- Browser smoke confirms new drink choices in Host, Muratina filtering and seeded Muratina/Whiskey banners; existing card spacing and 320/390/448/768px no-overflow checks remained green.
+- Change is only an extended frontend drink catalogue, not alcohol sales or a production backend.
 
 
 ### 2026-11-17 — M2 Discover cards and profile photos (verification pending)
