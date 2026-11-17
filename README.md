@@ -4,6 +4,10 @@
 
 Approved mobile-first social discovery web prototype for adults in Kenya, preserving the [original Lovable project design](https://lovable.dev/projects/20ff86c9-03b7-4e00-b80f-9560791ddbfb).
 
+## Visual behavior
+
+Discover cards use a consistent 16px vertical grid gap and 20px internal padding. Each session automatically renders a subtle banner based on its drink category (Beer, Wine, Cocktails, Coffee, Soft drinks or Tea). The Host action is inline to avoid covering mobile content. Profile pictures are resized and persisted **only in the local browser** for this demo; no upload service is enabled.
+
 ## Local development
 
 ```bash

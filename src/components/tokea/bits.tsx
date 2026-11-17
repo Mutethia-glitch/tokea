@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
-import { ChevronLeft, MapPin, Clock, Users, User } from "lucide-react";
+import { ChevronLeft, MapPin, Clock, Users, User, Beer, Wine, Martini, Coffee, CupSoda, Leaf } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { fmtTime, seatsLeft, useDemo, type Person, type Session } from "@/lib/demo-store";
+import { fmtTime, seatsLeft, useDemo, type Category, type Person, type Session } from "@/lib/demo-store";
 
 export function Logo({ className }: { className?: string }) {
   return (
@@ -20,12 +20,40 @@ export function Avatar({ person, size = 40, className }: { person?: Person | und
   const initials = person?.name.slice(0, 1) ?? "?";
   return (
     <span
-      className={cn("inline-flex shrink-0 items-center justify-center rounded-full border border-border font-medium text-foreground", className)}
+      className={cn("inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full border border-border font-medium text-foreground", className)}
       style={{ width: size, height: size, fontSize: size * 0.4, backgroundColor: `oklch(0.9 0.05 ${person?.hue ?? 0} / 0.55)` }}
       aria-hidden
     >
-      {initials}
+      {person?.photo ? <img src={person.photo} alt="" className="size-full object-cover" /> : initials}
     </span>
+  );
+}
+
+export const DRINK_VISUALS: Record<Category, {
+  icon: typeof Beer; label: string; detail: string;
+}> = {
+  Beer: { icon: Beer, label: "Beer", detail: "Easygoing evenings" },
+  Wine: { icon: Wine, label: "Wine", detail: "Good conversation" },
+  Cocktails: { icon: Martini, label: "Cocktails", detail: "A little something special" },
+  Coffee: { icon: Coffee, label: "Coffee", detail: "Time to catch up" },
+  "Soft drinks": { icon: CupSoda, label: "Soft drinks", detail: "Good company, your way" },
+  Tea: { icon: Leaf, label: "Tea", detail: "Slow down together" },
+};
+
+export function DrinkBanner({ category }: { category: Category }) {
+  const visual = DRINK_VISUALS[category];
+  const Icon = visual.icon;
+  return (
+    <div data-testid="drink-banner" data-drink={category} className="drink-banner relative isolate flex h-20 items-center justify-between overflow-hidden px-5" aria-label={`${category} themed banner`}>
+      <span className="pointer-events-none absolute -right-6 -top-16 size-40 rounded-full border border-current opacity-[0.10]" aria-hidden />
+      <span className="pointer-events-none absolute -right-2 -top-9 size-28 rounded-full border border-current opacity-[0.12]" aria-hidden />
+      <div className="relative z-10">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] opacity-65">Drinks & company</p>
+        <p className="mt-1 text-lg font-semibold leading-none">{visual.label}</p>
+        <p className="mt-1 text-xs opacity-75">{visual.detail}</p>
+      </div>
+      <Icon className="relative z-10 size-12 shrink-0 rotate-[-8deg] opacity-40" strokeWidth={1.25} aria-hidden />
+    </div>
   );
 }
 
@@ -57,10 +85,19 @@ export function SessionMeta({ session, compact }: { session: Session; compact?: 
   const { state } = useDemo();
   const left = seatsLeft(session, state.requests);
   return (
-    <div className={cn("flex flex-wrap gap-x-4 gap-y-1.5 text-sm text-muted-foreground", compact && "text-xs")}>
-      <span className="inline-flex items-center gap-1.5"><MapPin className="size-3.5" />{session.neighbourhood}{session.hostId !== "me" && <> · ~{session.distanceKm} km</>}</span>
-      <span className="inline-flex items-center gap-1.5"><Clock className="size-3.5" />{fmtTime(session.start)}–{fmtTime(session.end)}</span>
-      <span className="inline-flex items-center gap-1.5">{session.mode === "group" ? <Users className="size-3.5" /> : <User className="size-3.5" />}{session.mode === "group" ? `Group of ${session.groupSize}` : "Solo"} · {left} seat{left === 1 ? "" : "s"} left</span>
+    <div className={cn("flex min-w-0 flex-wrap gap-x-4 gap-y-2 text-sm leading-5 text-muted-foreground", compact && "text-xs")}>
+      <span className="inline-flex max-w-full min-w-0 items-start gap-1.5">
+        <MapPin className="mt-0.5 size-3.5 shrink-0" />
+        <span className="min-w-0 break-words">{session.neighbourhood}{session.hostId !== "me" && <> · ~{session.distanceKm} km</>}</span>
+      </span>
+      <span className="inline-flex max-w-full min-w-0 items-start gap-1.5">
+        <Clock className="mt-0.5 size-3.5 shrink-0" />
+        <span>{fmtTime(session.start)}–{fmtTime(session.end)}</span>
+      </span>
+      <span className="inline-flex max-w-full min-w-0 items-start gap-1.5">
+        {session.mode === "group" ? <Users className="mt-0.5 size-3.5 shrink-0" /> : <User className="mt-0.5 size-3.5 shrink-0" />}
+        <span>{session.mode === "group" ? `Group of ${session.groupSize}` : "Solo"} · {left} seat{left === 1 ? "" : "s"} left</span>
+      </span>
     </div>
   );
 }
@@ -73,22 +110,30 @@ export function SessionCard({ session }: { session: Session }) {
     <Link
       to="/session/$id"
       params={{ id: session.id }}
-      className="block rounded-3xl border border-border bg-card p-5 transition-colors hover:border-brand/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      data-testid="session-card"
+      data-category={session.category}
+      className="group block min-w-0 overflow-hidden rounded-3xl border border-border bg-card shadow-[0_2px_10px_oklch(0.3_0_0/0.025)] transition-[border-color,box-shadow] hover:border-brand/40 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
     >
-      <div className="flex items-start gap-3">
-        <Avatar person={host} size={44} />
-        <div className="min-w-0 flex-1">
-          <div className="flex items-center justify-between gap-2">
-            <p className="font-medium">{mine ? "Your session" : session.mode === "group" ? `${host?.name ?? "Someone"} & friends` : (host?.name ?? "Someone")}</p>
-            <div className="flex gap-1.5"><MyRequestPill sessionId={session.id} /><StatusPill session={session} /></div>
+      <DrinkBanner category={session.category} />
+      <div className="flex min-h-[224px] flex-col p-5">
+        <div className="flex min-w-0 items-start gap-3">
+          <Avatar person={host} size={44} />
+          <div className="min-w-0 flex-1">
+            <p className="font-semibold leading-5">{mine ? "Your session" : session.mode === "group" ? `${host?.name ?? "Someone"} & friends` : (host?.name ?? "Someone")}</p>
+            <div className="mt-1 flex flex-wrap items-center gap-1.5">
+              <p className="min-w-0 truncate text-xs text-muted-foreground">{session.category}{session.drink ? ` · ${session.drink}` : ""}</p>
+              <MyRequestPill sessionId={session.id} />
+            </div>
           </div>
-          <p className="text-sm text-muted-foreground">{session.category}{session.drink ? ` · ${session.drink}` : ""}</p>
+          <div className="shrink-0"><StatusPill session={session} /></div>
         </div>
-      </div>
-      <p className="mt-3 text-[15px] leading-relaxed">{session.vibe}</p>
-      <div className="mt-4 flex items-end justify-between gap-3">
-        <SessionMeta session={session} compact />
-        <span className="shrink-0 text-sm font-medium text-brand">{mine ? "Manage" : "Details"}</span>
+        <p className="mt-3 min-h-12 overflow-hidden text-[15px] leading-6 line-clamp-2">{session.vibe}</p>
+        <div className="mt-auto border-t border-border/70 pt-3">
+          <SessionMeta session={session} compact />
+          <div className="mt-3 flex justify-end">
+            <span className="text-sm font-semibold text-brand group-hover:underline">{mine ? "Manage session" : "View details"}</span>
+          </div>
+        </div>
       </div>
     </Link>
   );

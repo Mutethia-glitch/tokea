@@ -8,7 +8,7 @@ export type SessionStatus = "open" | "paused" | "ended";
 export type RequestStatus = "pending" | "accepted" | "declined" | "cancelled";
 export const ME = "me";
 
-export type Person = { id: string; name: string; neighbourhood: string; bio: string; hue: number };
+export type Person = { id: string; name: string; neighbourhood: string; bio: string; hue: number; photo?: string | undefined };
 export type Session = {
   id: string; hostId: string; vibe: string; category: Category; drink?: string | undefined;
   mode: "solo" | "group"; groupSize: number; capacity: number; openTo: OpenTo;
@@ -21,7 +21,7 @@ export type Theme = "system" | "light" | "dark";
 
 export type DemoState = {
   onboarded: boolean; neighbourhood: string; theme: Theme;
-  profile: { name: string; bio: string };
+  profile: { name: string; bio: string; photo?: string | undefined };
   people: Record<string, Person>; sessions: Session[]; requests: JoinRequest[];
   messages: Message[]; notices: Notice[]; blocked: string[]; reports: number;
 };
@@ -152,7 +152,16 @@ function useProvideStore() {
     onboard: (name: string, neighbourhood: string) => setState((s) => ({ ...s, onboarded: true, neighbourhood, profile: { ...s.profile, name: name || "Alex" }, people: { ...s.people, [ME]: { ...currentPerson(s), name: name || "Alex", neighbourhood } }, sessions: s.sessions.map((x) => (x.id === "mine" ? { ...x, neighbourhood } : x)) })),
     setNeighbourhood: (n: string) => setState((s) => ({ ...s, neighbourhood: n })),
     setTheme: (theme: Theme) => setState((s) => ({ ...s, theme })),
-    setProfile: (p: { name: string; bio: string }) => setState((s) => ({ ...s, profile: p, people: { ...s.people, [ME]: { ...currentPerson(s), name: p.name } } })),
+    setProfile: (p: { name: string; bio: string }) => setState((s) => ({
+      ...s,
+      profile: { ...s.profile, ...p },
+      people: { ...s.people, [ME]: { ...currentPerson(s), name: p.name, bio: p.bio } },
+    })),
+    setPhoto: (photo?: string) => setState((s) => ({
+      ...s,
+      profile: { ...s.profile, photo },
+      people: { ...s.people, [ME]: { ...currentPerson(s), photo } },
+    })),
     requestJoin: (sessionId: string, partySize: number, intro: string): string | null => {
       const err = joinError(state, sessionId, partySize);
       if (err) return err;

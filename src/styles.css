@@ -185,3 +185,38 @@
   scrollbar-width: none;
   &::-webkit-scrollbar { display: none; }
 }
+/*
+ * Drink-themed Discover banners. These are decorative CSS artwork rather than
+ * external image requests; a session's chosen category always determines its banner.
+ * Colors remain restrained so the original Lovable cards and typography lead.
+ */
+.drink-banner {
+  color: oklch(0.33 0.045 290);
+  background-color: oklch(0.95 0.025 290);
+  background-image: radial-gradient(circle at 88% 6%, oklch(0.98 0.065 295 / 0.9), transparent 45%), linear-gradient(115deg, oklch(0.965 0.025 290), oklch(0.91 0.065 295));
+}
+.drink-banner[data-drink="Beer"] {
+  color: oklch(0.36 0.06 72);
+  background-image: radial-gradient(circle at 84% 8%, oklch(0.99 0.065 85), transparent 44%), linear-gradient(110deg, oklch(0.975 0.032 85), oklch(0.91 0.105 77));
+}
+.drink-banner[data-drink="Wine"] {
+  color: oklch(0.37 0.1 350);
+  background-image: radial-gradient(circle at 83% 7%, oklch(0.99 0.04 345), transparent 44%), linear-gradient(110deg, oklch(0.975 0.024 345), oklch(0.91 0.075 350));
+}
+.drink-banner[data-drink="Cocktails"] {
+  color: oklch(0.36 0.095 307);
+  background-image: radial-gradient(circle at 85% 10%, oklch(0.97 0.055 322), transparent 44%), linear-gradient(110deg, oklch(0.96 0.035 297), oklch(0.89 0.085 320));
+}
+.drink-banner[data-drink="Coffee"] {
+  color: oklch(0.36 0.055 55);
+  background-image: radial-gradient(circle at 86% 10%, oklch(0.98 0.03 74), transparent 44%), linear-gradient(110deg, oklch(0.97 0.022 67), oklch(0.88 0.058 62));
+}
+.drink-banner[data-drink="Soft drinks"] {
+  color: oklch(0.32 0.075 193);
+  background-image: radial-gradient(circle at 86% 8%, oklch(0.99 0.037 182), transparent 44%), linear-gradient(110deg, oklch(0.965 0.025 194), oklch(0.89 0.075 190));
+}
+.drink-banner[data-drink="Tea"] {
+  color: oklch(0.34 0.07 147);
+  background-image: radial-gradient(circle at 86% 8%, oklch(0.99 0.04 130), transparent 44%), linear-gradient(110deg, oklch(0.965 0.026 138), oklch(0.89 0.065 151));
+}
+

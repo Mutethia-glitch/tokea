@@ -1,6 +1,6 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { Bell, ChevronDown, SlidersHorizontal, SearchX, MapPin, ShieldCheck } from "lucide-react";
+import { Bell, ChevronDown, SlidersHorizontal, SearchX, MapPin, ShieldCheck, Plus } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { CATEGORIES, NEIGHBOURHOODS, ago, useDemo } from "@/lib/demo-store";
@@ -49,7 +49,14 @@ function Discover() {
     .filter((s) => s.hostId === "me" || s.distanceKm <= f.maxKm)
     .filter((s) => f.mode === "all" || s.mode === f.mode)
     .filter((s) => f.cats.length === 0 || f.cats.includes(s.category))
-    .sort((a, b) => (a.hostId === "me" ? -1 : b.hostId === "me" ? 1 : a.distanceKm - b.distanceKm)),
+    .sort((a, b) => {
+      // A stable sort preserves newest-first insertion order for the user's own sessions.
+      const myA = a.hostId === "me";
+      const myB = b.hostId === "me";
+      if (myA !== myB) return myA ? -1 : 1;
+      if (myA && myB) return 0;
+      return a.distanceKm - b.distanceKm;
+    }),
   [state, f]);
 
   const active = f.hood !== "All" || f.maxKm !== 50 || f.mode !== "all" || f.cats.length > 0;
@@ -71,7 +78,14 @@ function Discover() {
       </header>
 
       <section className="px-5 pt-6">
-        <DemoTag />
+        <div className="flex items-center justify-between gap-3">
+          <DemoTag />
+          <Link to="/host" search={{ edit: undefined }}
+            aria-label="Host a drink"
+            className="inline-flex h-10 shrink-0 items-center justify-center gap-1.5 rounded-full bg-brand px-4 text-xs font-semibold text-brand-foreground transition-colors hover:bg-brand/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+            <Plus className="size-4" /> Host a drink
+          </Link>
+        </div>
         <h1 className="wordmark mt-3 text-4xl">Who's out nearby?</h1>
         <p className="mt-2 text-muted-foreground">People around Nairobi open to a casual drink. Ask to join — meet somewhere public.</p>
       </section>
@@ -87,15 +101,17 @@ function Discover() {
         {CATEGORIES.map((c) => <Chip key={c} active={f.cats.includes(c)} onClick={() => toggleCat(c)}>{c}</Chip>)}
       </div>
 
-      <div className="mt-4 space-y-3 px-4 pb-8">
-        <div className="flex h-8 items-center justify-between px-1 text-sm text-muted-foreground">
+      <div className="mt-5 px-5 pb-10">
+        <div className="mb-3 flex min-h-8 items-center justify-between gap-2 text-sm text-muted-foreground">
           <span>{list.length} session{list.length === 1 ? "" : "s"} · demo distances</span>
           {active && <button onClick={() => setF(DEFAULT)} className="h-8 font-medium text-brand">Reset</button>}
         </div>
-        {list.length === 0 ? (
-          <Empty icon={SearchX} title="No one matches right now" body="Try widening the distance or clearing a filter. You could also host your own." action={<Button variant="outline" onClick={() => setF(DEFAULT)}>Reset filters</Button>} />
-        ) : list.map((s) => <SessionCard key={s.id} session={s} />)}
-        <p className="flex items-start gap-2 px-1 pt-4 text-xs text-muted-foreground"><ShieldCheck className="mt-0.5 size-3.5 shrink-0" /> Adults 18+. Locations are approximate. Always meet in a public venue and leave whenever you like.</p>
+        <div data-testid="discover-card-list" className="grid grid-cols-1 gap-4">
+          {list.length === 0 ? (
+            <Empty icon={SearchX} title="No one matches right now" body="Try widening the distance or clearing a filter. You could also host your own." action={<Button variant="outline" onClick={() => setF(DEFAULT)}>Reset filters</Button>} />
+          ) : list.map((s) => <SessionCard key={s.id} session={s} />)}
+        </div>
+        <p className="mt-5 flex items-start gap-2 text-xs text-muted-foreground"><ShieldCheck className="mt-0.5 size-3.5 shrink-0" /> Adults 18+. Locations are approximate. Always meet in a public venue and leave whenever you like.</p>
       </div>
 
       <Sheet open={filterOpen} onOpenChange={setFilterOpen}>

@@ -50,6 +50,29 @@ try {
   await mkdir("artifacts", { recursive: true });
   await page.screenshot({ path: "artifacts/discover-mobile.png", fullPage: true });
 
+  const cards = page.locator('[data-testid="discover-card-list"] [data-testid="session-card"]');
+  assert.ok(await cards.count() >= 5, "Seeded Discover cards should be visible");
+  const cardLayout = await cards.evaluateAll((items) => items.map((el) => {
+    const rect = el.getBoundingClientRect();
+    const banner = el.querySelector('[data-testid="drink-banner"]');
+    return {
+      category: el.getAttribute("data-category"),
+      banner: banner?.getAttribute("data-drink"),
+      left: rect.left, width: rect.width, top: rect.top, bottom: rect.bottom,
+    };
+  }));
+  for (let i = 0; i < cardLayout.length; i++) {
+    assert.equal(cardLayout[i].banner, cardLayout[i].category, "Banner should match host-selected drink");
+    if (i > 0) {
+      assert.ok(Math.abs(cardLayout[i].top - cardLayout[i - 1].bottom - 16) <= 1,
+        "Every Discover card must have exactly 16px vertical spacing");
+      assert.ok(Math.abs(cardLayout[i].width - cardLayout[i - 1].width) <= 1,
+        "Every Discover card must have the same width");
+    }
+  }
+  assert.ok(new Set(cardLayout.map((card) => card.category)).size >= 4,
+    "Distinct categories should produce category-specific banners");
+
   const tabs = [
     { path: "/requests", title: "Requests" },
     { path: "/chats", title: "Chats" },
@@ -64,6 +87,21 @@ try {
   await page.getByRole("textbox", { name: "First name" }).fill("Taylor");
   await page.getByRole("button", { name: "Save changes" }).click();
   await page.getByRole("heading", { name: "Taylor" }).waitFor();
+  // Use a genuine screenshot PNG as a fixture; photo processing should center-crop,
+  // compress, and persist it in local browser state without a network upload.
+  const testImage = await page.screenshot();
+  await page.locator('input[aria-label="Upload profile picture"]').setInputFiles({
+    name: "sample-photo.png", mimeType: "image/png", buffer: Buffer.from(testImage),
+  });
+  await page.getByRole("button", { name: "Change photo" }).waitFor();
+  const photo = page.locator("section").first().locator("img");
+  await photo.waitFor();
+  assert.ok((await photo.getAttribute("src"))?.startsWith("data:image/jpeg;base64,"),
+    "Profile photo should be compressed and saved as a local JPEG");
+  await page.reload();
+  await page.getByRole("heading", { name: "Taylor" }).waitFor();
+  await page.locator("section").first().locator("img").waitFor();
+
 
   await visit("/chats", "Chats");
   await page.locator('a[href="/chats/s2"]').click();
@@ -88,9 +126,23 @@ try {
   );
   await page.getByRole("button", { name: "Publish session" }).click();
   await page.getByRole("heading", { name: "Your session", exact: true }).waitFor();
+  // Wait for the local-state write before a hard navigation; this mirrors
+  // a user returning to Discover after creating the new session.
+  await page.waitForFunction(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem("tokea-demo-v1") ?? "{}");
+      return saved.sessions?.some((s) => s.hostId === "me" && s.category === "Coffee");
+    } catch { return false; }
+  });
+  await visit("/", "Who's out nearby?");
+  const newest = page.locator('[data-testid="session-card"]').first();
+  assert.equal(await newest.getAttribute("data-category"), "Coffee");
+  assert.equal(await newest.locator('[data-testid="drink-banner"]').getAttribute("data-drink"), "Coffee");
+  await page.screenshot({ path: "artifacts/discover-with-drink-banners.png", fullPage: true });
+
 
   assert.deepEqual(pageErrors, [], `Unhandled client errors: ${pageErrors.join("; ")}`);
-  console.log("Browser smoke PASS: onboarding, tabs, chat, profile, hosting and 320/390/448/768px overflow checks.");
+  console.log("Browser smoke PASS: onboarding, tabs, chat, profile photo upload/persistence, hosting, category banners, 16px card gaps and 320/390/448/768px overflow checks.");
 } finally {
   await browser.close();
 }
