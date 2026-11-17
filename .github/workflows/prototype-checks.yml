@@ -42,3 +42,41 @@ jobs:
           path: artifacts/
           if-no-files-found: ignore
           retention-days: 7
+
+  api-foundation:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: services/api
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.3.5"
+      - name: Install API packages
+        run: bun install --no-save
+      - name: Typecheck API
+        run: bun run typecheck
+      - name: Compile API
+        run: bun run build
+      - name: Test API decision rules
+        run: bun run test
+
+  native-foundation:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: apps/mobile
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.3.5"
+      - name: Install Expo packages
+        run: bun install
+      - name: Typecheck native app
+        run: bun run typecheck
+      - name: Validate Expo Android JS bundle
+        run: bunx expo export --platform android --output-dir .expo-dist

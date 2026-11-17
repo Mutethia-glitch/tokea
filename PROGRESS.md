@@ -2,7 +2,7 @@
 
 **Project:** Tokea (formerly named Explore in early blueprint)  
 **Last updated:** 2026-11-17  
-**Current milestone:** M3 — Expanded Kenyan and international drink catalogue verified in CI/Chromium  
+**Current milestone:** M4 — native Expo + PostgreSQL API notification foundation (source added, validation pending)  
 **Repository:** https://github.com/Mutethia-glitch/tokea  
 **Design source:** https://lovable.dev/projects/20ff86c9-03b7-4e00-b80f-9560791ddbfb
 
@@ -25,8 +25,9 @@
 | Safety | Preliminary | Block/report demo controls; no server-side enforcement |
 | React web build | **Verified in CI** | Bun install, TypeScript, Vite/Nitro production build and 16 Vitest tests passed in GitHub Actions run #8 (2026-11-17) |
 | Hosted web demo | **Vercel deployment READY** | https://tokea-demo.vercel.app · SSO protection enabled · browser routes not yet independently smoke-tested |
-| Production backend | Not started | No real API, database, OTP, maps, push notifications or admin |
-| Native iOS/Android | Not started | Expo/React Native planned later |
+| Production backend | **M4 scaffold in review** | Independent Node 22 TypeScript API, PostgreSQL migration and transactional invitation decisions with persistent in-app notification records and per-device push delivery queue; not deployed |
+| Native push notifications | **M4 scaffold in review** | iOS/Android app registration on explicit opt-in, OS notification handler, inbox screen and notification-tap routing; physical device delivery not yet tested |
+| Native iOS/Android | **Source foundation created** | Expo SDK 58 / React Native 0.88 / Expo Router shell in `apps/mobile`, web UI remains visual reference, not the final product |
 | Kenya legal review | Required | Final age assurance, privacy policies, licensing/alcohol considerations |
 
 ## Immediate next steps
@@ -40,7 +41,11 @@
 - [ ] Check the protected Vercel domain directly in a browser; CI E2E verified a local dev server, not the deployed URL.
 - [ ] Decide photo storage, consent/moderation and deletion for production accounts; demo photos remain on the user's browser only.
 - [x] Add regression tests for capacity, approval restrictions, blocking and private chat access.
-- [ ] Approve production requirements and infrastructure choices before adding backend services.
+- [ ] Confirm hosting/managed PostgreSQL provider, production URLs, OTP/age assurance vendor and EAS project/Apple/Google developer accounts before deployment.
+- [ ] Provision and migrate a private PostgreSQL database; deploy the independent API with a trusted JWT issuer.
+- [ ] Complete native account authentication, live sessions, invitations and private messaging screens; current native shell is only a starting point.
+- [ ] Configure FCM/APNs credentials, build/install Tokea on Android and iOS devices, and verify accepted/declined requests generate OS + in-app notifications.
+- [ ] Implement push receipt checks, delivery monitoring, preferences, user blocking, moderation and safe sign-out/device revocation.
 
 ## Important architectural decisions
 
@@ -52,6 +57,17 @@
 - Draft privacy and terms effective date: **November 16, 2026**; no public support email yet.
 
 ## Changelog
+
+### 2026-11-17 — M4 Native mobile and notification API foundation (unverified)
+- Reaffirmed native **Expo iOS/Android app** as the product target; Lovable web preview is visual reference/legacy prototype only, not the user-facing product.
+- Added `apps/mobile` with native navigation, notification inbox, permission-on-opt-in, Expo token registration, native notification handlers, secure token storage helpers and notification tap routing.
+- Added `services/api` independent Node.js/TypeScript API with PostgreSQL schema for users, sessions, join requests, blocks, notifications, opted-in device tokens and retryable per-device push deliveries.
+- Server decision flow uses a session row lock to enforce capacity and host-only acceptance/decline, writing a durable inbox notice and push-delivery rows in the same transaction.
+- Real JWT validation via trusted JWKS, issuer and audience; no mock auth bypass, and unverified adults cannot call protected endpoints.
+- Included API domain tests, isolated API build job and native TypeScript/Android bundling job.
+- **Verification pending:** API CI, native CI/SDK dependency compatibility, live PostgreSQL migration, external authentication, native device build and actual OS push notification delivery. Do not treat this as a feature-complete app.
+- Open decisions: EAS project ID, push credentials (FCM/APNs), identity/age provider, deployment environment, SMS provider and database vendor/region.
+
 
 ### 2026-11-17 — Onboarding and Profile copy cleanup (verification pending)
 - Removed the visible Profile note `JPG, PNG or WebP · 5 MB max. Your photo stays in this browser for the demo; it is never uploaded.`; the file validation, cropping, local demo-only persistence and error feedback remain unchanged.

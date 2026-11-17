@@ -1,0 +1,27 @@
+# Tokea — native iOS & Android application
+
+This is the **native product**, distinct from the Lovable/Vercel web UX reference. Built with Expo SDK 58, React Native, Expo Router and `expo-notifications`.
+
+## Native app development
+
+```bash
+cd apps/mobile
+bun install
+bunx expo install --fix
+bun run typecheck
+bun run start
+```
+
+For genuine iOS/Android **push notifications**:
+1. Create/associate a real Expo EAS project ID in `app.json`.
+2. Configure Android FCM v1 and iOS APNs credentials using Expo/EAS.
+3. Create a **development build** and install it on a physical phone (or supported simulator/emulator). Expo Go cannot test remote pushes.
+4. Deploy `services/api` with HTTPS, a managed PostgreSQL database, real OTP identity/age-assurance, and EXPO_ACCESS_TOKEN.
+5. Configure EXPO_PUBLIC_API_URL (HTTPS) and sign in using a **real** verified server-issued JWT. There is no demo bypass.
+6. A user taps **Enable phone notifications** in the native Profile; the token is linked to their authenticated account.
+
+The backend stores all accepted/declined invitation events in an in-app notification inbox. If permission is granted and a device token is registered, it queues OS push delivery; a tap opens the app's Notifications screen.
+
+**Current status:** native shell, notification registration and inbox flows are a source-code foundation only. Real identity, device build, API deployment, physical push delivery, receipts, and complete session screens are NOT finished or verified.
+
+Always update the repository's `PROGRESS.md` with major milestones.

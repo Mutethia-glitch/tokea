@@ -1,10 +1,11 @@
 # Tokea contributor and coding-agent instructions
 
 ## Product and architecture
-- The current repository is a demo-only mobile-first web prototype using the original Lovable source.
+- The **final product is a native iOS/Android app**, not a responsive website or WebView. `apps/mobile` is the active Expo/React Native app; `services/api` is the independent Node.js + PostgreSQL API. The root web prototype is retained only as an approved visual design reference.
 - Preserve the approved clean Lovable design tokens, colors, Instrument fonts, shared components, mobile spacing and rounded card styles.
 - The production blueprint proposes a separate Expo/React Native application, Node.js API and PostgreSQL/PostGIS database; do **not** enable Supabase or production infrastructure in this demo.
-- Do not claim simulated OTP, chat, age checks, geolocation or moderation as real services.
+- Native notification requirement: accepted/declined requests must create persistent in-app inbox entries and opt-in device OS pushes. Never represent an enqueue as confirmed handset delivery; verify credentials, device builds, Expo tickets and receipts.
+- Do not claim simulated OTP, chat, age checks, geolocation, moderation or phone push as live services.
 
 ## Required progress tracking
 On **every major feature, UX change, architectural decision, meaningful bug fix, security/privacy change, deployment or milestone**:

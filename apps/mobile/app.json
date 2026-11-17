@@ -1,0 +1,33 @@
+{
+  "expo": {
+    "name": "Tokea",
+    "slug": "tokea",
+    "scheme": "tokea",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.tokea.social"
+    },
+    "android": {
+      "package": "com.tokea.social",
+      "edgeToEdgeEnabled": true
+    },
+    "plugins": [
+      [
+        "expo-notifications",
+        {
+          "color": "#7444D8",
+          "defaultChannel": "tokea_updates"
+        }
+      ],
+      "expo-secure-store"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "SET_REAL_EAS_PROJECT_ID_BEFORE_PUSH_TESTING"
+      }
+    }
+  }
+}
