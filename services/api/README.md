@@ -18,7 +18,7 @@ Requires Node 22+, PostgreSQL 16+ and a trusted JWT provider.
 ```bash
 cd services/api
 bun install
-psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f db/0001_initial.sql
+bun scripts/migrate.mjs
 bun run typecheck && bun run build && bun run test
 bun run dev
 ```
@@ -32,3 +32,7 @@ Copy `.env.example` to a locally controlled secrets environment. API intentional
 - Push receipts, failure telemetry, rate limits, support/report moderation and device end-to-end verification remain pending.
 - APIs are **not deployed** and native app is **not ready for production**.
 - This server is independent of Supabase; database must be a managed PostgreSQL instance selected for deployment.
+
+## Transaction integration test
+
+GitHub Actions starts an isolated PostgreSQL 17 container, applies `db/0001_initial.sql`, and exercises concurrent approvals. The test asserts that only one of two competing requests can fill the last seat, then verifies accepted/declined inbox messages, push-delivery queue records and read state. This is integration coverage **without** real Expo/APNs/FCM delivery.

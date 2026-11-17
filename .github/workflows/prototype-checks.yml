@@ -46,6 +46,22 @@ jobs:
   api-foundation:
     runs-on: ubuntu-24.04
     timeout-minutes: 10
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: tokea_ci
+          POSTGRES_PASSWORD: tokea_ci
+          POSTGRES_USER: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres -d tokea_ci"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=10
+    env:
+      DATABASE_URL: postgresql://postgres:tokea_ci@127.0.0.1:5432/tokea_ci
     defaults:
       run:
         working-directory: services/api
@@ -60,7 +76,9 @@ jobs:
         run: bun run typecheck
       - name: Compile API
         run: bun run build
-      - name: Test API decision rules
+      - name: Migrate isolated test PostgreSQL
+        run: bun scripts/migrate.mjs
+      - name: Test API decisions, DB transactions and notification inbox
         run: bun run test
 
   native-foundation:
