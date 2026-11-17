@@ -30,3 +30,15 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+# Independent native mobile app & API — never commit credentials or generated bundles.
+.env
+.env.*
+!.env.example
+apps/mobile/.expo/
+apps/mobile/.expo-dist/
+apps/mobile/.expo-shared/
+services/api/dist/
+*.pem
+*.p12
+*.p8
+*.mobileprovision

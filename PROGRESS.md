@@ -63,6 +63,7 @@
 - All 3 GitHub Actions jobs **PASSED**: legacy web build/Chromium, Expo native TypeScript + Android JS bundling, and API TypeScript/compile/tests.
 - API: **8 tests passed**, including an isolated PostgreSQL 17 integration test that simultaneously approves two competing applicants for one remaining seat, confirms one acceptance only, verifies accepted/declined inbox entries and pending per-device push jobs, and tests read state.
 - Native: code compiles and exports an Android JavaScript bundle; **not** a signed or installed Android/iOS app, not a verified notification bar delivery.
+- Adjusted native opt-in logic to verify EAS project ID, secure API URL and signed-in account **before** requesting OS notification permission; added gitignore rules for credentials and generated native artifacts.
 - Added notification-event design checklist to `docs/notifications.md`, with additional triggers beyond invitation decisions identified as future work.
 - Remaining production blockers: real OTP and age assurance, external JWT issuer/credentials, managed database and API deployment, mobile session/login UX, Expo/EAS project ownership and FCM/APNs credentials, real device push receipts, monitoring/rate limits.
 
