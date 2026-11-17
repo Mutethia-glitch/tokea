@@ -53,6 +53,14 @@
 
 ## Changelog
 
+### 2026-11-17 — Onboarding and Profile copy cleanup (verification pending)
+- Removed the visible Profile note `JPG, PNG or WebP · 5 MB max. Your photo stays in this browser for the demo; it is never uploaded.`; the file validation, cropping, local demo-only persistence and error feedback remain unchanged.
+- Retained **For adults 18+ only** on the opening onboarding card and removed its additional prototype disclaimer paragraph.
+- Added Chromium assertions that the age statement remains visible and both removed paragraphs are absent.
+- No change to age verification status, eligibility requirements, account security, or backend capabilities. All real-world limitations remain documented in project notes and policies.
+- **Pending:** typecheck, build, unit and browser tests, then merge.
+
+
 ### 2026-11-17 — M3 Expanded drink options (verification pending)
 - Added 8 drink categories: **Muratina**, **Whiskey**, **Vodka**, **Gin**, **Rum**, **Tequila**, **Brandy**, and **Spirits**, retaining Beer, Wine, Cocktails, Coffee, Soft drinks and Tea (14 total).
 - Shared the catalogue between session hosting, quick filters and full Discover filters, grouped as alcoholic/non-alcoholic for easier selection.
