@@ -2,7 +2,7 @@
 
 **Project:** Tokea (formerly named Explore in early blueprint)  
 **Last updated:** 2026-11-19  
-**Current milestone:** M5 — local API health verified, authenticated HTTP lifecycle tests pending CI (not hosted)  
+**Current milestone:** M5 — authenticated session/request/chat HTTP lifecycle verified in CI and local health verified (not hosted)  
 **Repository:** https://github.com/Mutethia-glitch/tokea  
 **Design source:** https://lovable.dev/projects/20ff86c9-03b7-4e00-b80f-9560791ddbfb
 
@@ -68,8 +68,8 @@
 - Restricted the API server's listening interface to `127.0.0.1` for local-only development, so starting it does not expose the HTTP port to the LAN. The PostgreSQL Compose port is also loopback-bound.
 - **Verified from supplied PowerShell health-check output:** local `GET http://127.0.0.1:4400/healthz` returned `ok=True`, `service=tokea-api`.
 - Added signed-JWT HTTP-route regression coverage with ephemeral loopback-only JWKS and API servers and isolated PostgreSQL test accounts. This tests real signature validation, adult account gate, session creation, joining, host approvals, inbox and member-only chat without adding any production auth bypass.
-- **Regression found:** later documentation/tree update accidentally omitted the complete M5 app and API source from the branch, causing 404 responses in the new signed-JWT HTTP integration test. Restored the last complete M5 source tree (commit `70c0b79`) while retaining local API safety changes and HTTP test. Rerun required.
-- **Pending CI:** full restored source + signed-JWT HTTP lifecycle. No hosting or external service provisioning.
+- **Regression resolved:** a documentation/tree update inadvertently omitted M5 app/API files, yielding HTTP 404s. Restored complete M5 source from commit `70c0b79`, preserved loopback binding and the new signed-JWT HTTP tests, then verified all files and API routing exist in the branch.
+- **Verified:** GitHub Actions run https://github.com/Mutethia-glitch/tokea/actions/runs/44422545779 passed all three jobs (web/reference, native TypeScript + Android JS export, API TypeScript/build + PostgreSQL migrations and tests). **16/16 API tests across five files passed**, including four real HTTP/JWKS integration tests for signature validity, unverified-adult rejection, creation, discovery, join, host-only acceptance, inbox, and member-only chat. No hosting or external service provisioning.
 
 
 ### 2026-11-18 — M5 native session screens added (pending verification)
