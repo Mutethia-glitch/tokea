@@ -2,7 +2,7 @@
 
 **Project:** Tokea (formerly named Explore in early blueprint)  
 **Last updated:** 2026-11-19  
-**Current milestone:** M5 — API tested in GitHub CI and on local Windows/PostgreSQL (not hosted or deployed)  
+**Current milestone:** M5 — local API health verified, authenticated HTTP lifecycle tests pending CI (not hosted)  
 **Repository:** https://github.com/Mutethia-glitch/tokea  
 **Design source:** https://lovable.dev/projects/20ff86c9-03b7-4e00-b80f-9560791ddbfb
 
@@ -66,7 +66,9 @@
 - **Verified from supplied PowerShell output:** 4 test files passed, **12/12 tests passed**, TypeScript check and compilation passed. Integration tests ran against local PostgreSQL.
 - **No service has been deployed or hosted.** Authenticated API requests still require a real JWKS identity provider and verified-adult account. Phone notifications and native physical builds are not live.
 - Restricted the API server's listening interface to `127.0.0.1` for local-only development, so starting it does not expose the HTTP port to the LAN. The PostgreSQL Compose port is also loopback-bound.
-- Local next check: start `bun run dev` with `DATABASE_URL` configured and verify `GET /healthz` over loopback. Stop the service afterward; no external network exposure.
+- **Verified from supplied PowerShell health-check output:** local `GET http://127.0.0.1:4400/healthz` returned `ok=True`, `service=tokea-api`.
+- Added signed-JWT HTTP-route regression coverage with ephemeral loopback-only JWKS and API servers and isolated PostgreSQL test accounts. This tests real signature validation, adult account gate, session creation, joining, host approvals, inbox and member-only chat without adding any production auth bypass.
+- **Pending CI:** new HTTP regression test on PR branch. No hosting or external service provisioning.
 
 
 ### 2026-11-18 — M5 native session screens added (pending verification)

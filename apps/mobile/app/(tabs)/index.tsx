@@ -1,48 +1,24 @@
-import { useCallback, useState } from "react";
-import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-native";
-import { router, useFocusEffect } from "expo-router";
-import { Heading, Screen } from "@/ui";
+import { Pressable, Text, View } from "react-native";
+import { router } from "expo-router";
+import { Heading, Paper, Screen } from "@/ui";
 import { colors } from "@/theme";
-import { Action, MessageBox, Pill, SessionCard } from "@/native-cards";
-import { CATEGORIES, listSessions, type Category, type NativeSession } from "@/sessions";
 
 export default function DiscoverScreen() {
-  const [category,setCategory]=useState<Category|undefined>(undefined);
-  const [sessions,setSessions]=useState<NativeSession[]>([]);
-  const [busy,setBusy]=useState(true);
-  const [error,setError]=useState<string|null>(null);
-  const refresh=useCallback(async()=>{
-    setBusy(true);setError(null);
-    try {setSessions((await listSessions(category)).sessions);}
-    catch(e) {setSessions([]);setError(e instanceof Error?e.message:"Unable to load sessions.");}
-    finally {setBusy(false);}
-  },[category]);
-  useFocusEffect(useCallback(()=>{void refresh();},[refresh]));
-
   return <Screen>
-    <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{paddingBottom:48}}>
-      <View style={{flexDirection:"row",alignItems:"center",justifyContent:"space-between",marginBottom:24,gap:12}}>
-        <Text style={{fontSize:27,color:colors.brand,fontWeight:"700"}}>tokea</Text>
-        <Pressable onPress={()=>router.push("/notifications")} accessibilityRole="button" accessibilityLabel="Open notifications"
-          style={{borderColor:colors.border,borderWidth:1,borderRadius:30,minHeight:44,paddingHorizontal:12,justifyContent:"center"}}>
-          <Text style={{color:colors.text,fontSize:12}}>Notifications</Text>
-        </Pressable>
-      </View>
-      <Heading title="Who's out nearby?" subtitle="Find your people. Share a drink at a public place." />
-      <View style={{alignSelf:"flex-start",marginBottom:20}}>
-        <Action label="＋  Host a drink" onPress={()=>router.push("/host")}/>
-      </View>
-      <Text style={{fontWeight:"600",color:colors.text,marginBottom:10,fontSize:13}}>Drinks</Text>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{marginBottom:20}}>
-        <Pill selected={!category} onPress={()=>setCategory(undefined)}>All</Pill>
-        {CATEGORIES.map(c=><Pill key={c} selected={category===c} onPress={()=>setCategory(c)}>{c}</Pill>)}
-      </ScrollView>
-      {busy?<ActivityIndicator color={colors.brand} style={{marginTop:25}}/>:null}
-      {error?<MessageBox text={error}/>:null}
-      {!busy&&!error&&sessions.length===0?<MessageBox text="No sessions match this filter yet. You can create one."/>:null}
-      {sessions.map(s=><SessionCard key={s.id} session={s} onPress={()=>router.push({pathname:"/session/[id]",params:{id:s.id}})}/>)}
-      <Text style={{color:colors.muted,fontSize:12,lineHeight:19,marginTop:10}}>Approximate neighbourhoods only. Exact locations are not shown.</Text>
-      <Text style={{color:colors.muted,fontSize:12,marginTop:10}}>For adults 18+ only</Text>
-    </ScrollView>
+    <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
+      <Text style={{ fontSize: 27, color: colors.brand, fontWeight: "700" }}>tokea</Text>
+      <Pressable onPress={() => router.push("/notifications")} accessibilityRole="button" accessibilityLabel="Open notifications"
+        style={{ borderColor: colors.border, borderWidth: 1, borderRadius: 30, paddingVertical: 11, paddingHorizontal: 14 }}>
+        <Text style={{ color: colors.text }}>Notifications</Text>
+      </Pressable>
+    </View>
+    <Heading title="Who's out nearby?" subtitle="Find people to share a drink with. Meet somewhere public." />
+    <Paper>
+      <Text style={{ color: colors.text, fontSize: 17, fontWeight: "600", marginBottom: 8 }}>Native discovery is coming together</Text>
+      <Text style={{ color: colors.muted, lineHeight: 21 }}>
+        The iOS and Android screens will reuse the approved Tokea design. Live sessions will load from the authenticated API after signup, age assurance and session discovery endpoints are connected.
+      </Text>
+    </Paper>
+    <Text style={{ color: colors.muted, fontSize: 13 }}>For adults 18+ only</Text>
   </Screen>;
 }
