@@ -1,8 +1,8 @@
 # Tokea — Development Progress
 
 **Project:** Tokea (formerly named Explore in early blueprint)  
-**Last updated:** 2026-11-17  
-**Current milestone:** M4 — native Expo and PostgreSQL notification API foundation verified in CI (not deployed)  
+**Last updated:** 2026-11-18  
+**Current milestone:** M5 — local-only live session/request/chat API and native screens (in progress, not deployed)  
 **Repository:** https://github.com/Mutethia-glitch/tokea  
 **Design source:** https://lovable.dev/projects/20ff86c9-03b7-4e00-b80f-9560791ddbfb
 
@@ -25,7 +25,7 @@
 | Safety | Preliminary | Block/report demo controls; no server-side enforcement |
 | React web build | **Verified in CI** | Bun install, TypeScript, Vite/Nitro production build and 16 Vitest tests passed in GitHub Actions run #8 (2026-11-17) |
 | Hosted web demo | **Vercel deployment READY** | https://tokea-demo.vercel.app · SSO protection enabled · browser routes not yet independently smoke-tested |
-| Production backend | **M4 source verified in CI** | Node 22/TypeScript API, PostgreSQL migration, host-only transactional decisions, in-app notifications and device push queue. 8 API tests pass (including PostgreSQL integration); not deployed |
+| Production backend | **M5 work in progress** | PostgreSQL session discovery, session creation, joins/incoming requests, private chat and notifications source added; awaiting CI. No API or database is hosted. |
 | Native push notifications | **M4 code verified, delivery unverified** | Explicit opt-in and Expo token registration, in-app inbox and native notification tap handling; push needs EAS ID, APNs/FCM credentials, real authentication and device testing |
 | Native iOS/Android | **Typecheck + Android JS export passed** | Expo SDK 58 / React Native 0.88 / Expo Router shell in `apps/mobile`; not an installed native build or complete feature UI |
 | Kenya legal review | Required | Final age assurance, privacy policies, licensing/alcohol considerations |
@@ -57,6 +57,16 @@
 - Draft privacy and terms effective date: **November 16, 2026**; no public support email yet.
 
 ## Changelog
+
+### 2026-11-18 — M5 backend/API development, local-only (pending verification)
+- Added database migration for member-only session messages; migrator now applies schema scripts in order.
+- Added approved 14-category drink catalogue and approximate Nairobi neighbourhood choices, without revealing exact location.
+- Added authenticated session discovery/create/detail routes, request submission/list/cancel, and approved-members-only chat read/post routes.
+- Join submissions create host inbox events and per-device queued push jobs in one PostgreSQL transaction; new chat messages create privacy-preserving inbox and push-queue records.
+- All routes require real JWKS JWT and server-side verified-adult checks. No mock authentication bypass.
+- **Strict restriction: no hosting, no cloud resources, and no deployment.** GitHub CI uses only temporary test containers.
+- **Pending:** native UI wiring, regression tests, build checks, full functional verification, and review. Real signup, vendor credentials, physical push delivery and cloud hosting are not configured.
+
 
 ### 2026-11-17 — M4 foundation checks verified (still not production-ready)
 - CI: https://github.com/Mutethia-glitch/tokea/actions/runs/43990223625
