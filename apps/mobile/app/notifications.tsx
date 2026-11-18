@@ -24,7 +24,12 @@ export default function NotificationsScreen() {
     catch { /* Stay in inbox even when marking as read fails. */ }
     setItems((current) => current.map((n) => n.id === item.id ? { ...n, readAt: new Date().toISOString() } : n));
     // Never navigate to an arbitrary destination received from server/push data.
-    if (item.route === "/requests") router.push("/(tabs)/requests");
+    if (item.route === "/requests") {
+      router.push("/(tabs)/requests");
+    } else {
+      const chat = /^\/chats\/([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})$/.exec(item.route);
+      if (chat?.[1]) router.push({ pathname: "/chats/[id]", params: { id: chat[1] } });
+    }
   }
 
   return <View style={{ flex: 1, backgroundColor: colors.background }}>

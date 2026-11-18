@@ -13,8 +13,8 @@
 | --- | --- | --- | --- | --- |
 | Join request accepted | Applicant | Yes | If opted in | **Backend decision → inbox + push queue implemented** |
 | Join request declined | Applicant | Yes | If opted in | **Backend decision → inbox + push queue implemented** |
-| Someone requests to join | Session host | Yes | If opted in | Schema supports event, request-submission API pending |
-| New session chat message | Accepted session members except sender | Yes | Optional, respect mute | Not yet implemented |
+| Someone requests to join | Session host | Yes | If opted in | **Backend request API creates durable inbox + queued device deliveries; provider delivery unverified** |
+| New session chat message | Accepted session members except sender | Yes | Optional, respect mute | **Server writes generic-text inbox + push queue; preferences, receipts and delivery pending** |
 | Session cancelled or materially changed | Accepted members | Yes | Yes, if opted in | Not yet implemented |
 | Session starts soon | Confirmed members | Yes | Optional reminder | Not yet implemented |
 | Safety/moderation or account security action | Affected account | Yes | Appropriate high priority | Not yet implemented |

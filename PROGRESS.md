@@ -2,7 +2,7 @@
 
 **Project:** Tokea (formerly named Explore in early blueprint)  
 **Last updated:** 2026-11-18  
-**Current milestone:** M5 — local-only live session/request/chat API and native screens (in progress, not deployed)  
+**Current milestone:** M5 — native session/request/chat API tested locally in GitHub CI (not hosted or deployed)  
 **Repository:** https://github.com/Mutethia-glitch/tokea  
 **Design source:** https://lovable.dev/projects/20ff86c9-03b7-4e00-b80f-9560791ddbfb
 
@@ -43,7 +43,8 @@
 - [x] Add regression tests for capacity, approval restrictions, blocking and private chat access.
 - [ ] Confirm hosting/managed PostgreSQL provider, production URLs, OTP/age assurance vendor and EAS project/Apple/Google developer accounts before deployment.
 - [ ] Provision and migrate a private PostgreSQL database; deploy the independent API with a trusted JWT issuer.
-- [ ] Complete native account authentication, live sessions, invitations and private messaging screens; current native shell is only a starting point.
+- [ ] Add OTP/age assurance and verified session-token provisioning. Native Discover, Host, Requests, Chat and session-detail screens now consume API contracts, but cannot show live data without sign-in.
+- [ ] Replace short-interval chat refresh with authenticated realtime transport and controls.
 - [ ] Configure FCM/APNs credentials, build/install Tokea on Android and iOS devices, and verify accepted/declined requests generate OS + in-app notifications.
 - [ ] Implement push receipt checks, delivery monitoring, preferences, user blocking, moderation and safe sign-out/device revocation.
 
@@ -66,7 +67,9 @@
 - Added temporary PostgreSQL integration tests for creating/discovering sessions, join notifications, approvals, chat membership, cancellation and blocking.
 - Corrected host detection for sessions with zero join requests: the server derives `isHost` from the JWT subject rather than whether invitations already exist.
 - Native messages currently refresh on a short interval; full realtime transport, phone push receipts and complete identity/onboarding still outstanding.
-- Initial CI exposed a malformed API routing module and a native list-type mismatch; corrected both and rerunning checks.
+- Initial CI exposed a malformed API routing module and a native list-type mismatch; both corrected.
+- **Verified:** GitHub Actions run https://github.com/Mutethia-glitch/tokea/actions/runs/44388261555 passed web design-reference checks, Android JavaScript export, native TS check, PostgreSQL migration, backend compilation and **12 API tests** (4 session/request/chat integrations plus the prior 8 tests).
+- No external service provisioned, no cloud hosting, and no native device push yet.
 - **Pending:** GitHub CI, native typecheck and security review. No hosting or deployment.
 
 ### 2026-11-18 — M5 backend/API development, local-only (pending verification)
