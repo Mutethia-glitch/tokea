@@ -48,7 +48,7 @@ export default function SessionChat() {
         data={messages} keyExtractor={item=>item.id}
         style={{flex:1}}
         contentContainerStyle={{paddingVertical:12,gap:10}}
-        ListEmptyComponent={!busy&&!error?<Text style={{color:colors.muted}}>Say hello to your group.</Text>:null}
+        ListEmptyComponent={!busy&&!error?<Text style={{color:colors.muted}}>Say hello to your group.</Text>:undefined}
         renderItem={({item})=><View style={{alignSelf:"flex-start",maxWidth:"95%",backgroundColor:colors.card,
           borderWidth:1,borderColor:colors.border,padding:15,borderRadius:18}}>
           <Text style={{color:colors.brand,fontWeight:"700",fontSize:12}}>{item.authorName}</Text>

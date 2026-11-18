@@ -66,6 +66,7 @@
 - Added temporary PostgreSQL integration tests for creating/discovering sessions, join notifications, approvals, chat membership, cancellation and blocking.
 - Corrected host detection for sessions with zero join requests: the server derives `isHost` from the JWT subject rather than whether invitations already exist.
 - Native messages currently refresh on a short interval; full realtime transport, phone push receipts and complete identity/onboarding still outstanding.
+- Initial CI exposed a malformed API routing module and a native list-type mismatch; corrected both and rerunning checks.
 - **Pending:** GitHub CI, native typecheck and security review. No hosting or deployment.
 
 ### 2026-11-18 — M5 backend/API development, local-only (pending verification)
