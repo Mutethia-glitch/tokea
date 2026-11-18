@@ -24,9 +24,7 @@ export default function SessionDetailsScreen() {
       setSession(s);
       const sent=r.sent.find(x=>x.sessionId===id&&(x.status==="pending"||x.status==="accepted"));
       setExisting(sent??null);
-      setIsHost(r.incoming.some(x=>x.sessionId===id));
-      // Host has a dedicated hostId from the protected API. An empty session has no requests yet.
-      setIsHost(current=>current||false);
+      setIsHost(s.isHost);
     }catch(e){setError(e instanceof Error?e.message:"Unable to load session.");}
     finally{setBusy(false);}
   },[id]);

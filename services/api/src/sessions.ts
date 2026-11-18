@@ -32,7 +32,8 @@ const select = `SELECT s.id,s.host_user_id,u.display_name AS host_name,s.title,
   COALESCE((SELECT SUM(party_size) FROM join_requests r
     WHERE r.session_id=s.id AND r.status='accepted'),0)::text AS accepted_seats
   FROM sessions s JOIN users u ON u.id=s.host_user_id`;
-const dto=(s:SessionRow)=>({
+const dto=(s:SessionRow,actorId:string)=>({
+  isHost:s.host_user_id===actorId,
   id:s.id,hostId:s.host_user_id,hostName:s.host_name,title:s.title,
   category:s.category,neighbourhood:s.neighbourhood,
   guestCapacity:s.guest_capacity,seatsLeft:Math.max(0,s.guest_capacity-Number(s.accepted_seats)),
@@ -49,7 +50,7 @@ export async function discoverSessions(actorId:string,filters:z.infer<typeof dis
         (b.blocker_user_id=s.host_user_id AND b.blocked_user_id=$1))
     ORDER BY s.starts_at ASC,s.created_at DESC LIMIT 50`,
     [actorId,filters.category??null,filters.neighbourhood??null]);
-  return found.rows.map(dto);
+  return found.rows.map(s=>dto(s,actorId));
 }
 
 export async function getSession(actorId:string,id:string) {
@@ -60,7 +61,7 @@ export async function getSession(actorId:string,id:string) {
       (b.blocker_user_id=$2 AND b.blocked_user_id=s.host_user_id) OR
       (b.blocker_user_id=s.host_user_id AND b.blocked_user_id=$2))`,[id,actorId]);
   if(!found.rows[0])throw new ApiError(404,"Session not available.");
-  return dto(found.rows[0]);
+  return dto(found.rows[0],actorId);
 }
 
 export async function createSession(actorId:string,input:z.infer<typeof createSessionSchema>) {

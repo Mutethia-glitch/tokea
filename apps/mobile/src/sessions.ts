@@ -12,7 +12,7 @@ export const NEIGHBOURHOODS=[
 export type Neighbourhood=(typeof NEIGHBOURHOODS)[number];
 
 export type NativeSession={
-  id:string;hostId:string;hostName:string;title:string;category:Category;
+  id:string;hostId:string;hostName:string;isHost:boolean;title:string;category:Category;
   neighbourhood:string;guestCapacity:number;seatsLeft:number;status:"open"|"paused"|"ended";
   startsAt:string;endsAt:string;
 };

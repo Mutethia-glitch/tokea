@@ -64,6 +64,7 @@
 - Preserved Lovable-inspired purple typography and 20px card padding; extended 14 drink choices and grouped Nairobi neighbourhoods to native forms.
 - No fake logged-in users or live sessions are displayed when identity/API is not configured.
 - Added temporary PostgreSQL integration tests for creating/discovering sessions, join notifications, approvals, chat membership, cancellation and blocking.
+- Corrected host detection for sessions with zero join requests: the server derives `isHost` from the JWT subject rather than whether invitations already exist.
 - Native messages currently refresh on a short interval; full realtime transport, phone push receipts and complete identity/onboarding still outstanding.
 - **Pending:** GitHub CI, native typecheck and security review. No hosting or deployment.
 
