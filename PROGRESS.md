@@ -1,8 +1,8 @@
 # Tokea — Development Progress
 
 **Project:** Tokea (formerly named Explore in early blueprint)  
-**Last updated:** 2026-11-18  
-**Current milestone:** M5 — native session/request/chat API tested locally in GitHub CI (not hosted or deployed)  
+**Last updated:** 2026-11-19  
+**Current milestone:** M5 — API tested in GitHub CI and on local Windows/PostgreSQL (not hosted or deployed)  
 **Repository:** https://github.com/Mutethia-glitch/tokea  
 **Design source:** https://lovable.dev/projects/20ff86c9-03b7-4e00-b80f-9560791ddbfb
 
@@ -25,7 +25,7 @@
 | Safety | Preliminary | Block/report demo controls; no server-side enforcement |
 | React web build | **Verified in CI** | Bun install, TypeScript, Vite/Nitro production build and 16 Vitest tests passed in GitHub Actions run #8 (2026-11-17) |
 | Hosted web demo | **Vercel deployment READY** | https://tokea-demo.vercel.app · SSO protection enabled · browser routes not yet independently smoke-tested |
-| Production backend | **M5 work in progress** | PostgreSQL session discovery, session creation, joins/incoming requests, private chat and notifications source added; awaiting CI. No API or database is hosted. |
+| Production backend | **M5 local + CI verified** | PostgreSQL sessions, join requests, chat and notification API compile; 12/12 backend tests passed in GitHub CI and independently on local Windows using PostgreSQL 17. No hosting or deployment. |
 | Native push notifications | **M4 code verified, delivery unverified** | Explicit opt-in and Expo token registration, in-app inbox and native notification tap handling; push needs EAS ID, APNs/FCM credentials, real authentication and device testing |
 | Native iOS/Android | **Typecheck + Android JS export passed** | Expo SDK 58 / React Native 0.88 / Expo Router shell in `apps/mobile`; not an installed native build or complete feature UI |
 | Kenya legal review | Required | Final age assurance, privacy policies, licensing/alcohol considerations |
@@ -58,6 +58,15 @@
 - Draft privacy and terms effective date: **November 16, 2026**; no public support email yet.
 
 ## Changelog
+
+### 2026-11-19 — Developer's local Windows backend environment verified
+- User successfully installed Docker Desktop and Bun 1.4.4 on Windows.
+- Started developer-only PostgreSQL 17 in Docker; changed local host port to `127.0.0.1:5433` after Windows denied binding on port 5432. Container PostgreSQL remains on 5432.
+- On the local machine, ran `bun install`, `bun scripts/migrate.mjs`, `bun run typecheck`, `bun run build`, `bun run test`. Both `0001_initial.sql` and `0002_messages.sql` were applied successfully.
+- **Verified from supplied PowerShell output:** 4 test files passed, **12/12 tests passed**, TypeScript check and compilation passed. Integration tests ran against local PostgreSQL.
+- **No service has been deployed or hosted.** Authenticated API requests still require a real JWKS identity provider and verified-adult account. Phone notifications and native physical builds are not live.
+- Local next check: start `bun run dev` with `DATABASE_URL` configured and verify `GET /healthz` over loopback. Stop the service afterward; no external network exposure.
+
 
 ### 2026-11-18 — M5 native session screens added (pending verification)
 - Replaced native Discover, Requests and Chats placeholders with screens consuming authenticated API endpoints.
