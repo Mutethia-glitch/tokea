@@ -65,6 +65,7 @@
 - On the local machine, ran `bun install`, `bun scripts/migrate.mjs`, `bun run typecheck`, `bun run build`, `bun run test`. Both `0001_initial.sql` and `0002_messages.sql` were applied successfully.
 - **Verified from supplied PowerShell output:** 4 test files passed, **12/12 tests passed**, TypeScript check and compilation passed. Integration tests ran against local PostgreSQL.
 - **No service has been deployed or hosted.** Authenticated API requests still require a real JWKS identity provider and verified-adult account. Phone notifications and native physical builds are not live.
+- Restricted the API server's listening interface to `127.0.0.1` for local-only development, so starting it does not expose the HTTP port to the LAN. The PostgreSQL Compose port is also loopback-bound.
 - Local next check: start `bun run dev` with `DATABASE_URL` configured and verify `GET /healthz` over loopback. Stop the service afterward; no external network exposure.
 
 

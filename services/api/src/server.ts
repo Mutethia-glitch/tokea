@@ -7,7 +7,8 @@ const port = Number(process.env.PORT || "4400");
 const server = createServer((req, res) => { void route(req, res); });
 server.requestTimeout = 10_000;
 server.headersTimeout = 15_000;
-server.listen(port, "0.0.0.0", () => console.log(`Tokea API listening on ${port}`));
+// Local-development default: do not expose the API on the LAN or public interfaces.
+server.listen(port, "127.0.0.1", () => console.log(`Tokea API listening locally at http://127.0.0.1:${port}`));
 
 // Keep push dispatch separate from request transactions; a production deployment
 // should run this worker independently with job monitoring and push receipts.
