@@ -68,7 +68,8 @@
 - Restricted the API server's listening interface to `127.0.0.1` for local-only development, so starting it does not expose the HTTP port to the LAN. The PostgreSQL Compose port is also loopback-bound.
 - **Verified from supplied PowerShell health-check output:** local `GET http://127.0.0.1:4400/healthz` returned `ok=True`, `service=tokea-api`.
 - Added signed-JWT HTTP-route regression coverage with ephemeral loopback-only JWKS and API servers and isolated PostgreSQL test accounts. This tests real signature validation, adult account gate, session creation, joining, host approvals, inbox and member-only chat without adding any production auth bypass.
-- **Pending CI:** new HTTP regression test on PR branch. No hosting or external service provisioning.
+- **Regression found:** later documentation/tree update accidentally omitted the complete M5 app and API source from the branch, causing 404 responses in the new signed-JWT HTTP integration test. Restored the last complete M5 source tree (commit `70c0b79`) while retaining local API safety changes and HTTP test. Rerun required.
+- **Pending CI:** full restored source + signed-JWT HTTP lifecycle. No hosting or external service provisioning.
 
 
 ### 2026-11-18 — M5 native session screens added (pending verification)

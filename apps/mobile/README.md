@@ -27,3 +27,11 @@ The backend stores all accepted/declined invitation events in an in-app notifica
 Always update the repository's `PROGRESS.md` with major milestones.
 
 See [notification requirements](../../docs/notifications.md) for planned alerts, platform testing and user preferences.
+
+## M5 local native screens (not hosted)
+
+The native app contains Discover, Host, session details, Requests, Chats and conversation screens. They use the authenticated API; without a verified access token they show a sign-in/configuration message instead of fake production data. Session date/time is entered in the phone's local time zone. Cards use the original Lovable palette and 16px inter-card spacing.
+
+The base `EXPO_PUBLIC_API_URL` should use HTTPS. For an **emulator only**, development builds accept loopback HTTP when `EXPO_PUBLIC_ALLOW_LOOPBACK_HTTP=true` and URL host is `localhost`, `127.0.0.1`, or Android emulator `10.0.2.2`. This exception is forbidden in production. A real phone on a LAN requires HTTPS for a safely authenticated API connection.
+
+No remote app hosting, production database, EAS build or credentials were created.

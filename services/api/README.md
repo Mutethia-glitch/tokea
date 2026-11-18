@@ -38,3 +38,27 @@ Copy `.env.example` to a locally controlled secrets environment. API intentional
 GitHub Actions starts an isolated PostgreSQL 17 container, applies `db/0001_initial.sql`, and exercises concurrent approvals. The test asserts that only one of two competing requests can fill the last seat, then verifies accepted/declined inbox messages, push-delivery queue records and read state. This is integration coverage **without** real Expo/APNs/FCM delivery.
 
 See [notification requirements](../../docs/notifications.md) for the full event matrix and production delivery checklist.
+
+## M5 native-session endpoints (local development only)
+
+All `/v1/*` routes require a real, signature-verified JWT matching `JWT_ISSUER`, `JWT_AUDIENCE`, `JWT_JWKS_URL`, an active account, and an actual `age_verified_at` value. The service contains **no demo-login bypass**.
+
+| Method | Endpoint | Purpose |
+| --- | --- | --- |
+| GET | `/v1/sessions?category=Muratina` | List open, non-blocked sessions and remaining seats |
+| POST | `/v1/sessions` | Create a session, 1–15 guest seats, approved drink and approximate neighbourhood |
+| GET | `/v1/sessions/:id` | Session details; server supplies `isHost` |
+| POST | `/v1/sessions/:id/requests` | Ask to join; notify host and queue opted-in device pushes |
+| GET | `/v1/requests` | Incoming host requests and user's sent requests |
+| PATCH | `/v1/requests/:id/cancel` | Cancel your own pending request |
+| POST | `/v1/sessions/:id/requests/:id/decision` | Host-only accept/decline; applicant inbox event and push queue |
+| GET/POST | `/v1/sessions/:id/messages` | Member-only history and messages; generic new-message alerts |
+| GET | `/v1/notifications` | Durable account inbox |
+
+All capacity-changing operations lock the session row transactionally. Messages and notifications are stored in PostgreSQL. **No live realtime sockets, login service, remote push validation or production hosting are configured.**
+
+### Local PostgreSQL option
+
+`docker compose -f services/api/compose.local.yml up -d` starts a developer-only PostgreSQL service bound to **127.0.0.1**. Copy the example environment to your own untracked file; do not paste credentials into chat or commit them.
+
+To run migrations and tests, set `DATABASE_URL` in your local shell, then execute `cd services/api && bun install && bun scripts/migrate.mjs && bun run test`. Running the HTTP API additionally requires a configured real JWT provider. GitHub Actions can test the data layer without this provider using isolated temporary accounts and containers.
