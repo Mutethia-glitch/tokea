@@ -58,6 +58,15 @@
 
 ## Changelog
 
+### 2026-11-18 — M5 native session screens added (pending verification)
+- Replaced native Discover, Requests and Chats placeholders with screens consuming authenticated API endpoints.
+- Added native Host form, session details/join request, confirmed session list and member-only conversation screen.
+- Preserved Lovable-inspired purple typography and 20px card padding; extended 14 drink choices and grouped Nairobi neighbourhoods to native forms.
+- No fake logged-in users or live sessions are displayed when identity/API is not configured.
+- Added temporary PostgreSQL integration tests for creating/discovering sessions, join notifications, approvals, chat membership, cancellation and blocking.
+- Native messages currently refresh on a short interval; full realtime transport, phone push receipts and complete identity/onboarding still outstanding.
+- **Pending:** GitHub CI, native typecheck and security review. No hosting or deployment.
+
 ### 2026-11-18 — M5 backend/API development, local-only (pending verification)
 - Added database migration for member-only session messages; migrator now applies schema scripts in order.
 - Added approved 14-category drink catalogue and approximate Nairobi neighbourhood choices, without revealing exact location.

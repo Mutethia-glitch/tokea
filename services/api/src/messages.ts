@@ -1,4 +1,5 @@
 import { z } from "zod";
+import type { PoolClient } from "pg";
 import { pool } from "./db.js";
 import { ApiError } from "./auth.js";
 import { uuidPattern } from "./sessions.js";
@@ -6,7 +7,7 @@ import { uuidPattern } from "./sessions.js";
 export const messageSchema=z.object({text:z.string().trim().min(1).max(500)}).strict();
 type MessageRow={id:string;session_id:string;author_user_id:string;author_name:string;message_text:string;created_at:Date};
 
-async function canAccess(db:{query:typeof pool.query},actorId:string,sessionId:string,write:boolean) {
+async function canAccess(db:PoolClient,actorId:string,sessionId:string,write:boolean) {
   if(!uuidPattern.test(sessionId))throw new ApiError(400,"Invalid session ID.");
   const info=await db.query<{host_user_id:string;status:string;ends_at:Date}>(
     `SELECT host_user_id,status,ends_at FROM sessions WHERE id=$1${write?" FOR UPDATE":""}`,[sessionId]);
