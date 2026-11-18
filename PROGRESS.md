@@ -1,8 +1,8 @@
 # Tokea — Development Progress
 
 **Project:** Tokea (formerly named Explore in early blueprint)  
-**Last updated:** 2026-11-17  
-**Current milestone:** M4 — native Expo and PostgreSQL notification API foundation verified in CI (not deployed)  
+**Last updated:** 2026-11-19  
+**Current milestone:** M5 — authenticated session/request/chat HTTP lifecycle verified in CI and local health verified (not hosted)  
 **Repository:** https://github.com/Mutethia-glitch/tokea  
 **Design source:** https://lovable.dev/projects/20ff86c9-03b7-4e00-b80f-9560791ddbfb
 
@@ -25,7 +25,7 @@
 | Safety | Preliminary | Block/report demo controls; no server-side enforcement |
 | React web build | **Verified in CI** | Bun install, TypeScript, Vite/Nitro production build and 16 Vitest tests passed in GitHub Actions run #8 (2026-11-17) |
 | Hosted web demo | **Vercel deployment READY** | https://tokea-demo.vercel.app · SSO protection enabled · browser routes not yet independently smoke-tested |
-| Production backend | **M4 source verified in CI** | Node 22/TypeScript API, PostgreSQL migration, host-only transactional decisions, in-app notifications and device push queue. 8 API tests pass (including PostgreSQL integration); not deployed |
+| Production backend | **M5 local + CI verified** | PostgreSQL sessions, join requests, chat and notification API compile; 12/12 backend tests passed in GitHub CI and independently on local Windows using PostgreSQL 17. No hosting or deployment. |
 | Native push notifications | **M4 code verified, delivery unverified** | Explicit opt-in and Expo token registration, in-app inbox and native notification tap handling; push needs EAS ID, APNs/FCM credentials, real authentication and device testing |
 | Native iOS/Android | **Typecheck + Android JS export passed** | Expo SDK 58 / React Native 0.88 / Expo Router shell in `apps/mobile`; not an installed native build or complete feature UI |
 | Kenya legal review | Required | Final age assurance, privacy policies, licensing/alcohol considerations |
@@ -43,7 +43,8 @@
 - [x] Add regression tests for capacity, approval restrictions, blocking and private chat access.
 - [ ] Confirm hosting/managed PostgreSQL provider, production URLs, OTP/age assurance vendor and EAS project/Apple/Google developer accounts before deployment.
 - [ ] Provision and migrate a private PostgreSQL database; deploy the independent API with a trusted JWT issuer.
-- [ ] Complete native account authentication, live sessions, invitations and private messaging screens; current native shell is only a starting point.
+- [ ] Add OTP/age assurance and verified session-token provisioning. Native Discover, Host, Requests, Chat and session-detail screens now consume API contracts, but cannot show live data without sign-in.
+- [ ] Replace short-interval chat refresh with authenticated realtime transport and controls.
 - [ ] Configure FCM/APNs credentials, build/install Tokea on Android and iOS devices, and verify accepted/declined requests generate OS + in-app notifications.
 - [ ] Implement push receipt checks, delivery monitoring, preferences, user blocking, moderation and safe sign-out/device revocation.
 
@@ -57,6 +58,42 @@
 - Draft privacy and terms effective date: **November 16, 2026**; no public support email yet.
 
 ## Changelog
+
+### 2026-11-19 — Developer's local Windows backend environment verified
+- User successfully installed Docker Desktop and Bun 1.4.4 on Windows.
+- Started developer-only PostgreSQL 17 in Docker; changed local host port to `127.0.0.1:5433` after Windows denied binding on port 5432. Container PostgreSQL remains on 5432.
+- On the local machine, ran `bun install`, `bun scripts/migrate.mjs`, `bun run typecheck`, `bun run build`, `bun run test`. Both `0001_initial.sql` and `0002_messages.sql` were applied successfully.
+- **Verified from supplied PowerShell output:** 4 test files passed, **12/12 tests passed**, TypeScript check and compilation passed. Integration tests ran against local PostgreSQL.
+- **No service has been deployed or hosted.** Authenticated API requests still require a real JWKS identity provider and verified-adult account. Phone notifications and native physical builds are not live.
+- Restricted the API server's listening interface to `127.0.0.1` for local-only development, so starting it does not expose the HTTP port to the LAN. The PostgreSQL Compose port is also loopback-bound.
+- **Verified from supplied PowerShell health-check output:** local `GET http://127.0.0.1:4400/healthz` returned `ok=True`, `service=tokea-api`.
+- Added signed-JWT HTTP-route regression coverage with ephemeral loopback-only JWKS and API servers and isolated PostgreSQL test accounts. This tests real signature validation, adult account gate, session creation, joining, host approvals, inbox and member-only chat without adding any production auth bypass.
+- **Regression resolved:** a documentation/tree update inadvertently omitted M5 app/API files, yielding HTTP 404s. Restored complete M5 source from commit `70c0b79`, preserved loopback binding and the new signed-JWT HTTP tests, then verified all files and API routing exist in the branch.
+- **Verified:** GitHub Actions run https://github.com/Mutethia-glitch/tokea/actions/runs/44422545779 passed all three jobs (web/reference, native TypeScript + Android JS export, API TypeScript/build + PostgreSQL migrations and tests). **16/16 API tests across five files passed**, including four real HTTP/JWKS integration tests for signature validity, unverified-adult rejection, creation, discovery, join, host-only acceptance, inbox, and member-only chat. No hosting or external service provisioning.
+
+
+### 2026-11-18 — M5 native session screens added (pending verification)
+- Replaced native Discover, Requests and Chats placeholders with screens consuming authenticated API endpoints.
+- Added native Host form, session details/join request, confirmed session list and member-only conversation screen.
+- Preserved Lovable-inspired purple typography and 20px card padding; extended 14 drink choices and grouped Nairobi neighbourhoods to native forms.
+- No fake logged-in users or live sessions are displayed when identity/API is not configured.
+- Added temporary PostgreSQL integration tests for creating/discovering sessions, join notifications, approvals, chat membership, cancellation and blocking.
+- Corrected host detection for sessions with zero join requests: the server derives `isHost` from the JWT subject rather than whether invitations already exist.
+- Native messages currently refresh on a short interval; full realtime transport, phone push receipts and complete identity/onboarding still outstanding.
+- Initial CI exposed a malformed API routing module and a native list-type mismatch; both corrected.
+- **Verified:** GitHub Actions run https://github.com/Mutethia-glitch/tokea/actions/runs/44388261555 passed web design-reference checks, Android JavaScript export, native TS check, PostgreSQL migration, backend compilation and **12 API tests** (4 session/request/chat integrations plus the prior 8 tests).
+- No external service provisioned, no cloud hosting, and no native device push yet.
+- **Pending:** GitHub CI, native typecheck and security review. No hosting or deployment.
+
+### 2026-11-18 — M5 backend/API development, local-only (pending verification)
+- Added database migration for member-only session messages; migrator now applies schema scripts in order.
+- Added approved 14-category drink catalogue and approximate Nairobi neighbourhood choices, without revealing exact location.
+- Added authenticated session discovery/create/detail routes, request submission/list/cancel, and approved-members-only chat read/post routes.
+- Join submissions create host inbox events and per-device queued push jobs in one PostgreSQL transaction; new chat messages create privacy-preserving inbox and push-queue records.
+- All routes require real JWKS JWT and server-side verified-adult checks. No mock authentication bypass.
+- **Strict restriction: no hosting, no cloud resources, and no deployment.** GitHub CI uses only temporary test containers.
+- **Pending:** native UI wiring, regression tests, build checks, full functional verification, and review. Real signup, vendor credentials, physical push delivery and cloud hosting are not configured.
+
 
 ### 2026-11-17 — M4 foundation checks verified (still not production-ready)
 - CI: https://github.com/Mutethia-glitch/tokea/actions/runs/43990223625

@@ -22,7 +22,10 @@ export async function clearSessionToken() {
 
 export async function api<T>(path: string, method = "GET", body?: object): Promise<T> {
   const base = process.env.EXPO_PUBLIC_API_URL;
-  if (!base || !base.startsWith("https://")) throw Error("A secure Tokea API endpoint is not configured.");
+  const loopback = !!base && /^http:\/\/(localhost|127\.0\.0\.1|10\.0\.2\.2):[0-9]{2,5}$/.test(base);
+  const allowedLocal = __DEV__ && process.env.EXPO_PUBLIC_ALLOW_LOOPBACK_HTTP === "true" && loopback;
+  if (!base || !(base.startsWith("https://") || allowedLocal))
+    throw Error("Secure Tokea API is not configured. Local HTTP is limited to emulator loopback during development.");
   const accessToken = await getAccessToken();
   if (!accessToken) throw Error("Sign in and verify your age to connect to Tokea.");
   const response = await fetch(`${base}${path}`, {
@@ -30,7 +33,15 @@ export async function api<T>(path: string, method = "GET", body?: object): Promi
     headers: { Authorization: `Bearer ${accessToken}`, "Content-Type": "application/json" },
     ...(body ? { body: JSON.stringify(body) } : {}),
   });
-  if (!response.ok) throw Error(response.status === 401 ? "Please sign in again." : `Tokea request failed (${response.status})`);
+  if (!response.ok) {
+    let message = "";
+    try {
+      const payload = await response.json() as { error?: unknown };
+      if (typeof payload.error === "string" && payload.error.length < 180) message = payload.error;
+    } catch { /* Server response was not JSON. */ }
+    throw Error(response.status === 401 ? "Please sign in again." :
+      message || `Tokea request failed (${response.status})`);
+  }
   return response.json() as Promise<T>;
 }
 
