@@ -2,7 +2,7 @@
 
 **Project:** Tokea (formerly named Explore in early blueprint)  
 **Last updated:** 2026-11-20  
-**Current milestone:** M5 — native phone OTP and private operator SMS smoke-test harness added (CI pending); live backend-to-simulator test pending  
+**Current milestone:** M5 — native phone OTP, default-off sandbox API and private local smoke-test harness verified in CI; actual backend-to-simulator call pending  
 **Repository:** https://github.com/Mutethia-glitch/tokea  
 **Design source:** checked-in GitHub UX in src/components/tokea and src/styles.css, translated to apps/mobile/src/theme.ts and native components; external Lovable is not authoritative
 
@@ -17,7 +17,7 @@
 | Blueprint and scope | Reviewed | Adults-only Kenya social discovery; no dating, alcohol commerce, payments, or AI matching |
 | Visual design | **GitHub repository is authoritative** | Match checked-in GitHub session banners, rounded cards, avatars, colors, spacing; translate to native components, not external Lovable. |
 | Legacy web Discover + filters | **M3 verified (historical)** | 14 drink categories, browser UI checks passed; this is not the customer app |
-| Native phone proof | **M5 source added; pending CI** | Native Kenyan number form, OTP input, countdown, resend throttle and API calls; not authenticated account/JWT or age assurance |
+| Native phone proof | **M5 source verified in CI** | Native Kenyan number form, OTP input, countdown, resend throttle and API calls; Expo Android JS exported. Not a signed build, account/JWT or age assurance |
 | Host/create session | Prototype | Client-side creation/edit/pause/end |
 | Join requests | Prototype | Local simulated acceptance/decline and capacity checks |
 | Session chats | Prototype | Demo-only; access shown after approval, no real messages delivered |
@@ -66,6 +66,12 @@
 - Copyright attribution in native Profile/About: **© 2026 Tokea. All rights reserved.**
 
 ## Changelog
+
+### 2026-11-20 — Native and private SMS-test harness CI verified
+- New native phone number/OTP screen: https://github.com/Mutethia-glitch/tokea/actions/runs/44627229682 — all 3 jobs PASSED, including Kenyan phone-format tests and Android JS export/typecheck.
+- Private local OTP harness and default-off sandbox feature gate: https://github.com/Mutethia-glitch/tokea/actions/runs/44627398858 — all 3 jobs PASSED, including PostgreSQL-backed API tests and disabled-public-route test, plus native and legacy browser regression jobs.
+- **No live backend-to-provider request, device build, real signup or age check was performed by CI.** These require private operator credentials, deployed/local Postgres and separate identity/age providers.
+
 
 ### 2026-11-20 — Private sandbox verification harness and default-off API gate (CI pending)
 - Added localhost-only backend-to-simulator CLI script at `services/api/scripts/otp-sandbox-smoke.mjs`; operator enters simulator number and received code locally. No credentials were uploaded or provider calls made by this commit.
