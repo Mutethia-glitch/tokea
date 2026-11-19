@@ -47,3 +47,11 @@ services/api/dist/
 .private-verification/
 services/api/.private-verification/
 *.enc
+
+# Local-only identity signing and encrypted persistent avatar files.
+services/api/.local-secrets/
+services/api/.profile-photos/
+apps/mobile/google-services.json
+apps/mobile/GoogleService-Info.plist
+*.jks
+*.keystore

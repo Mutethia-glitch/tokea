@@ -23,18 +23,20 @@ export const discoverSchema=z.object({
 }).strict();
 
 type SessionRow = {
-  id:string; host_user_id:string; host_name:string; title:string; category:string;
+  id:string; host_user_id:string; host_name:string; host_has_photo:boolean; host_photo_updated_at:Date|null; title:string; category:string;
   neighbourhood:string; guest_capacity:number; status:"open"|"paused"|"ended";
   starts_at:Date; ends_at:Date; accepted_seats:string;
 };
 const select = `SELECT s.id,s.host_user_id,u.display_name AS host_name,s.title,
   s.category,s.neighbourhood,s.guest_capacity,s.status,s.starts_at,s.ends_at,
+  (u.avatar_file_key IS NOT NULL) AS host_has_photo,u.avatar_updated_at AS host_photo_updated_at,
   COALESCE((SELECT SUM(party_size) FROM join_requests r
     WHERE r.session_id=s.id AND r.status='accepted'),0)::text AS accepted_seats
   FROM sessions s JOIN users u ON u.id=s.host_user_id`;
 const dto=(s:SessionRow,actorId:string)=>({
   isHost:s.host_user_id===actorId,
-  id:s.id,hostId:s.host_user_id,hostName:s.host_name,title:s.title,
+  id:s.id,hostId:s.host_user_id,hostName:s.host_name,
+  hostHasPhoto:s.host_has_photo,hostPhotoVersion:s.host_photo_updated_at,title:s.title,
   category:s.category,neighbourhood:s.neighbourhood,
   guestCapacity:s.guest_capacity,seatsLeft:Math.max(0,s.guest_capacity-Number(s.accepted_seats)),
   status:s.status,startsAt:s.starts_at,endsAt:s.ends_at,

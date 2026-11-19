@@ -8,7 +8,9 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run --config ./vitest.config.mts",
     "start": "node dist/server.js",
-    "cleanup:verification": "bun scripts/cleanup-verification.mjs"
+    "cleanup:verification": "bun scripts/cleanup-verification.mjs",
+    "identity:keygen": "bun scripts/create-local-identity.mjs",
+    "admin:bootstrap": "bun scripts/bootstrap-owner.mjs"
   },
   "engines": {
     "node": ">=22"

@@ -77,12 +77,13 @@ export async function verifyPhoneCode(phone:string,code:string){
       throw new ApiError(401,"That code isn't correct. Please try again.");
     }
     await db.query("DELETE FROM phone_login_codes WHERE phone_e164=$1",[phone]);
-    const account=await db.query<{id:string;display_name:string}>(`INSERT INTO users(phone_e164,display_name)
+    const account=await db.query<{id:string;display_name:string;age_verified_at:Date|null}>(`INSERT INTO users(phone_e164,display_name)
       VALUES($1,'New member') ON CONFLICT(phone_e164) DO UPDATE
-      SET phone_e164=EXCLUDED.phone_e164 RETURNING id,display_name`,[phone]);
+      SET phone_e164=EXCLUDED.phone_e164 RETURNING id,display_name,age_verified_at`,[phone]);
     const session=await issueSession(db,account.rows[0]!.id);
     await db.query("COMMIT");
-    return {...session,displayName:account.rows[0]!.display_name,ageVerified:false};
+    return {...session,displayName:account.rows[0]!.display_name,
+      ageVerified:!!account.rows[0]!.age_verified_at};
   }catch(e){
     await db.query("ROLLBACK").catch(()=>{});
     throw e;

@@ -65,7 +65,7 @@
 - Selected Africa's Talking SMS API with explicit sandbox/live modes. Added Kenya E.164 phone validation, random six-digit OTP, five-minute expiry, HMAC hashing (no plaintext code storage), throttling, capped attempts, and encrypted/signed first-party JWT access tokens.
 - Added revocable, rotating 30-day refresh sessions and /v1/auth code-request/verify/refresh/sign-out endpoints. A verified phone does **not** mark the person age-verified; ID+selfie review remains separate.
 - RSA signing keys and SMS secrets are local-only and must not be committed. OTP login fails closed when credentials are missing; sandbox messages are not live handset delivery.
-- Next: native sign-in form, Gmail-backed admin Google sign-in mapping, photo banners/profile persistence and push receipt checks. No hosting or deployment.
+- Added local owner bootstrap command, verified-Google-ID-token staff exchange with PKCE and nonce, and the account/profile photo API. Profile photos are stored separately from 24-hour identity documents; signed-in users can view public-in-app avatars when profile storage is enabled. Native sign-in and photo screens are next. No hosting.
 
 
 ### 2026-11-19 — M6 verification and cleanup implementation checkpoint

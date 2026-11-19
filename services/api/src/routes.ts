@@ -4,6 +4,7 @@ import type { IncomingMessage, ServerResponse } from "node:http";
 import { z } from "zod";
 import { authenticateIdentity, requireVerifiedAdult, requireAdmin, ApiError } from "./auth.js";
 import { loginConfig, exchangeCode, exchangeSchema } from "./admin-login.js";
+import { getMyProfile,updateMyName,saveMyAvatar,readUserAvatar,removeMyAvatar } from "./profile-photos.js";
 import { requestCodeSchema,verifyCodeSchema,refreshSchema,
   requestPhoneCode,verifyPhoneCode,refreshPhoneSession,revokePhoneSession } from "./phone-auth.js";
 import { decideJoinRequest } from "./decisions.js";
@@ -86,9 +87,28 @@ export async function route(req:IncomingMessage,res:ServerResponse){
       return respond(res,200,loginConfig());
     if(method==="POST"&&path==="/v1/admin/auth/exchange"){
       const payload=exchangeSchema.parse(await parseBody(req));
-      return respond(res,200,await exchangeCode(payload.code,payload.verifier));
+      return respond(res,200,await exchangeCode(payload.code,payload.verifier,payload.nonce));
     }
     const user=await authenticateIdentity(req.headers);
+    if(method==="GET"&&path==="/v1/me")
+      return respond(res,200,await getMyProfile(user.id));
+    if(method==="PATCH"&&path==="/v1/me"){
+      const update=z.object({displayName:z.string().trim().min(2).max(60)}).strict().parse(await parseBody(req));
+      return respond(res,200,await updateMyName(user.id,update.displayName));
+    }
+    if(method==="POST"&&path==="/v1/me/photo"){
+      if(!["image/jpeg","image/png","image/webp"].includes(req.headers["content-type"]?.split(";")[0]??""))
+        throw new ApiError(415,"Use a JPG, PNG or WebP picture.");
+      return respond(res,200,await saveMyAvatar(user.id,await readBody(req,5*1024*1024)));
+    }
+    if(method==="DELETE"&&path==="/v1/me/photo")
+      return respond(res,200,await removeMyAvatar(user.id));
+    const avatarPath=new RegExp("^/v1/users/"+uuid+"/photo$").exec(path);
+    if(method==="GET"&&avatarPath){
+      const file=await readUserAvatar(avatarPath[1]!);
+      res.writeHead(200,{...normalHeaders,"content-type":"image/jpeg","content-security-policy":"default-src 'none'","cross-origin-resource-policy":"same-origin"});
+      res.end(file);return;
+    }
     if(method==="GET"&&path==="/v1/admin/me")
       return respond(res,200,{role:await requireAdmin(user)});
 

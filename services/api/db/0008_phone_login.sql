@@ -1,6 +1,6 @@
 -- Kenya phone sign-in. A verified SMS number is NOT age verification.
 ALTER TABLE users ADD COLUMN IF NOT EXISTS phone_e164 TEXT;
-CREATE UNIQUE INDEX IF NOT EXISTS idx_users_unique_phone ON users(phone_e164) WHERE phone_e164 IS NOT NULL;
+CREATE UNIQUE INDEX IF NOT EXISTS idx_users_unique_phone ON users(phone_e164);
 CREATE TABLE IF NOT EXISTS phone_login_codes (
   phone_e164 TEXT PRIMARY KEY,
   code_hmac TEXT NOT NULL,
