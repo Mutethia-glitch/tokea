@@ -96,6 +96,7 @@
 - Added temporary PostgreSQL integration tests for creating/discovering sessions, join notifications, approvals, chat membership, cancellation and blocking.
 - Corrected host detection for sessions with zero join requests: the server derives `isHost` from the JWT subject rather than whether invitations already exist.
 - Native messages currently refresh on a short interval; full realtime transport, phone push receipts and complete identity/onboarding still outstanding.
+- Made unverified-state Requests and Chats friendly: a plain explanation and a `Check age verification` action replace technical 403 errors. Simplified privacy notice wording for non-technical users.
 - Initial CI exposed a malformed API routing module and a native list-type mismatch; both corrected.
 - **Verified:** GitHub Actions run https://github.com/Mutethia-glitch/tokea/actions/runs/44388261555 passed web design-reference checks, Android JavaScript export, native TS check, PostgreSQL migration, backend compilation and **12 API tests** (4 session/request/chat integrations plus the prior 8 tests).
 - No external service provisioned, no cloud hosting, and no native device push yet.
