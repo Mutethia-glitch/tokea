@@ -66,6 +66,10 @@ export default function DiscoverScreen() {
         <Text style={{ color: colors.text, fontWeight: "700", marginBottom: 8 }}>Can't load sessions yet</Text>
         <Text style={{ color: colors.muted, lineHeight: 22 }}>{error}</Text>
         <Text style={{ color: colors.muted, lineHeight: 22, marginTop: 8 }}>A verified account and connected Tokea API are required. Sample sessions are not shown as real users.</Text>
+        <Pressable accessibilityRole="button" onPress={() => router.push("/verify-phone")}
+          style={{ minHeight: 46, backgroundColor: colors.brandSoft, borderRadius: 14, marginTop: 16, justifyContent: "center", alignItems: "center" }}>
+          <Text style={{ color: colors.brand, fontWeight: "700" }}>Try phone verification</Text>
+        </Pressable>
       </View> : null}
       {!loading && !error && visible.length === 0 ? <View style={{ borderRadius: layout.cardRadius, backgroundColor: colors.card, borderColor: colors.border, borderWidth: 1, padding: 20 }}>
         <Text style={{ color: colors.text, fontWeight: "700", marginBottom: 8 }}>Nothing available yet</Text>

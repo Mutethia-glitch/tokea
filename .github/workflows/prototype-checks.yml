@@ -96,5 +96,7 @@ jobs:
         run: bun install
       - name: Typecheck native app
         run: bun run typecheck
+      - name: Validate Kenyan mobile-number formats
+        run: bun run test:phone
       - name: Validate Expo Android JS bundle
         run: bunx expo export --platform android --output-dir .expo-dist

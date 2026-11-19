@@ -21,6 +21,14 @@ export default function ProfileScreen() {
   return <Screen>
     <Heading title="Profile" subtitle="Your Tokea account, privacy and notifications." />
     <Paper>
+      <Text style={{ color: colors.text, fontSize: 16, fontWeight: "700", marginBottom: 8 }}>Phone verification</Text>
+      <Text style={{ color: colors.muted, lineHeight: 21, marginBottom: 12 }}>Test a Kenyan number with SMS. This is not account sign-in or age verification.</Text>
+      <Pressable accessibilityRole="button" onPress={() => router.push("/verify-phone")}
+        style={{ minHeight: 46, backgroundColor: colors.brandSoft, borderRadius: 14, justifyContent: "center", alignItems: "center" }}>
+        <Text style={{ color: colors.brand, fontWeight: "700" }}>Verify phone number</Text>
+      </Pressable>
+    </Paper>
+    <Paper>
       <Text style={{ color: colors.text, fontSize: 16, fontWeight: "600" }}>Phone notifications</Text>
       <Text style={{ color: colors.muted, lineHeight: 21, marginVertical: 11 }}>
         Get notified when a host accepts or declines your request. You can still see important updates inside Tokea if phone notifications are off.

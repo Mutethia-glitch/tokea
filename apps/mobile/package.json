@@ -8,6 +8,7 @@
     "android": "expo run:android",
     "ios": "expo run:ios",
     "typecheck": "tsc --noEmit",
+    "test:phone": "bun scripts/test-phone.mjs",
     "doctor": "expo-doctor"
   },
   "dependencies": {

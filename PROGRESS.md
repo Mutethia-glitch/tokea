@@ -2,7 +2,7 @@
 
 **Project:** Tokea (formerly named Explore in early blueprint)  
 **Last updated:** 2026-11-20  
-**Current milestone:** M5 — Africa's Talking sandbox delivery manually verified and server OTP challenge source verified in CI; real backend-to-simulator end-to-end test pending  
+**Current milestone:** M5 — native Kenyan SMS OTP screens connected to sandbox proof endpoints in source (CI verification pending); real backend-to-simulator test still pending  
 **Repository:** https://github.com/Mutethia-glitch/tokea  
 **Design source:** checked-in GitHub UX in src/components/tokea and src/styles.css, translated to apps/mobile/src/theme.ts and native components; external Lovable is not authoritative
 
@@ -17,7 +17,7 @@
 | Blueprint and scope | Reviewed | Adults-only Kenya social discovery; no dating, alcohol commerce, payments, or AI matching |
 | Visual design | **GitHub repository is authoritative** | Match checked-in GitHub session banners, rounded cards, avatars, colors, spacing; translate to native components, not external Lovable. |
 | Legacy web Discover + filters | **M3 verified (historical)** | 14 drink categories, browser UI checks passed; this is not the customer app |
-| Onboarding + profile | Prototype | Legacy web mock OTP remains demo-only; standalone server-side phone OTP source added but not yet connected to native account/JWT/age verification |
+| Native phone proof | **M5 source added; pending CI** | Native Kenyan number form, OTP input, countdown, resend throttle and API calls; not authenticated account/JWT or age assurance |
 | Host/create session | Prototype | Client-side creation/edit/pause/end |
 | Join requests | Prototype | Local simulated acceptance/decline and capacity checks |
 | Session chats | Prototype | Demo-only; access shown after approval, no real messages delivered |
@@ -66,6 +66,12 @@
 - Copyright attribution in native Profile/About: **© 2026 Tokea. All rights reserved.**
 
 ## Changelog
+
+### 2026-11-20 — Native phone OTP UX (verification pending)
+- Added `apps/mobile/app/verify-phone.tsx`: Kenya phone entry, six-digit code entry, expiry countdown, resend controls, verified/non-authenticated information and user-visible errors, matching the checked-in GitHub palette, rounded cards and spacing.
+- Added native start/verify API calls without leaking Africa's Talking credentials or minting login tokens. Linked the screen from Profile and Discover's disconnected state.
+- Added phone-number normalization checks to the native CI workflow. No real signed app, sandbox call, account creation or age assurance was verified by this patch.
+
 
 ### 2026-11-20 — M5 server OTP CI verification complete
 - GitHub Actions: https://github.com/Mutethia-glitch/tokea/actions/runs/44626255270 — **all 3 jobs passed** (API TypeScript and compile, isolated PostgreSQL OTP/challenge and existing API tests, native Android JS export/typecheck, and legacy browser smoke tests).
