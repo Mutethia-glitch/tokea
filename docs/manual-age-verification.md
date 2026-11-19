@@ -7,7 +7,7 @@
 - Email invitations: owner-only; token hashed in database, 48-hour expiry, verified email identity required on acceptance. No SMTP means endpoint fails closed. The first owner must be bootstrapped separately with a real authenticated identity.
 - On approval user gets `age_verified_at` and previously blocked host/request/chat actions become accessible automatically; final decisions generate user-scoped inbox and queued opt-in phone notifications.
 - User submission sends a pending notification explaining **5-minute review target during staffed hours**; no unstaffed review promise.
-- Document images are validated and re-encoded to JPEG, losing embedded metadata, and AES-256-GCM encrypted in a private local directory. Files are removed on review or when cases exceed their 24-hour expiry; reviewer access ends at expiry.
+- Document images are validated and re-encoded to JPEG, losing embedded metadata, and AES-256-GCM encrypted in a private local directory. On replacement, review completion or 24h expiry, obsolete photo file IDs are cleared and files deleted. Successful deletions also remove file IDs from the deletion queue. Orphaned files are swept periodically with a short in-flight upload grace window.
 - **No real images may be collected until production-grade deletion uptime, key management, backup exclusion, legal review and incident procedures are demonstrated.** Environment defaults keep uploads disabled.
 
 ## Configure local development safely

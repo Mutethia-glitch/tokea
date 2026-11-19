@@ -50,6 +50,14 @@ describe.skipIf(!enabled)("Human age review, secure photos, and immutable staff 
     await expect(verification.uploadDocument(actor(userId),"id",idSample,false))
       .rejects.toMatchObject({status:400});
     await verification.uploadDocument(actor(userId),"id",idSample,true);
+    const first=await localPool.query<{id_file_key:string}>(
+      "SELECT id_file_key FROM age_verification_cases WHERE user_id=$1",[userId]);
+    const oldIdKey=first.rows[0]!.id_file_key;
+    await verification.uploadDocument(actor(userId),"id",idSample,true);
+    await expect(store.readPhoto(oldIdKey)).rejects.toThrow();
+    const oldRecord=await localPool.query<{n:number}>(
+      "SELECT COUNT(*)::int AS n FROM verification_photo_deletions WHERE file_key=$1",[oldIdKey]);
+    expect(oldRecord.rows[0]!.n).toBe(0);
     await verification.uploadDocument(actor(userId),"selfie",selfieSample,true);
     const row=await localPool.query<{id:string;id_file_key:string;selfie_file_key:string;consent_at:Date}>(
       "SELECT id,id_file_key,selfie_file_key,consent_at FROM age_verification_cases WHERE user_id=$1",[userId]);
@@ -98,6 +106,9 @@ describe.skipIf(!enabled)("Human age review, secure photos, and immutable staff 
     expect((await verification.getVerificationStatus(userId)).verified).toBe(true);
     await expect(store.readPhoto(idPhoto)).rejects.toThrow();
     await expect(store.readPhoto(selfiePhoto)).rejects.toThrow();
+    const deadRefs=await localPool.query<{n:number}>(`SELECT COUNT(*)::int AS n FROM verification_photo_deletions
+      WHERE file_key IN ($1,$2)`,[idPhoto,selfiePhoto]);
+    expect(deadRefs.rows[0]!.n).toBe(0);
     await expect(localPool.query("UPDATE age_verification_cases SET status='declined' WHERE id=$1",[caseId]))
       .rejects.toMatchObject({code:"23514"});
     const inbox=await (await import("./inbox.js")).getInbox(userId);
@@ -145,5 +156,41 @@ describe.skipIf(!enabled)("Human age review, secure photos, and immutable staff 
     expect(Number(queue.rows[0]?.total)).toBe(0);
     const inbox=await (await import("./inbox.js")).getInbox(expiredId);
     expect(inbox.some(x=>x.kind==="verification_expired")).toBe(true);
+  });
+
+  it("restarts an expired draft without retaining old ID or selfie references",async()=>{
+    await verification.uploadDocument(actor(expiredId),"id",idSample,true);
+    await verification.uploadDocument(actor(expiredId),"selfie",selfieSample,true);
+    const old=await localPool.query<{id:string;id_file_key:string;selfie_file_key:string}>(
+      "SELECT id,id_file_key,selfie_file_key FROM age_verification_cases WHERE user_id=$1 AND status='draft'",[expiredId]);
+    const previous=old.rows[0]!;
+    await localPool.query("UPDATE age_verification_cases SET expires_at=NOW()-INTERVAL '1 minute' WHERE id=$1",[previous.id]);
+    await verification.uploadDocument(actor(expiredId),"id",idSample,true);
+    const expired=await localPool.query<{status:string;id_file_key:string|null;selfie_file_key:string|null}>(
+      "SELECT status,id_file_key,selfie_file_key FROM age_verification_cases WHERE id=$1",[previous.id]);
+    expect(expired.rows[0]).toMatchObject({status:"expired",id_file_key:null,selfie_file_key:null});
+    await expect(store.readPhoto(previous.id_file_key)).rejects.toThrow();
+    await expect(store.readPhoto(previous.selfie_file_key)).rejects.toThrow();
+    const stale=await localPool.query<{n:number}>(`SELECT COUNT(*)::int AS n FROM verification_photo_deletions
+      WHERE file_key IN ($1,$2)`,[previous.id_file_key,previous.selfie_file_key]);
+    expect(stale.rows[0]!.n).toBe(0);
+    const fresh=await localPool.query<{id:string;id_file_key:string;selfie_file_key:string|null}>(
+      "SELECT id,id_file_key,selfie_file_key FROM age_verification_cases WHERE user_id=$1 AND status='draft'",[expiredId]);
+    expect(fresh.rows[0]?.id).not.toBe(previous.id);
+    expect(fresh.rows[0]?.id_file_key).not.toBe(previous.id_file_key);
+    expect(fresh.rows[0]?.selfie_file_key).toBeNull();
+  });
+
+  it("removes unreferenced encrypted files from interrupted uploads, without clearing active images",async()=>{
+    const abandoned=await store.savePhoto(idSample,"id");
+    const live=await localPool.query<{file_key:string}>(`SELECT id_file_key AS file_key
+        FROM age_verification_cases WHERE status IN ('draft','pending') AND id_file_key IS NOT NULL
+      UNION ALL SELECT selfie_file_key AS file_key
+        FROM age_verification_cases WHERE status IN ('draft','pending') AND selfie_file_key IS NOT NULL`);
+    const current=new Set(live.rows.map(x=>x.file_key));
+    expect(current.has(abandoned)).toBe(false);
+    expect(await store.sweepUnreferencedPhotos(current,0)).toBeGreaterThanOrEqual(1);
+    await expect(store.readPhoto(abandoned)).rejects.toThrow();
+    for(const key of current)expect((await store.readPhoto(key)).length).toBeGreaterThan(0);
   });
 });

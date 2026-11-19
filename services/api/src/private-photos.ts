@@ -1,5 +1,5 @@
 import { createCipheriv, createDecipheriv, randomBytes, randomUUID } from "node:crypto";
-import { mkdir, readFile, readdir, rm, writeFile, chmod } from "node:fs/promises";
+import { mkdir, readFile, readdir, rm, writeFile, chmod, stat } from "node:fs/promises";
 import { resolve, join } from "node:path";
 import sharp from "sharp";
 import { ApiError } from "./auth.js";
@@ -61,4 +61,26 @@ export async function readPhoto(id:string) {
 export async function removePhoto(id:string|null|undefined) {
   if(!id)return;
   await rm(pathFor(id),{force:true});
+}
+
+/** Reclaim abandoned encrypted files, without deleting in-flight image uploads. */
+export async function sweepUnreferencedPhotos(activeKeys:Set<string>,graceMs=10*60*1000){
+  if(process.env.VERIFICATION_UPLOADS_ENABLED!=="true")return 0;
+  const entries=await readdir(DIRECTORY,{withFileTypes:true});
+  let removed=0;
+  for(const item of entries){
+    if(!item.isFile()||!item.name.endsWith(".enc"))continue;
+    const id=item.name.slice(0,-4);
+    if(!UUID.test(id)||activeKeys.has(id))continue;
+    try{
+      const info=await stat(pathFor(id));
+      if(Date.now()-info.mtimeMs<graceMs)continue;
+      await removePhoto(id);
+      removed++;
+    }catch(error){
+      if((error as NodeJS.ErrnoException)?.code==="ENOENT")continue;
+      console.error("Orphan photo cleanup error",error instanceof Error?error.message:"Unknown failure");
+    }
+  }
+  return removed;
 }

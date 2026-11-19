@@ -1,6 +1,6 @@
 import { pool } from "./db.js";
 import { ApiError, type AuthenticatedUser, requireAdmin } from "./auth.js";
-import { savePhoto, removePhoto, readPhoto } from "./private-photos.js";
+import { savePhoto, removePhoto, readPhoto, sweepUnreferencedPhotos } from "./private-photos.js";
 import { enqueueNotice } from "./notice.js";
 import { z } from "zod";
 
@@ -43,7 +43,11 @@ export async function uploadDocument(user:AuthenticatedUser,kind:"id"|"selfie",b
     if(row?.status==="pending")throw new ApiError(409,"Age review is already in progress.");
     if(row?.status==="verified")throw new ApiError(409,"Review already completed.");
     if(row?.status==="draft"&&row.expires_at.getTime()<=Date.now()) {
-      await db.query("UPDATE age_verification_cases SET status='expired' WHERE id=$1",[row.id]);
+      for(const key of [row.id_file_key,row.selfie_file_key]) {
+        if(key)await db.query("INSERT INTO verification_photo_deletions(file_key) VALUES($1) ON CONFLICT DO NOTHING",[key]);
+      }
+      await db.query(`UPDATE age_verification_cases
+        SET status='expired',id_file_key=NULL,selfie_file_key=NULL WHERE id=$1`,[row.id]);
       row=undefined;
     }
     if(!row||row.status!=="draft") {
@@ -56,6 +60,7 @@ export async function uploadDocument(user:AuthenticatedUser,kind:"id"|"selfie",b
     await db.query(`UPDATE age_verification_cases SET ${column}=$1,consent_at=COALESCE(consent_at,NOW()) WHERE id=$2 AND status='draft'`,[fileKey,row.id]);
     if(old)await db.query("INSERT INTO verification_photo_deletions(file_key) VALUES($1) ON CONFLICT DO NOTHING",[old]);
     await db.query("COMMIT");
+    await drainPhotoDeletionQueue();
     return {received:true,kind};
   } catch(e) {
     await db.query("ROLLBACK");
@@ -142,8 +147,8 @@ export async function drainPhotoDeletionQueue(){
   for(const row of r.rows){
     try{
       await removePhoto(row.file_key);
-      await pool.query("UPDATE verification_photo_deletions SET deleted_at=NOW(),last_error=NULL WHERE file_key=$1",
-        [row.file_key]);
+      // After deletion, remove the old file ID from the queue entirely.
+      await pool.query("DELETE FROM verification_photo_deletions WHERE file_key=$1",[row.file_key]);
       done++;
     }catch(e){
       await pool.query("UPDATE verification_photo_deletions SET attempts=attempts+1,last_error=$2 WHERE file_key=$1",
@@ -174,5 +179,12 @@ export async function purgeExpiredVerificationPhotos(){
     await db.query("COMMIT");
   }catch(e){await db.query("ROLLBACK");throw e;}finally{db.release();}
   await drainPhotoDeletionQueue();
+  // Recover encrypted photos orphaned by a crash between disk write and SQL commit.
+  // The grace period keeps active uploads from being removed mid-request.
+  const current=await pool.query<{file_key:string}>(`SELECT id_file_key AS file_key FROM age_verification_cases
+      WHERE status IN ('draft','pending') AND id_file_key IS NOT NULL
+    UNION ALL SELECT selfie_file_key AS file_key FROM age_verification_cases
+      WHERE status IN ('draft','pending') AND selfie_file_key IS NOT NULL`);
+  await sweepUnreferencedPhotos(new Set(current.rows.map(r=>r.file_key)),10*60*1000);
   return expired;
 }

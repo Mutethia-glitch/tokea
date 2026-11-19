@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Alert, Image, Pressable, ScrollView, Text, View } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { router, useFocusEffect } from "expo-router";
@@ -6,12 +6,27 @@ import { Heading, Paper, Screen } from "@/ui";
 import { Action, MessageBox } from "@/native-cards";
 import { colors } from "@/theme";
 import { getVerificationStatus, submitAgeReview, uploadIdentityPhoto, type VerificationStatus } from "@/verification";
+import { releasePickedIdentityPhoto } from "@/temporary-identity-photos";
 
 type Selected={uri:string;mimeType:string}|null;
 export default function VerifyAgeScreen(){
   const [status,setStatus]=useState<VerificationStatus|null>(null);
   const [id,setId]=useState<Selected>(null);
   const [selfie,setSelfie]=useState<Selected>(null);
+  // Only the CURRENT selected cache file is retained; older previews are discarded.
+  const pendingPhotoFiles=useRef<{id:Selected;selfie:Selected}>({id:null,selfie:null});
+  function updatePhoto(kind:"id"|"selfie",photo:Selected){
+    const previous=pendingPhotoFiles.current[kind];
+    pendingPhotoFiles.current[kind]=photo;
+    if(kind==="id")setId(photo);else setSelfie(photo);
+    if(previous && previous.uri!==photo?.uri)releasePickedIdentityPhoto(previous.uri);
+  }
+  useEffect(()=>()=> {
+    // Clean temporary camera/gallery copies when the screen is left or unmounted.
+    releasePickedIdentityPhoto(pendingPhotoFiles.current.id?.uri);
+    releasePickedIdentityPhoto(pendingPhotoFiles.current.selfie?.uri);
+    pendingPhotoFiles.current={id:null,selfie:null};
+  },[]);
   const [consent,setConsent]=useState(false);
   const [busy,setBusy]=useState(false);
   const [loading,setLoading]=useState(true);
@@ -33,10 +48,15 @@ export default function VerifyAgeScreen(){
     if(result.canceled||!result.assets[0])return;
     const image=result.assets[0];
     if(image.fileSize&&image.fileSize>5*1024*1024){
-      Alert.alert("Photo too large","Use a JPG, PNG or WebP no larger than 5 MB.");return;
+      releasePickedIdentityPhoto(image.uri);
+      Alert.alert("Photo too large","Please choose a photo smaller than 5 MB.");return;
     }
-    const selected={uri:image.uri,mimeType:image.mimeType??"image/jpeg"};
-    if(kind==="id")setId(selected);else setSelfie(selected);
+    const mime=image.mimeType??"";
+    if(!["image/jpeg","image/png","image/webp"].includes(mime)){
+      releasePickedIdentityPhoto(image.uri);
+      Alert.alert("Choose a different photo","Please use a JPG, PNG or WebP image.");return;
+    }
+    updatePhoto(kind,{uri:image.uri,mimeType:mime});
   }
   async function submit(){
     if(!id||!selfie)return;
@@ -46,7 +66,7 @@ export default function VerifyAgeScreen(){
       await uploadIdentityPhoto(id.uri,"id",id.mimeType);
       await uploadIdentityPhoto(selfie.uri,"selfie",selfie.mimeType);
       const result=await submitAgeReview(consent);
-      setId(null);setSelfie(null);
+      updatePhoto("id",null);updatePhoto("selfie",null);
       Alert.alert("Submitted for review",result.message);
       await refresh();
     }catch(e){setError(e instanceof Error?e.message:"Verification could not be submitted.");}
