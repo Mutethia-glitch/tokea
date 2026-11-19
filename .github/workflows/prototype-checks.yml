@@ -80,7 +80,9 @@ jobs:
         run: bun run build
       - name: Migrate isolated test PostgreSQL
         run: bun scripts/migrate.mjs
-      - name: Test API decisions, DB transactions and notification inbox
+      - name: Smoke test independent cleanup command (uploads disabled)
+        run: bun run cleanup:verification
+      - name: Test API, reviews, database transactions and image expiry
         run: bun run test
 
   native-foundation:

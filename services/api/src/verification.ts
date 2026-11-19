@@ -33,8 +33,15 @@ export async function getVerificationStatus(userId:string) {
 export async function uploadDocument(user:AuthenticatedUser,kind:"id"|"selfie",bytes:Buffer,consented:boolean) {
   if(!consented)throw new ApiError(400,"Please agree to temporary identity-photo review before uploading.");
   if(user.ageVerified)throw new ApiError(409,"Account already age verified.");
+  const receivedAt=new Date();
   const fileKey=await savePhoto(bytes,kind);
-  const db=await pool.connect();
+  let db;
+  try{db=await pool.connect();}
+  catch(error){
+    await removePhoto(fileKey).catch(()=>{});
+    throw error;
+  }
+  let committed=false;
   let old:string|null=null;
   try {
     await db.query("BEGIN");
@@ -52,7 +59,8 @@ export async function uploadDocument(user:AuthenticatedUser,kind:"id"|"selfie",b
     }
     if(!row||row.status!=="draft") {
       const result=await db.query<ReviewCase>(
-        "INSERT INTO age_verification_cases(user_id) VALUES($1) RETURNING *",[user.id]);
+        "INSERT INTO age_verification_cases(user_id,expires_at) VALUES($1,$2) RETURNING *",
+        [user.id,new Date(receivedAt.getTime()+24*60*60*1000)]);
       row=result.rows[0]!;
     }
     old=kind==="id"?row.id_file_key:row.selfie_file_key;
@@ -60,13 +68,20 @@ export async function uploadDocument(user:AuthenticatedUser,kind:"id"|"selfie",b
     await db.query(`UPDATE age_verification_cases SET ${column}=$1,consent_at=COALESCE(consent_at,NOW()) WHERE id=$2 AND status='draft'`,[fileKey,row.id]);
     if(old)await db.query("INSERT INTO verification_photo_deletions(file_key) VALUES($1) ON CONFLICT DO NOTHING",[old]);
     await db.query("COMMIT");
-    await drainPhotoDeletionQueue();
+    committed=true;
     return {received:true,kind};
   } catch(e) {
-    await db.query("ROLLBACK");
-    await removePhoto(fileKey).catch(()=>{});
+    if(!committed){
+      await db.query("ROLLBACK").catch(()=>{});
+      await removePhoto(fileKey).catch(()=>{});
+    }
     throw e;
-  }finally{db.release();}
+  }finally{
+    db.release();
+    // Cleanup must NEVER erase the new file or undo a committed upload when it fails.
+    if(committed)await drainPhotoDeletionQueue().catch(e=>
+      console.error("Old photo deletion queued for retry",e instanceof Error?e.message:"Cleanup failed"));
+  }
 }
 export async function submitVerification(user:AuthenticatedUser) {
   if(user.ageVerified)throw new ApiError(409,"Already verified.");
@@ -135,7 +150,9 @@ export async function decideVerification(admin:AuthenticatedUser,id:string,decis
     }
     await db.query("COMMIT");
   }catch(e){await db.query("ROLLBACK");throw e;}finally{db.release();}
-  await drainPhotoDeletionQueue();
+  // A transient file-system failure cannot reverse a committed final decision.
+  await drainPhotoDeletionQueue().catch(e=>
+    console.error("Review photos queued for retry",e instanceof Error?e.message:"Cleanup failed"));
   return {status:decision.decision,final:true};
 }
 /** Persisted deletion jobs are retried after service restart. */

@@ -61,6 +61,13 @@
 
 ## Changelog
 
+### 2026-11-19 — Keep current photo valid even if old-file cleanup fails (CI pending)
+- Upload expiry now begins when photo intake starts, not after image processing finishes.
+- Upload transactions separate the committed **current** photo from the best-effort cleanup of obsolete files. If deletion fails, the new active photo remains valid and a retry job persists; it cannot accidentally be removed as a fallback.
+- Admin verification decisions similarly remain final/successful even if immediate file deletion fails; cleanup errors are logged for retry.
+- No hosting; no real identity documents accepted.
+
+
 ### 2026-11-19 — Independent identity-photo cleanup command (verification pending)
 - Added `bun run cleanup:verification`, a separate one-shot local task to expire pending/draft ID and selfie files and clear orphaned encrypted files even when the HTTP server is stopped.
 - Reports overdue deletion jobs so an operating-system scheduler can detect failures. This still cannot guarantee deletion while the computer is off; no real user ID uploads are authorized without 24-hour operational controls.
