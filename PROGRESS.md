@@ -2,7 +2,7 @@
 
 **Project:** Tokea (formerly named Explore in early blueprint)  
 **Last updated:** 2026-11-19  
-**Current milestone:** M5 — native Discover read endpoint, setup checklist and copyright source verified in CI; external accounts/real device tests pending  
+**Current milestone:** M5 — authenticated native Discover with GitHub-native visual cards, API and copyright verified in CI; external providers/real devices pending  
 **Repository:** https://github.com/Mutethia-glitch/tokea  
 **Design source:** checked-in GitHub UX in src/components/tokea and src/styles.css, translated to apps/mobile/src/theme.ts and native components; external Lovable is not authoritative
 
@@ -33,6 +33,7 @@
 ## Immediate next steps
 
 - [x] Review GitHub Actions for M5 native/API changes — all three CI jobs passed: https://github.com/Mutethia-glitch/tokea/actions/runs/44538251699.
+- [x] Verify GitHub-design native Discover card translation — all three CI jobs passed: https://github.com/Mutethia-glitch/tokea/actions/runs/44539052668.
 - [ ] Provision owner-controlled Africa's Talking sandbox, dedicated Google admin, Expo/Firebase, Apple Developer and a mail-only Zoho domain; see docs/account-setup.md. **No account has been created by this code change.**
 - [ ] Confirm Tokea trademark/brand suitability and ownership of the selected mail domain before publishing support contact details.
 
@@ -62,6 +63,11 @@
 - Copyright attribution in native Profile/About: **© 2026 Tokea. All rights reserved.**
 
 ## Changelog
+
+### 2026-11-19 — M5 GitHub-design card translation verified in CI
+- GitHub Actions: https://github.com/Mutethia-glitch/tokea/actions/runs/44539052668 — **all three jobs PASSED**: native Expo TypeScript/Android JS export; API compilation/PostgreSQL integration tests; archived web browser regressions.
+- Confirms the native banner/session-card translation from the repository's existing UI compiles, without claiming a signed/installed app or live provider delivery. External account setup, age assurance, OTP and real-device testing are still outstanding.
+
 
 ### 2026-11-19 — M5 native Discover card styling translated from checked-in GitHub design (CI pending)
 - Clarified that the **polished designs already in GitHub** (src/components/tokea and src/styles.css) are the visual source of truth for React Native, rather than either the separate Lovable project or the early placeholder native screens.
