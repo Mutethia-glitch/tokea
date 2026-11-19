@@ -10,6 +10,9 @@
 - Document images are validated and re-encoded to JPEG, losing embedded metadata, and AES-256-GCM encrypted in a private local directory. On replacement, review completion or 24h expiry, obsolete photo file IDs are cleared and files deleted. Successful deletions also remove file IDs from the deletion queue. Orphaned files are swept periodically with a short in-flight upload grace window.
 - **No real images may be collected until production-grade deletion uptime, key management, backup exclusion, legal review and incident procedures are demonstrated.** Environment defaults keep uploads disabled.
 
+## Verification status and launch gate
+The local code and synthetic-data tests now cover consent, photo replacement, final decisions by two competing administrators, admin invitation single-use rules, photo expiry, old database reference removal, and orphan-file cleanup. This is NOT evidence of secure live ID processing or working phone push. Production eligibility still requires identity-provider setup, staff onboarding, SMTP, continuously monitored deletion, documented backups/key management, DPIA/legal approval and real native device testing.
+
 ## Old-photo and code-reference cleanup
 - Superseded, declined, approved and expired case images are never used as fallback input. Active case records retain only the current draft/pending photo IDs. Once deletion succeeds, the deletion queue's record is also removed.
 - `0006_remove_old_photo_refs.sql` clears previously finalized photo references. `0007_remove_deleted_file_tombstones.sql` removes old completed-deletion records. Both leave audit decisions intact.

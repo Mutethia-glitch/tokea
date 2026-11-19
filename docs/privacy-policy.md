@@ -20,7 +20,7 @@ ID/selfie photos are used only to confirm adult eligibility and prevent misuse o
 
 ## Protection and retention
 
-Our proposed system validates and re-encodes uploads to remove embedded image metadata, encrypts photos at rest with AES-256-GCM, uses private storage outside public directories, and makes photo access available only to authorized reviewers while a submission is pending. Review records and notifications do not contain or expose the photo bytes.
+Our proposed system validates and re-encodes uploads to remove embedded image metadata, encrypts photos at rest with AES-256-GCM, uses private storage outside public directories, and makes photo access available only to authorized reviewers while a submission is pending. Review records and notifications do not contain or expose the photo bytes. After replacing or finishing a review, the system also removes old file identifiers from the active case and deletes completed cleanup references. Old images are not reused as a fallback.
 
 **The intended photo retention limit is 24 hours from the initial upload, and less if the review finishes sooner.** The service attempts to delete both encrypted document and selfie files immediately following a final review, and automatically expires and deletes outstanding files after 24 hours. It denies reviewer access after expiry. We intend to exclude this storage from backups.
 

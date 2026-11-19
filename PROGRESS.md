@@ -2,7 +2,7 @@
 
 **Project:** Tokea (formerly named Explore in early blueprint)  
 **Last updated:** 2026-11-19  
-**Current milestone:** M6 — manual age review, encrypted photo expiry and stale-reference cleanup CI-verified locally (not hosted)  
+**Current milestone:** M6 — manual age review and no-fallback photo cleanup source verified in CI (not hosted; real accounts pending)  
 **Repository:** https://github.com/Mutethia-glitch/tokea  
 **Design source:** https://lovable.dev/projects/20ff86c9-03b7-4e00-b80f-9560791ddbfb
 
@@ -61,17 +61,25 @@
 
 ## Changelog
 
-### 2026-11-19 — Keep current photo valid even if old-file cleanup fails (CI pending)
+### 2026-11-19 — M6 verification and cleanup implementation checkpoint
+- **All three CI jobs passed** at https://github.com/Mutethia-glitch/tokea/actions/runs/44432147253: 25/25 backend tests, migration and local cleanup command smoke, native TS check/Android JS export, no legacy runtime-import audit, and existing reference browser checks.
+- Review access is role-limited, final decisions cannot be overturned, admin invitations are bound to verified email and single-use, and review/expiry triggers durable in-app notifications.
+- Superseded encrypted photo references and successful deletion tombstones are removed; failed deletion jobs remain only while required for retry. The native app clears temporary app-cache photo copies without touching the original gallery.
+- An independent cleanup command supports a separately scheduled job. A reliable **24-hour deletion guarantee**, five-minute review staffing, provider-backed sign-in/email and actual phone push delivery are **NOT operational** without additional configuration and monitoring.
+- **No API/mobile hosting or deployment.** M6 remains a draft PR stacked on M5; root web prototype is retained as approved design reference only.
+
+
+### 2026-11-19 — Keep current photo valid even if old-file cleanup fails (CI verified)
 - Upload expiry now begins when photo intake starts, not after image processing finishes.
 - Upload transactions separate the committed **current** photo from the best-effort cleanup of obsolete files. If deletion fails, the new active photo remains valid and a retry job persists; it cannot accidentally be removed as a fallback.
 - Admin verification decisions similarly remain final/successful even if immediate file deletion fails; cleanup errors are logged for retry.
 - No hosting; no real identity documents accepted.
 
 
-### 2026-11-19 — Independent identity-photo cleanup command (verification pending)
+### 2026-11-19 — Independent identity-photo cleanup command (CI verified)
 - Added `bun run cleanup:verification`, a separate one-shot local task to expire pending/draft ID and selfie files and clear orphaned encrypted files even when the HTTP server is stopped.
 - Reports overdue deletion jobs so an operating-system scheduler can detect failures. This still cannot guarantee deletion while the computer is off; no real user ID uploads are authorized without 24-hour operational controls.
-- CI verification pending; existing API photo cleanup and native checks remain intact.
+- **Verified:** independent cleanup command smoke ran in GitHub Actions with uploads disabled; encrypted photo replacement/expiry/deletion logic was tested with synthetic images and PostgreSQL.
 
 
 ### 2026-11-19 — Obsolete-file and staff-invitation cleanup (CI verified)
@@ -81,7 +89,7 @@
 - Native phone app cleans temporary selected images on replacement, successful submission and screen exit, without deleting the user's original gallery pictures.
 - Admin review UI invalidates image previews after another reviewer completes the case. Consumed and expired admin email invitations are purged periodically.
 - Expanded automated tests to assert superseded images cannot be read, stale drafts are reset without previous IDs, orphan images are removed, and invite tokens are single-use and email-bound.
-- **Verified:** 24/24 backend tests including eight age-review/deletion/administrator cases; native Android JS export, native TS checks and web reference smoke passed in GitHub Actions #44431059848. Additional admin-screen and no-legacy-import audits are pending this commit's CI.
+- **Verified:** 25/25 backend tests across six files, including eight age-review/deletion/admin tests and a staff access HTTP test. Native Android JS export, native TypeScript, active-code no-legacy-fallback audit and design reference smoke all passed in GitHub Actions #44432147253.
 - **Not hosted; real ID processing and external email/push are disabled pending credentials, privacy/security verification and legal review.**
 
 
