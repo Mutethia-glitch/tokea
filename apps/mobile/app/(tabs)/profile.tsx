@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { Alert, Pressable, Text, View } from "react-native";
-import { router } from "expo-router";
+import { router, useFocusEffect } from "expo-router";
+import { getVerificationStatus, type VerificationStatus } from "@/verification";
 import { Heading, Paper, Screen } from "@/ui";
 import { colors } from "@/theme";
 import { enablePhoneNotifications } from "@/push";
@@ -8,6 +9,10 @@ import { enablePhoneNotifications } from "@/push";
 export default function ProfileScreen() {
   const [loading, setLoading] = useState(false);
   const [enabled, setEnabled] = useState(false);
+  const [verification,setVerification]=useState<VerificationStatus|null>(null);
+  useFocusEffect(useCallback(()=>{
+    void getVerificationStatus().then(setVerification).catch(()=>setVerification(null));
+  },[]));
   async function optIn() {
     setLoading(true);
     try {
@@ -20,6 +25,27 @@ export default function ProfileScreen() {
   }
   return <Screen>
     <Heading title="Profile" subtitle="Your Tokea account, privacy and notifications." />
+    <Paper>
+      <Text style={{color:colors.text,fontSize:16,fontWeight:"700"}}>Age verification</Text>
+      <Text style={{color:verification?.verified?colors.success:colors.muted,
+        fontSize:13,marginTop:9,marginBottom:13,lineHeight:20}}>
+        {verification?.verified?"Verified — you can host and join sessions.":
+          verification?.status==="pending"?"Under review — you can browse while the support team reviews your photos.":
+          verification?.status==="declined"?"Not approved — you may upload clearer photos in a new submission.":
+          "Verify your age with a clear ID photo and selfie before hosting or joining."}
+      </Text>
+      <Pressable accessibilityRole="button" onPress={()=>router.push("/verification")}
+        style={{minHeight:44,justifyContent:"center"}}>
+        <Text style={{color:colors.brand,fontWeight:"700"}}>
+          {verification?.verified?"View verification status":
+            verification?.status==="pending"?"Check review progress":"Verify my age"}
+        </Text>
+      </Pressable>
+      <Pressable accessibilityRole="button" onPress={()=>router.push("/privacy")}
+        style={{minHeight:44,justifyContent:"center"}}>
+        <Text style={{color:colors.muted,fontWeight:"600"}}>Privacy Policy</Text>
+      </Pressable>
+    </Paper>
     <Paper>
       <Text style={{ color: colors.text, fontSize: 16, fontWeight: "600" }}>Phone notifications</Text>
       <Text style={{ color: colors.muted, lineHeight: 21, marginVertical: 11 }}>

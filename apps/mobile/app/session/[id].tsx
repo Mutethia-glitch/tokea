@@ -5,12 +5,14 @@ import { Heading, Screen } from "@/ui";
 import { colors } from "@/theme";
 import { Action, MessageBox, Pill } from "@/native-cards";
 import { listRequests, loadSession, requestToJoin, type NativeRequest, type NativeSession } from "@/sessions";
+import { getVerificationStatus } from "@/verification";
 
 export default function SessionDetailsScreen() {
   const {id}=useLocalSearchParams<{id:string}>();
   const [session,setSession]=useState<NativeSession|null>(null);
   const [existing,setExisting]=useState<NativeRequest|null>(null);
   const [isHost,setIsHost]=useState(false);
+  const [verified,setVerified]=useState(false);
   const [error,setError]=useState<string|null>(null);
   const [busy,setBusy]=useState(true);
   const [sending,setSending]=useState(false);
@@ -20,10 +22,13 @@ export default function SessionDetailsScreen() {
     if(!id)return;
     setBusy(true);setError(null);
     try{
-      const [s,r]=await Promise.all([loadSession(id),listRequests()]);
-      setSession(s);
-      const sent=r.sent.find(x=>x.sessionId===id&&(x.status==="pending"||x.status==="accepted"));
-      setExisting(sent??null);
+      const [s,status]=await Promise.all([loadSession(id),getVerificationStatus()]);
+      setSession(s);setVerified(status.verified);
+      if(status.verified){
+        const r=await listRequests();
+        const sent=r.sent.find(x=>x.sessionId===id&&(x.status==="pending"||x.status==="accepted"));
+        setExisting(sent??null);
+      }else setExisting(null);
       setIsHost(s.isHost);
     }catch(e){setError(e instanceof Error?e.message:"Unable to load session.");}
     finally{setBusy(false);}
@@ -53,7 +58,9 @@ export default function SessionDetailsScreen() {
             Exact meeting points are shared privately after confirmation. Choose a safe public venue.
           </Text>
         </View>
-        {existing?.status==="accepted"||isHost?<Action label="Open private chat"
+        {!verified?<View><MessageBox text="You can view this session while age verification is pending. Host, join requests and private chat unlock only after approval."/>
+          <Action label="Verify age to join" onPress={()=>router.push("/verification")}/></View>:
+        existing?.status==="accepted"||isHost?<Action label="Open private chat"
           onPress={()=>router.push({pathname:"/chats/[id]",params:{id:session.id}})}/>:
         existing?.status==="pending"?<MessageBox text="Your request is pending. You'll get an in-app update when the host responds."/>:
         session.seatsLeft===0?<MessageBox text="This session is full."/>:

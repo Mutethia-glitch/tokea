@@ -22,7 +22,15 @@
           "defaultChannel": "tokea_updates"
         }
       ],
-      "expo-secure-store"
+      "expo-secure-store",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Choose a clear photo of your government-issued ID or selfie for age review.",
+          "cameraPermission": "Take a clear ID photo or selfie for age verification.",
+          "microphonePermission": false
+        }
+      ]
     ],
     "extra": {
       "eas": {

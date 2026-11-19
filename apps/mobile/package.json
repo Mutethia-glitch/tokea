@@ -19,7 +19,9 @@
     "react": "19.3.0",
     "react-native": "0.88.1",
     "react-native-screens": "*",
-    "react-native-safe-area-context": "*"
+    "react-native-safe-area-context": "*",
+    "expo-image-picker": "~18.0.8",
+    "expo-file-system": "~18.0.13"
   },
   "devDependencies": {
     "@types/react": "^19.2.0",

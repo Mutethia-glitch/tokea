@@ -42,3 +42,8 @@ services/api/dist/
 *.p12
 *.p8
 *.mobileprovision
+
+# Sensitive age verification data: NEVER commit or sync these encrypted artifacts.
+.private-verification/
+services/api/.private-verification/
+*.enc

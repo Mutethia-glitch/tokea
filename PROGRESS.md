@@ -2,7 +2,7 @@
 
 **Project:** Tokea (formerly named Explore in early blueprint)  
 **Last updated:** 2026-11-19  
-**Current milestone:** M5 — authenticated session/request/chat HTTP lifecycle verified in CI and local health verified (not hosted)  
+**Current milestone:** M6 — manual age verification, encrypted photo expiry and admin reviews (in development; not hosted)  
 **Repository:** https://github.com/Mutethia-glitch/tokea  
 **Design source:** https://lovable.dev/projects/20ff86c9-03b7-4e00-b80f-9560791ddbfb
 
@@ -17,18 +17,18 @@
 | Blueprint and scope | Reviewed | Adults-only Kenya social discovery; no dating, alcohol commerce, payments, or AI matching |
 | Visual design | Approved | Preserve original Lovable tokens, fonts, 448px mobile canvas, 64px nav/header, 20px card padding, 12px card gap |
 | Discover + filters | **M3 verified** | 14 drink categories including Muratina and spirits; grouped hosting/filter controls, themed card banners and mobile browser checks passed |
-| Onboarding + profile | Prototype | Demo-only self declaration and mock OTP; no actual verification |
+| Onboarding + profile | **M6 source in review** | Native ID+selfie verification form, detailed clear-photo guidance, consent and status; needs real OTP provider and physical-device tests |
 | Host/create session | Prototype | Client-side creation/edit/pause/end |
 | Join requests | Prototype | Local simulated acceptance/decline and capacity checks |
 | Session chats | Prototype | Demo-only; access shown after approval, no real messages delivered |
 | Profile + appearance | **M2 photo UX verified** | Browser-local cropped profile photo choose/change/remove, photo persistence and avatar rendering; no server upload |
-| Safety | Preliminary | Block/report demo controls; no server-side enforcement |
+| Safety | **M6 source in review** | Signed-in unverified accounts can browse, but server blocks hosting, joining and chats; ID+selfie encrypted at rest and deletions attempted on review/expiry |
 | React web build | **Verified in CI** | Bun install, TypeScript, Vite/Nitro production build and 16 Vitest tests passed in GitHub Actions run #8 (2026-11-17) |
 | Hosted web demo | **Vercel deployment READY** | https://tokea-demo.vercel.app · SSO protection enabled · browser routes not yet independently smoke-tested |
 | Production backend | **M5 local + CI verified** | PostgreSQL sessions, join requests, chat and notification API compile; 12/12 backend tests passed in GitHub CI and independently on local Windows using PostgreSQL 17. No hosting or deployment. |
 | Native push notifications | **M4 code verified, delivery unverified** | Explicit opt-in and Expo token registration, in-app inbox and native notification tap handling; push needs EAS ID, APNs/FCM credentials, real authentication and device testing |
 | Native iOS/Android | **Typecheck + Android JS export passed** | Expo SDK 58 / React Native 0.88 / Expo Router shell in `apps/mobile`; not an installed native build or complete feature UI |
-| Kenya legal review | Required | Final age assurance, privacy policies, licensing/alcohol considerations |
+| Kenya legal review | **Pre-launch blocker** | Updated draft privacy notice for ID/selfie, restricted admin review, metadata and deletion; mandatory DPIA/ODPC legal review and 24h deletion assurance before live collection |
 
 ## Immediate next steps
 
@@ -43,7 +43,9 @@
 - [x] Add regression tests for capacity, approval restrictions, blocking and private chat access.
 - [ ] Confirm hosting/managed PostgreSQL provider, production URLs, OTP/age assurance vendor and EAS project/Apple/Google developer accounts before deployment.
 - [ ] Provision and migrate a private PostgreSQL database; deploy the independent API with a trusted JWT issuer.
-- [ ] Add OTP/age assurance and verified session-token provisioning. Native Discover, Host, Requests, Chat and session-detail screens now consume API contracts, but cannot show live data without sign-in.
+- [ ] Integrate trusted OTP sign-in with verified identity claims. Manual ID+selfie review is being implemented locally; no real uploads until privacy/legal/security readiness.
+- [ ] Configure an owner reviewer identity and SMTP invitation provider securely, test email invitations and one-decision-only protection.
+- [ ] Before any live ID collection: test production-independent 24h deletion including downtime, storage backup exclusion, monitoring, incident handling, human reviewer staffing and Kenya ODPC compliance.
 - [ ] Replace short-interval chat refresh with authenticated realtime transport and controls.
 - [ ] Configure FCM/APNs credentials, build/install Tokea on Android and iOS devices, and verify accepted/declined requests generate OS + in-app notifications.
 - [ ] Implement push receipt checks, delivery monitoring, preferences, user blocking, moderation and safe sign-out/device revocation.
@@ -58,6 +60,18 @@
 - Draft privacy and terms effective date: **November 16, 2026**; no public support email yet.
 
 ## Changelog
+
+### 2026-11-19 — M6 manual age assurance and reviewer workspace (source in progress)
+- Added native ID and selfie capture/selection screen with clear-photo instructions, explicit consent and account status; Profile links to review and updated privacy notice.
+- Signed-in but unverified people can browse public sessions, profile and notifications. All host/join/request/chat operations remain server-side restricted until age-verified in the database.
+- Added PostgreSQL case records, immutable final reviews, owner/reviewer membership, limited email invites and extended notification kinds; final approved cases set `users.age_verified_at` immediately.
+- Added a local **staff-only** admin workspace with reviewer queue, secure ID/selfie comparison and explicit Verify/Decline controls. Final decisions cannot be overwritten, including by other reviewers.
+- Added server-side image validation and re-encoding (removes EXIF/GPS), private AES-256-GCM storage, 24h case expiry and cleanup timer, plus immediate deletion attempt on review. **Not yet a production 24h deletion guarantee**: independent cleanup monitoring, process uptime and backups must be verified before enabling real uploads.
+- Added invite-by-email code requiring verified email identity and SMTP provider configuration; cannot send emails without provider. Only owner role can invite reviewers; invite token expires in 48 hours and is single-use.
+- Added draft Privacy Policy explaining personal ID/selfie collection, retention, human review, restricted access and review response *target* (5 minutes during staffed hours, not guaranteed).
+- **No hosting/deployment, email delivery, real identity signup, physical device notification or real ID processing enabled.**
+- **Pending:** automated CI, signature/permissions tests, PostgreSQL concurrency and deletion tests, independent expiry worker, DPIA/legal review, physical Android/iOS validation.
+
 
 ### 2026-11-19 — Developer's local Windows backend environment verified
 - User successfully installed Docker Desktop and Bun 1.4.4 on Windows.

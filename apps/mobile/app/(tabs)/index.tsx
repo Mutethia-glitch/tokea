@@ -5,19 +5,24 @@ import { Heading, Screen } from "@/ui";
 import { colors } from "@/theme";
 import { Action, MessageBox, Pill, SessionCard } from "@/native-cards";
 import { CATEGORIES, listSessions, type Category, type NativeSession } from "@/sessions";
+import { getVerificationStatus, type VerificationStatus } from "@/verification";
 
 export default function DiscoverScreen() {
   const [category,setCategory]=useState<Category|undefined>(undefined);
   const [sessions,setSessions]=useState<NativeSession[]>([]);
   const [busy,setBusy]=useState(true);
   const [error,setError]=useState<string|null>(null);
+  const [verification,setVerification]=useState<VerificationStatus|null>(null);
   const refresh=useCallback(async()=>{
     setBusy(true);setError(null);
     try {setSessions((await listSessions(category)).sessions);}
     catch(e) {setSessions([]);setError(e instanceof Error?e.message:"Unable to load sessions.");}
     finally {setBusy(false);}
   },[category]);
-  useFocusEffect(useCallback(()=>{void refresh();},[refresh]));
+  useFocusEffect(useCallback(()=>{
+    void refresh();
+    void getVerificationStatus().then(setVerification).catch(()=>setVerification(null));
+  },[refresh]));
 
   return <Screen>
     <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{paddingBottom:48}}>
@@ -30,8 +35,9 @@ export default function DiscoverScreen() {
       </View>
       <Heading title="Who's out nearby?" subtitle="Find your people. Share a drink at a public place." />
       <View style={{alignSelf:"flex-start",marginBottom:20}}>
-        <Action label="＋  Host a drink" onPress={()=>router.push("/host")}/>
+        <Action label="＋  Host a drink" onPress={()=>router.push(verification?.verified?"/host":"/verification")}/>
       </View>
+      {verification&&!verification.verified?<MessageBox text="Browse freely while your age is being verified. To host or request to join, upload your ID and a clear selfie in Profile."/>:null}
       <Text style={{fontWeight:"600",color:colors.text,marginBottom:10,fontSize:13}}>Drinks</Text>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{marginBottom:20}}>
         <Pill selected={!category} onPress={()=>setCategory(undefined)}>All</Pill>
