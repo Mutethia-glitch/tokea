@@ -73,7 +73,8 @@ export async function route(req:IncomingMessage,res:ServerResponse){
       if(!["image/jpeg","image/png","image/webp"].includes(ct??""))
         throw new ApiError(415,"Upload a JPG, PNG or WebP image.");
       const bytes=await readBody(req,5*1024*1024);
-      return respond(res,201,await uploadDocument(user,photoPath[1] as "id"|"selfie",bytes));
+      return respond(res,201,await uploadDocument(user,photoPath[1] as "id"|"selfie",bytes,
+        req.headers["x-tokea-privacy-consent"]==="true"));
     }
     if(method==="POST"&&path==="/v1/verification/submit"){
       const consent=z.object({consent:z.literal(true)}).strict().parse(await parseBody(req));

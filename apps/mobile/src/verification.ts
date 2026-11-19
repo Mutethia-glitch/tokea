@@ -20,10 +20,11 @@ async function signedHeaders(){
   if(!token)throw Error("Sign in to Tokea before verifying your age.");
   return {Authorization:`Bearer ${token}`};
 }
-async function request(path:string,method="GET",body?:BodyInit,contentType?:string){
+async function request(path:string,method="GET",body?:BodyInit,contentType?:string,uploadConsent=false){
   const authorization=await signedHeaders();
   const response=await fetch(baseUrl()+path,{
-    method,headers:{...authorization,...(contentType?{"Content-Type":contentType}:{})},
+    method,headers:{...authorization,...(contentType?{"Content-Type":contentType}:{}),
+      ...(uploadConsent?{"X-Tokea-Privacy-Consent":"true"}:{})},
     ...(body?{body}:{})
   });
   let result:any;
@@ -40,7 +41,7 @@ export async function uploadIdentityPhoto(uri:string,kind:"id"|"selfie",mimeType
   if(photo.size>5*1024*1024)throw Error("Photo must be no more than 5 MB.");
   const payload=await photo.arrayBuffer();
   return request(`/v1/verification/photos/${kind}`,"POST",payload,
-    ["image/jpeg","image/png","image/webp"].includes(mimeType)?mimeType:"image/jpeg");
+    ["image/jpeg","image/png","image/webp"].includes(mimeType)?mimeType:"image/jpeg",true);
 }
 export async function submitAgeReview(consent:boolean){
   if(!consent)throw Error("Please read the privacy notice and consent to the temporary ID and selfie review.");

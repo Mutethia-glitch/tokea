@@ -8,7 +8,7 @@ const uuid=z.uuid();
 type ReviewCase={
   id:string;user_id:string;status:"draft"|"pending"|"verified"|"declined"|"expired";
   id_file_key:string|null;selfie_file_key:string|null;created_at:Date;expires_at:Date;
-  submitted_at:Date|null;reviewed_at:Date|null;reviewed_by:string|null;decline_reason:string|null;
+  submitted_at:Date|null;reviewed_at:Date|null;reviewed_by:string|null;decline_reason:string|null;consent_at:Date|null;
 };
 export const decisionSchema=z.object({
   decision:z.enum(["verified","declined"]),
@@ -30,7 +30,8 @@ export async function getVerificationStatus(userId:string) {
     reviewTarget:"We aim to review within 5 minutes during staffed hours. This is not guaranteed.",
   };
 }
-export async function uploadDocument(user:AuthenticatedUser,kind:"id"|"selfie",bytes:Buffer) {
+export async function uploadDocument(user:AuthenticatedUser,kind:"id"|"selfie",bytes:Buffer,consented:boolean) {
+  if(!consented)throw new ApiError(400,"Please agree to temporary identity-photo review before uploading.");
   if(user.ageVerified)throw new ApiError(409,"Account already age verified.");
   const fileKey=await savePhoto(bytes,kind);
   const db=await pool.connect();
@@ -52,7 +53,7 @@ export async function uploadDocument(user:AuthenticatedUser,kind:"id"|"selfie",b
     }
     old=kind==="id"?row.id_file_key:row.selfie_file_key;
     const column=kind==="id"?"id_file_key":"selfie_file_key";
-    await db.query(`UPDATE age_verification_cases SET ${column}=$1 WHERE id=$2 AND status='draft'`,[fileKey,row.id]);
+    await db.query(`UPDATE age_verification_cases SET ${column}=$1,consent_at=COALESCE(consent_at,NOW()) WHERE id=$2 AND status='draft'`,[fileKey,row.id]);
     await db.query("COMMIT");
     if(old)await removePhoto(old).catch(e=>console.error("Photo cleanup failed",e));
     return {received:true,kind};
@@ -71,6 +72,7 @@ export async function submitVerification(user:AuthenticatedUser) {
     const row=found.rows[0];
     if(!row)throw new ApiError(409,"Upload your ID and selfie first.");
     if(!row.id_file_key||!row.selfie_file_key)throw new ApiError(409,"Both a clear ID photo and a clear selfie are required.");
+    if(!row.consent_at)throw new ApiError(409,"Your consent to temporary photo review is required.");
     if(row.expires_at.getTime()<=Date.now())throw new ApiError(410,"Your uploads expired. Please start again.");
     await db.query("UPDATE age_verification_cases SET status='pending',submitted_at=NOW() WHERE id=$1",[row.id]);
     await enqueueNotice(db,user.id,"verification_submitted","Age verification submitted",REVIEW_TEXT,"/verification");

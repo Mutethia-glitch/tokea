@@ -1,44 +1,34 @@
 <!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Tokea · Private Admin Workspace</title>
-<link rel="stylesheet" href="/admin/admin.css">
-<script src="/admin/admin.js" defer></script>
-</head>
-<body>
-<main>
-  <header><div class="wordmark">tokea <span>staff</span></div><p>Private age-verification reviews</p></header>
-  <section class="panel" id="sign-in">
-    <h1>Administrator access</h1>
-    <p>Sign in with your organization-issued access token. Tokens are held only in this tab's memory.</p>
-    <label for="token">Verified admin access token</label>
-    <input id="token" type="password" autocomplete="off" spellcheck="false" placeholder="Paste a signed token">
-    <button id="connect">Open workspace</button>
-    <p class="error" id="sign-error" role="alert"></p>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tokea · Verification Team</title>
+<link rel="stylesheet" href="/admin/admin.css"><script src="/admin/admin.js" defer></script>
+</head><body><main>
+<header><div class="wordmark">tokea <span>team</span></div><p>Age verification</p></header>
+<section class="panel" id="sign-in">
+  <h1>Welcome, Tokea team</h1>
+  <p>Sign in to review age-verification requests. Only invited staff members can access identity photos.</p>
+  <button id="connect">Sign in with your work account</button>
+  <p class="error" id="sign-error" role="alert"></p>
+</section>
+<section id="workspace" hidden>
+  <div class="toolbar"><h1>Waiting for review</h1><div><button class="secondary" id="refresh">Refresh list</button><button class="secondary" id="sign-out">Sign out</button></div></div>
+  <p>Review applications in order. Check the person's age on their ID and compare the photo with their selfie.</p>
+  <p id="state" aria-live="polite"></p>
+  <div id="queue"></div>
+  <section class="panel" id="review" hidden>
+    <h2 id="review-title">Review application</h2>
+    <div class="photos"><div><h3>ID photo</h3><img id="id-image" alt="Submitted identity document"></div><div><h3>Selfie</h3><img id="selfie-image" alt="Submitted selfie photograph"></div></div>
+    <p>Approve only when the ID is legible, shows a birth date confirming age 18+, and appears to match the selfie. Otherwise decline and explain why.</p>
+    <label for="reason">Reason for decline (only needed if declining)</label><textarea id="reason" rows="2" placeholder="For example: the date of birth isn't clear. Please retake the ID photo."></textarea>
+    <div class="actions"><button id="approve">Approve age</button><button class="secondary" id="decline">Decline application</button><button class="secondary" id="close">Back to list</button></div>
+    <p class="error" id="review-error" role="alert"></p>
   </section>
-  <section id="workspace" hidden>
-    <div class="toolbar"><h1>Pending reviews</h1><button class="secondary" id="refresh">Refresh</button></div>
-    <p>Review ID date of birth and face against a clear, unfiltered selfie. Approve only if the person is at least 18 and the face matches. A completed decision cannot be changed by another admin.</p>
-    <p id="state" aria-live="polite"></p>
-    <div id="queue"></div>
-    <section class="panel" id="review" hidden>
-      <h2 id="review-title">Review</h2>
-      <div class="photos"><div><h3>ID photo</h3><img id="id-image" alt="Submitted identity document"></div><div><h3>Selfie</h3><img id="selfie-image" alt="Submitted selfie"></div></div>
-      <p>Only approve if the ID is legitimate, readable, belongs to this person, confirms 18+, and both faces appear to match. Decline unclear, illegible, obscured or suspicious submissions.</p>
-      <label for="reason">Decline reason (required for decline)</label><textarea id="reason" rows="2" placeholder="Specify what the user should correct"></textarea>
-      <div class="actions"><button id="approve">Verify age</button><button class="secondary" id="decline">Decline</button><button class="secondary" id="close">Close</button></div>
-      <p class="error" id="review-error" role="alert"></p>
-    </section>
-    <section class="panel" id="invite-section">
-      <h2>Invite another reviewer</h2>
-      <p>Only an owner can email an invitation. Email provider configuration is required. All reviewers have separate identities and each decision is final.</p>
-      <label for="invite-email">Reviewer email</label><input id="invite-email" type="email" placeholder="reviewer@example.com">
-      <button id="send-invite">Send email invitation</button><p id="invite-state" aria-live="polite"></p>
-    </section>
-    <p class="muted">Restricted staff tool. Do not screenshot, save or redistribute identity images. Images are withheld after expiry or review.</p>
+  <section class="panel" id="invite-section" hidden>
+    <h2>Invite a team member</h2><p>Send an invitation to a trusted reviewer. Every reviewer has a separate account.</p>
+    <label for="invite-email">Work email address</label><input id="invite-email" type="email" placeholder="name@company.com" autocomplete="email">
+    <button id="send-invite">Send invitation</button><p id="invite-state" aria-live="polite"></p>
   </section>
-</main>
-</body>
-</html>
+  <p class="muted">Identity photos are private. Never screenshot, save or share them. Each case can be decided only once.</p>
+</section>
+</main></body></html>

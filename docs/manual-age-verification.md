@@ -15,7 +15,7 @@
 - User sign-in must be backed by a real JWT issuer with JWKS, issuer and audience config. A JWT's `sub` must match an existing, active `users.id`. **Do not create a fake production sign-in bypass.**
 - `VERIFICATION_UPLOADS_ENABLED=false` by default. For synthetic local test images *only*, configure `VERIFICATION_ENCRYPTION_KEY_BASE64` with a securely generated 32-byte key and `VERIFICATION_PHOTO_DIR` to a private local directory. Never put photos or keys in a git repo, versioned backups, shared folders or public service.
 - CI uses generated synthetic images and local encrypted storage. Tests must verify app permissions, image encryption/deletion, human review locking and expiry.
-- Local admin panel is a staff **web tool**; Tokea consumer experience remains native.
+- Local admin panel is a staff **web tool**; Tokea consumer experience remains native. Staff see a simple `Sign in with your work account` button, using provider-backed OAuth2 PKCE (unavailable until an identity provider is configured). Never ask reviewers to paste API tokens or secret keys.
 - Provision real SMTP only after selecting email service and owner identity. Email admin invitations cannot work until provider credentials are supplied, verified email claims exist and `ADMIN_PANEL_URL` is an accessible authorized URL.
 - Real notifications require EAS/FCM/APNs platform credentials, real phone builds and push delivery monitoring. A queued notification is not proof of OS delivery.
 - Support queue staffing, incident response, appeal process and legal analysis are required before promising review turnaround or accepting sensitive IDs from real users.
