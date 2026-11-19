@@ -41,6 +41,7 @@ export async function route(req: IncomingMessage, res: ServerResponse) {
     if (method === "GET" && pathname === "/healthz") return respond(res, 200, { ok: true, service: "tokea-api" });
     // Public endpoints for proof of phone possession; not account login or age verification.
     if (method === "POST" && pathname === "/v1/auth/phone/start") {
+      if (process.env.ENABLE_PHONE_OTP !== "true" || process.env.AFRICASTALKING_ENV !== "sandbox") throw new ApiError(503, "Sandbox phone verification is disabled.");
       const { phone } = startOtpSchema.parse(await parseBody(req));
       // Peer socket address is intentionally used instead of spoofable X-Forwarded-For.
       // Trust-proxy configuration for production must be completed before rollout.
@@ -49,6 +50,7 @@ export async function route(req: IncomingMessage, res: ServerResponse) {
       return respond(res, 202, await requestPhoneOtp(phone, requester));
     }
     if (method === "POST" && pathname === "/v1/auth/phone/verify") {
+      if (process.env.ENABLE_PHONE_OTP !== "true" || process.env.AFRICASTALKING_ENV !== "sandbox") throw new ApiError(503, "Sandbox phone verification is disabled.");
       const { challengeId, code } = verifyOtpSchema.parse(await parseBody(req));
       return respond(res, 200, await verifyPhoneOtp(challengeId, code));
     }

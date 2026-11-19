@@ -1,6 +1,6 @@
 # Tokea provider accounts and business email — setup checklist
 
-Updated: 2026-11-19. **These are instructions, not evidence that accounts have been created.**
+Updated: 2026-11-20. **These are instructions, not evidence that accounts have been created.**
 Production product: **native iOS and Android only**. There is no planned customer-facing website.
 Brand name: **Tokea**. Do not use tokea.com as the email domain without confirmed ownership and rights.
 
@@ -20,6 +20,7 @@ Brand name: **Tokea**. Do not use tokea.com as the email domain without confirme
 - [ ] Validate the new server-side OTP endpoints against an actual private deployed/local Tokea API and Africa's Talking sandbox. Manual direct Postman-to-provider SMS has worked; GitHub CI mocks network calls. Never include API keys in the mobile bundle.
 - [ ] Before real user trials, finish live account verification, Kenyan SMS enablement, approved sender arrangements and billing.
 - [x] Add source code for random server-side six-digit OTP, HMAC storage, expiry, one-time use, per-number/request-source limits and resend cooldown. [ ] Confirm the full flow against the real sandbox with private server credentials; add deployment-grade proxy-aware abuse controls and retention cleanup.
+- [x] Add the native OTP screen and operator-run localhost test script (source/CI checks pending). [ ] Validate a complete backend-to-simulator code send/verify with private credentials. See services/api/README.md.
 - [ ] Select a separate **real age-assurance method**. SMS ownership or an 18+ checkbox alone does not verify age.
 
 Provider docs: https://help.africastalking.com/en/articles/1170660-how-do-i-get-started-on-the-africa-s-talking-sandbox

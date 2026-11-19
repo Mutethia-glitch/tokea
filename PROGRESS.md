@@ -2,7 +2,7 @@
 
 **Project:** Tokea (formerly named Explore in early blueprint)  
 **Last updated:** 2026-11-20  
-**Current milestone:** M5 — native Kenyan SMS OTP screens connected to sandbox proof endpoints in source (CI verification pending); real backend-to-simulator test still pending  
+**Current milestone:** M5 — native phone OTP and private operator SMS smoke-test harness added (CI pending); live backend-to-simulator test pending  
 **Repository:** https://github.com/Mutethia-glitch/tokea  
 **Design source:** checked-in GitHub UX in src/components/tokea and src/styles.css, translated to apps/mobile/src/theme.ts and native components; external Lovable is not authoritative
 
@@ -66,6 +66,13 @@
 - Copyright attribution in native Profile/About: **© 2026 Tokea. All rights reserved.**
 
 ## Changelog
+
+### 2026-11-20 — Private sandbox verification harness and default-off API gate (CI pending)
+- Added localhost-only backend-to-simulator CLI script at `services/api/scripts/otp-sandbox-smoke.mjs`; operator enters simulator number and received code locally. No credentials were uploaded or provider calls made by this commit.
+- Added default-disabled `ENABLE_PHONE_OTP` gate to both public OTP endpoints, plus sandbox-only requirement. Added configurable `HOST` so local tests bind to loopback, and a regression test confirming the public endpoints are disabled by default.
+- Documented private database, migration, local API and secret environment setup in `services/api/README.md`, with clear distinction between the prior manual provider test and a future full Tokea server end-to-end test. No public website is planned.
+- Tests have not yet run for this commit. Real provider testing, signed native builds, phone account authentication and 18+ checks remain unfinished.
+
 
 ### 2026-11-20 — Native phone OTP UX (verification pending)
 - Added `apps/mobile/app/verify-phone.tsx`: Kenya phone entry, six-digit code entry, expiry countdown, resend controls, verified/non-authenticated information and user-visible errors, matching the checked-in GitHub palette, rounded cards and spacing.

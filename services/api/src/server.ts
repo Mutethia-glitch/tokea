@@ -7,7 +7,8 @@ const port = Number(process.env.PORT || "4400");
 const server = createServer((req, res) => { void route(req, res); });
 server.requestTimeout = 10_000;
 server.headersTimeout = 15_000;
-server.listen(port, "0.0.0.0", () => console.log(`Tokea API listening on ${port}`));
+const host = process.env.HOST || "0.0.0.0";
+server.listen(port, host, () => console.log(`Tokea API listening on ${host}:${port}`));
 
 // Keep push dispatch separate from request transactions; a production deployment
 // should run this worker independently with job monitoring and push receipts.
