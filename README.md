@@ -1,32 +1,27 @@
-# Tokea
+# Tokea — native Android & iOS app
 
-## Final product: native mobile app
+Tokea is an **18+ Kenyan social discovery application for iOS and Android**. It helps people discover nearby casual drink meet-ups in public places. Tokea is not a dating app, alcohol marketplace, payment processor or website.
 
-**Tokea is an iOS and Android application, not a website.** The original Lovable/TanStack web app in `src/` is a **design reference and archived frontend prototype** only. Active production development happens in:
+**The design checked into this GitHub repository is the source of truth.** Build new native screens with the existing app's styling in apps/mobile/src/theme.ts, apps/mobile/src/ui.tsx and the approved native screen code. Do not replace it with Lovable output. The historical root web/React prototype remains archived for development context only; it is **not** the product or an approved public website. The protected Vercel URL, if retained, is only an internal legacy demo and must not be presented as the customer app.
 
-- [`apps/mobile/`](apps/mobile/) — Expo/React Native app with native notification support
-- [`services/api/`](services/api/) — standalone Node.js/TypeScript API and PostgreSQL migration
+## Active implementation
 
-Invitation accepted/declined events must create a durable in-app inbox item, and queue a native phone push for registered/opted-in devices. Production requires external OTP/age assurance, a trusted JWT issuer, deployment, FCM/APNs credentials and a real native build. See individual READMEs.
+- [apps/mobile](apps/mobile) — Expo / React Native / Expo Router, Android and iOS native application
+- [services/api](services/api) — separate secure Node.js TypeScript API and PostgreSQL schema, no Supabase
+- [PROGRESS.md](PROGRESS.md) — factual milestone status and test evidence; update in each substantive change
+- [docs/account-setup.md](docs/account-setup.md) — owner-operated provider provisioning, business email and credentials checklist
+- [docs/notifications.md](docs/notifications.md) — in-app and OS push notification design and verification checklist
 
+## M5: connecting real Discover
 
-**Hosted demo:** https://tokea-demo.vercel.app (Vercel sign-in may be required; prototype only, not production). The demo deploys from the GitHub `main` branch.
+The API has an authenticated **GET /v1/sessions** read endpoint exposing only safe public session fields, excluding blocked users and full sessions except for approved participants/hosts. The native Discover view fetches this data, filters drink categories and gives an accurate unauthenticated/unconfigured state. Hosting/join submissions, onboarding, chats, moderation and other production services are **not yet available**.
 
-Approved mobile-first social discovery web prototype for adults in Kenya, preserving the [original Lovable project design](https://lovable.dev/projects/20ff86c9-03b7-4e00-b80f-9560791ddbfb).
+Real usage requires trusted JWT-based authentication and independently verified age (18+), a deployed PostgreSQL database and API, plus the selected SMS/identity provider. Native push requires Expo EAS and FCM/APNs configuration and physical-device testing.
 
-## Visual behavior
+## Copyright
 
-Discover cards use a consistent 16px vertical grid gap and 20px internal padding. Each session automatically renders a subtle banner based on its drink category. Supported drinks: Beer, Wine, Cocktails, **Muratina**, Whiskey, Vodka, Gin, Rum, Tequila, Brandy, Spirits, Coffee, Soft drinks and Tea. The Host action is inline to avoid covering mobile content. Profile pictures are resized and persisted **only in the local browser** for this demo; no upload service is enabled.
+© 2026 Tokea. All rights reserved. The notice applies only to Tokea-owned original material; third-party dependencies and trademarks retain their own rights. Naming/trademark clearance is still pending.
 
-## Local development
+## Legacy web prototype (development only)
 
-```bash
-bun install --frozen-lockfile
-bun run dev
-```
-
-`bun run typecheck` validates TypeScript, `bun run build` builds the app, and `bun run test` runs automated tests. GitHub Actions runs these on pull requests. The project is an interactive frontend-only demo with seeded sessions and local browser storage — no production accounts, real OTP/age verification, GPS, real messaging service or database.
-
-Visual reference: original `src/styles.css` tokens and shared components, Instrument Sans / Instrument Serif, 448px mobile shell, 64px header/navigation, 20px content/card padding, 12px card spacing, 44px+ tap targets.
-
-Production architecture remains separately specified: Expo/React Native + Node.js + PostgreSQL/PostGIS, without Supabase. Kenyan privacy/alcohol law review is required before launch.
+The root src/ and Vite/TanStack project are legacy/internal code and CI regression coverage. They are not an intended customer-facing website or the design authority for the native product.

@@ -1,6 +1,6 @@
 # Tokea API — backend foundation (M4)
 
-Native-app backend scaffold. The existing Lovable/Vercel frontend is **design reference only** and is not the target native app.
+Native-app backend scaffold. M5 adds an authenticated read-only GET /v1/sessions endpoint that filters blocked/inactive/unverified hosts, hides filled sessions unless the viewer is an approved member or host, and returns only safe display fields. API and PostgreSQL are not yet deployed. The existing Lovable/Vercel frontend is **design reference only** and is not the target native app.
 
 ## Planned production flow
 

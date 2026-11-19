@@ -36,6 +36,15 @@ export default function ProfileScreen() {
         <Text style={{ color: colors.brand, fontWeight: "700" }}>See in-app notifications</Text>
       </Pressable>
     </Paper>
-    <View style={{ marginTop: 5 }}><Text style={{ color: colors.muted, fontSize: 13 }}>For adults 18+ only</Text></View>
+    <Paper>
+      <Pressable accessibilityRole="button" accessibilityLabel="About Tokea and copyright" onPress={() => router.push("/about")}
+        style={{ minHeight: 44, justifyContent: "center" }}>
+        <Text style={{ color: colors.brand, fontWeight: "700" }}>About Tokea · Copyright</Text>
+      </Pressable>
+    </Paper>
+    <View style={{ marginTop: 5 }}>
+      <Text style={{ color: colors.muted, fontSize: 13, marginBottom: 8 }}>For adults 18+ only</Text>
+      <Text style={{ color: colors.muted, fontSize: 12 }}>© 2026 Tokea. All rights reserved.</Text>
+    </View>
   </Screen>;
 }

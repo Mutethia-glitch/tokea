@@ -3,6 +3,7 @@ import { z } from "zod";
 import { authenticate, ApiError } from "./auth.js";
 import { decideJoinRequest } from "./decisions.js";
 import { getInbox, markInboxRead } from "./inbox.js";
+import { getDiscoverSessions } from "./sessions.js";
 import { registerDevice, unregisterDevice } from "./devices.js";
 
 const decisionSchema = z.object({ decision: z.enum(["accepted", "declined"]) }).strict();
@@ -36,6 +37,9 @@ export async function route(req: IncomingMessage, res: ServerResponse) {
     const pathname = new URL(req.url ?? "/", "http://localhost").pathname;
     if (method === "GET" && pathname === "/healthz") return respond(res, 200, { ok: true, service: "tokea-api" });
     const userId = await authenticate(req.headers);
+
+    if (method === "GET" && pathname === "/v1/sessions")
+      return respond(res, 200, { sessions: await getDiscoverSessions(userId) });
 
     if (method === "GET" && pathname === "/v1/notifications")
       return respond(res, 200, { notifications: await getInbox(userId) });

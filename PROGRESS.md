@@ -1,10 +1,10 @@
 # Tokea — Development Progress
 
 **Project:** Tokea (formerly named Explore in early blueprint)  
-**Last updated:** 2026-11-17  
-**Current milestone:** M4 — native Expo and PostgreSQL notification API foundation verified in CI (not deployed)  
+**Last updated:** 2026-11-19  
+**Current milestone:** M5 — native read-only Discover API and provider setup checklist added (verification pending)  
 **Repository:** https://github.com/Mutethia-glitch/tokea  
-**Design source:** https://lovable.dev/projects/20ff86c9-03b7-4e00-b80f-9560791ddbfb
+**Design source:** existing GitHub native code in apps/mobile/src/theme.ts and apps/mobile/src/ui.tsx; Lovable is historical only
 
 ## Working agreement
 
@@ -15,8 +15,8 @@
 | Area | Status | Notes |
 | --- | --- | --- |
 | Blueprint and scope | Reviewed | Adults-only Kenya social discovery; no dating, alcohol commerce, payments, or AI matching |
-| Visual design | Approved | Preserve original Lovable tokens, fonts, 448px mobile canvas, 64px nav/header, 20px card padding, 12px card gap |
-| Discover + filters | **M3 verified** | 14 drink categories including Muratina and spirits; grouped hosting/filter controls, themed card banners and mobile browser checks passed |
+| Visual design | **Repository is authoritative** | Preserve existing native Tokea palette, spacing and components. Do not replace native design with Lovable. |
+| Legacy web Discover + filters | **M3 verified (historical)** | 14 drink categories, browser UI checks passed; this is not the customer app |
 | Onboarding + profile | Prototype | Demo-only self declaration and mock OTP; no actual verification |
 | Host/create session | Prototype | Client-side creation/edit/pause/end |
 | Join requests | Prototype | Local simulated acceptance/decline and capacity checks |
@@ -25,12 +25,16 @@
 | Safety | Preliminary | Block/report demo controls; no server-side enforcement |
 | React web build | **Verified in CI** | Bun install, TypeScript, Vite/Nitro production build and 16 Vitest tests passed in GitHub Actions run #8 (2026-11-17) |
 | Hosted web demo | **Vercel deployment READY** | https://tokea-demo.vercel.app · SSO protection enabled · browser routes not yet independently smoke-tested |
-| Production backend | **M4 source verified in CI** | Node 22/TypeScript API, PostgreSQL migration, host-only transactional decisions, in-app notifications and device push queue. 8 API tests pass (including PostgreSQL integration); not deployed |
+| Production backend | **M4 verified; M5 changes pending CI** | Node 22 API, PostgreSQL, host-only transactional decisions, inbox, push queue; read-only /v1/sessions added with integration assertions; not deployed |
 | Native push notifications | **M4 code verified, delivery unverified** | Explicit opt-in and Expo token registration, in-app inbox and native notification tap handling; push needs EAS ID, APNs/FCM credentials, real authentication and device testing |
-| Native iOS/Android | **Typecheck + Android JS export passed** | Expo SDK 58 / React Native 0.88 / Expo Router shell in `apps/mobile`; not an installed native build or complete feature UI |
+| Native iOS/Android | **M4 native shell verified; M5 changes pending CI** | Expo SDK 58 / React Native 0.88; authenticated read-only Discover screen and app copyright/about screens added; no installed native build or full feature UI |
 | Kenya legal review | Required | Final age assurance, privacy policies, licensing/alcohol considerations |
 
 ## Immediate next steps
+
+- [ ] Review GitHub Actions for M5 native/API changes; this commit has not yet been verified by CI.
+- [ ] Provision owner-controlled Africa's Talking sandbox, dedicated Google admin, Expo/Firebase, Apple Developer and a mail-only Zoho domain; see docs/account-setup.md. **No account has been created by this code change.**
+- [ ] Confirm Tokea trademark/brand suitability and ownership of the selected mail domain before publishing support contact details.
 
 - [x] Verify Bun dependency install, TypeScript check, production build and automated tests in CI (16/16 tests passed).
 - [x] Verify TanStack Router routes (`/requests`, `/chats`, `/chats/$id`, `/profile`) with smoke tests.
@@ -49,14 +53,24 @@
 
 ## Important architectural decisions
 
-- The checked-in web project is **only an editable prototype**, not a shipped native app.
+- **No customer-facing website.** Native Android/iOS only; the root web project and protected Vercel preview are legacy internal references, not a shipped product.
 - Planned production architecture: **React Native + Expo + TypeScript**, independent **Node.js/TypeScript** API, **PostgreSQL/PostGIS** and appropriately selected storage/notifications.
 - **Do not enable Supabase as backend/database.**
 - No real age, phone, identity, or location verification exists in this prototype. Never imply otherwise.
-- Original Lovable styles and shared UI components are the design source of truth.
-- Draft privacy and terms effective date: **November 16, 2026**; no public support email yet.
+- **The current repository-native design is the source of truth** (apps/mobile/src/theme.ts and related native screens); Lovable must not replace it.
+- Draft privacy and terms effective date: **November 16, 2026**; no public support email yet. Candidate: support@gettokea.co.ke, subject to actual domain ownership, availability and legal clearance.
+- Copyright attribution in native Profile/About: **© 2026 Tokea. All rights reserved.**
 
 ## Changelog
+
+### 2026-11-19 — M5 native-only scope, provider checklist, copyright and read-only Discover (verification pending)
+- User reconfirmed that Tokea is an installed Android/iOS application **without a public website**; existing GitHub native UI is the design source, not Lovable. Updated agent/contributor documentation accordingly.
+- Added docs/account-setup.md covering Africa's Talking Kenyan SMS sandbox/live transition, dedicated Google administrator and staff OAuth, Expo/EAS + Firebase FCM, Apple Developer/APNs, and mail-only Zoho custom domain. **All external account creations remain user-controlled and pending.**
+- Added read-only authenticated GET /v1/sessions to Node API. Server filters blocked users, inactive or non-verified hosts, ended/full sessions (while retaining host/approved-member visibility), and exposes only public session information. Added DB integration assertions; **not yet CI verified**.
+- Replaced native Discover placeholder with a scrollable API-backed view, drink filtering, loading/empty/error states and existing purple/card design. No fake live sessions or request buttons were introduced.
+- Added native Profile copyright footer and About screen: © 2026 Tokea. All rights reserved.; added EAS internal development/preview build profiles. No ownership of third-party rights is claimed.
+- Remaining: CI verification, real verified sign-in, actual hosting/join APIs, messaging, service credentials, live database, physical push delivery, legal/age assurance review.
+
 
 ### 2026-11-17 — M4 foundation checks verified (still not production-ready)
 - CI: https://github.com/Mutethia-glitch/tokea/actions/runs/43990223625

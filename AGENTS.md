@@ -1,20 +1,26 @@
-# Tokea contributor and coding-agent instructions
+# Tokea coding and contribution rules
 
-## Product and architecture
-- The **final product is a native iOS/Android app**, not a responsive website or WebView. `apps/mobile` is the active Expo/React Native app; `services/api` is the independent Node.js + PostgreSQL API. The root web prototype is retained only as an approved visual design reference.
-- Preserve the approved clean Lovable design tokens, colors, Instrument fonts, shared components, mobile spacing and rounded card styles.
-- The production blueprint proposes a separate Expo/React Native application, Node.js API and PostgreSQL/PostGIS database; do **not** enable Supabase or production infrastructure in this demo.
-- Native notification requirement: accepted/declined requests must create persistent in-app inbox entries and opt-in device OS pushes. Never represent an enqueue as confirmed handset delivery; verify credentials, device builds, Expo tickets and receipts.
-- Do not claim simulated OTP, chat, age checks, geolocation, moderation or phone push as live services.
+## Product boundary
+- **Native installed iOS and Android app only. No public customer-facing website.**
+- The **repository's current native design is authoritative**: apps/mobile/src/theme.ts, apps/mobile/src/ui.tsx and established native screens. Preserve brand palette, spacing, shape, touch targets, accessibility and navigation.
+- Do not import, synchronize, regenerate or replace the native design with the older Lovable prototype. Root src/ is archived internal test context, not a design authority.
+- Production code lives in apps/mobile/ (Expo/React Native) and services/api/ (Node + PostgreSQL/PostGIS when enabled). Do not introduce Supabase.
+- Do not imply mock SMS, age, GPS, messages, or push are live. No customer data or secrets in source. The app is for adults 18+; phone OTP alone does not establish age.
+
+## Authentication and notifications
+- Use a trusted real JWT issuer with server-side authorization; no bypass tokens.
+- Native Discover must never expose precise private locations, unverified hosts or blocked users.
+- Requests and messaging are restricted server-side, including seat-capacity checks.
+- Acceptance/decline writes a durable in-app record and queues an opt-in OS push; a queued push is not confirmed delivery. Protect notification payloads and verify provider receipts on real devices.
+- Keep Africa's Talking, Google, Firebase, Expo and Apple credentials only in provider-managed secret stores or local untracked environments.
 
 ## Required progress tracking
-On **every major feature, UX change, architectural decision, meaningful bug fix, security/privacy change, deployment or milestone**:
-1. Read `PROGRESS.md` before starting.
-2. Update `PROGRESS.md` **in the same commit** as the change: change last-updated date, affected status rows, next steps, blockers, and add a dated changelog entry.
-3. Document verification evidence. Do not mark a test passed unless it actually ran and passed.
-4. Keep the file factual and concise so the next contributor can resume where work stopped.
+For every major feature, provider decision, UX/security change, deployment or milestone:
+1. Read PROGRESS.md first.
+2. Update status, blockers, next steps and date in PROGRESS.md **in the same commit**.
+3. Record CI/real-device evidence honestly. Never declare tests passed if they were not run and confirmed.
 
-## Before merging
-- Run `bun run typecheck`, `bun run build` and `bun run test` where available, or clearly record why they could not run.
-- Check that mobile screens share the original Lovable spacing, header and bottom-nav dimensions, and that interactions have no dead controls.
-- Keep request-to-chat authorization and capacity rules in mind. Demo client-side enforcement is **not** adequate for production.
+## Verification
+- Run the API tests, native TypeScript check and Android JS export; use GitHub Actions where local tools are unavailable.
+- Preserve the legacy browser tests while it remains in the repository, but never mistake the web demo for the native app.
+- Prefer working functionality with an explicit honest setup state to fake demo flows.

@@ -41,3 +41,20 @@ export async function fetchInbox() {
 export async function markNotificationRead(id: string) {
   return api<{ updated: boolean }>(`/v1/notifications/${encodeURIComponent(id)}/read`, "PATCH");
 }
+
+/** Only safe-to-display session fields; no precise address or contact data. */
+export type DiscoverSession = {
+  id: string;
+  title: string;
+  category: string;
+  neighbourhood: string;
+  hostName: string;
+  startsAt: string;
+  endsAt: string;
+  seatsRemaining: number;
+  isHost: boolean;
+};
+
+export async function fetchDiscoverSessions() {
+  return (await api<{ sessions: DiscoverSession[] }>("/v1/sessions")).sessions;
+}

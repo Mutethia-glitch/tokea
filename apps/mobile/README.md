@@ -1,29 +1,29 @@
-# Tokea — native iOS & Android application
+# Tokea — native Android and iOS application
 
-This is the **native product**, distinct from the Lovable/Vercel web UX reference. Built with Expo SDK 58, React Native, Expo Router and `expo-notifications`.
+This is the **only intended customer product**; Tokea is not a website.
 
-## Native app development
+The **existing repository native design is authoritative**. Its theme is apps/mobile/src/theme.ts, with shared surfaces in apps/mobile/src/ui.tsx. Do not replace it with the historical Lovable source.
 
-```bash
-cd apps/mobile
-bun install
-bunx expo install --fix
-bun run typecheck
-bun run start
-```
+## Local development
 
-For genuine iOS/Android **push notifications**:
-1. Create/associate a real Expo EAS project ID in `app.json`.
-2. Configure Android FCM v1 and iOS APNs credentials using Expo/EAS.
-3. Create a **development build** and install it on a physical phone (or supported simulator/emulator). Expo Go cannot test remote pushes.
-4. Deploy `services/api` with HTTPS, a managed PostgreSQL database, real OTP identity/age-assurance, and EXPO_ACCESS_TOKEN.
-5. Configure EXPO_PUBLIC_API_URL (HTTPS) and sign in using a **real** verified server-issued JWT. There is no demo bypass.
-6. A user taps **Enable phone notifications** in the native Profile; the token is linked to their authenticated account.
+Run from apps/mobile after installing Bun and the compatible Node version:
 
-The backend stores all accepted/declined invitation events in an in-app notification inbox. If permission is granted and a device token is registered, it queues OS push delivery; a tap opens the app's Notifications screen.
+- bun install
+- bun run typecheck
+- bun run start
 
-**Current status:** native shell, notification registration and inbox flows are a source-code foundation only. Real identity, device build, API deployment, physical push delivery, receipts, and complete session screens are NOT finished or verified.
+The authenticated Discover feed uses GET /v1/sessions. Configure EXPO_PUBLIC_API_URL as HTTPS in a local, untracked environment for real testing. There is deliberately no fake account or sample session fallback: a trusted JWT and confirmed 18+ verification must exist before the API will serve requests.
 
-Always update the repository's `PROGRESS.md` with major milestones.
+## EAS setup
 
-See [notification requirements](../../docs/notifications.md) for planned alerts, platform testing and user preferences.
+After a real Expo project has been created and linked, replace the EAS project placeholder in app.json. The checked-in eas.json contains internal Android development/preview profiles. Configure Firebase FCM v1 credentials via EAS, build an installed Android development app, and test on a phone. Repeat on iOS once Apple signing and APNs are configured. Expo Go is insufficient for actual remote pushes.
+
+See ../../docs/account-setup.md and ../../docs/notifications.md for provider ownership and OS push requirements.
+
+## Security and limits
+
+The API and managed database are not deployed. Real phone OTP and age assurance, host/create and join-request endpoints, and private chats are not implemented. Notification code is a foundation only: no verified phone delivery. Do not claim production launch readiness.
+
+Copyright notice appears on Profile and About. © 2026 Tokea. All rights reserved.
+
+Update ../../PROGRESS.md with every major milestone.

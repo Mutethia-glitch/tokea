@@ -8,6 +8,7 @@ describe.skipIf(!hasDatabase)("PostgreSQL invitation + notifications transaction
     const { pool } = await import("./db.js");
     const { decideJoinRequest } = await import("./decisions.js");
     const { getInbox, markInboxRead } = await import("./inbox.js");
+    const { getDiscoverSessions } = await import("./sessions.js");
 
     const host = randomUUID(), guestA = randomUUID(), guestB = randomUUID();
     const session = randomUUID(), rA = randomUUID(), rB = randomUUID();
@@ -77,6 +78,13 @@ describe.skipIf(!hasDatabase)("PostgreSQL invitation + notifications transaction
 
     await markInboxRead(acceptedUser,acceptedInbox[0]!.id);
     expect((await getInbox(acceptedUser))[0]?.readAt).not.toBeNull();
+    // M5 Discover: a full session remains visible to its host and approved guests,
+    // but not to unapproved applicants. Blocking removes it from discovery.
+    expect((await getDiscoverSessions(host)).some((s) => s.id === session)).toBe(true);
+    expect((await getDiscoverSessions(acceptedUser)).some((s) => s.id === session)).toBe(true);
+    expect((await getDiscoverSessions(declinedUser)).some((s) => s.id === session)).toBe(false);
+    await pool.query("INSERT INTO user_blocks(blocker_user_id, blocked_user_id) VALUES($1,$2)", [acceptedUser,host]);
+    expect((await getDiscoverSessions(acceptedUser)).some((s) => s.id === session)).toBe(false);
     await pool.end();
   }, 30_000);
 });
