@@ -32,3 +32,6 @@
 3. Ensure a well-lit unfiltered selfie matches the ID's photo and the user is clearly visible.
 4. Approve only when all checks pass. Otherwise decline with a short, respectful explanation.
 5. Never screenshot, download, forward or publish the ID/selfie. Another admin cannot modify the final case. A declined applicant may submit a *new* case.
+
+## Separate cleanup job (not hosting)
+`cd services/api && bun run cleanup:verification` runs expiry and deletion once without starting the API. It is designed to be invoked by an operating-system scheduler as a fallback to the API's periodic cleanup. It checks for deletion jobs older than five minutes and exits unsuccessfully if any remain. No real identity photos should be submitted until the scheduled job, alerts, uptime, backup exclusion and recovery practices are actually verified.

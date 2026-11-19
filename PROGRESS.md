@@ -61,6 +61,12 @@
 
 ## Changelog
 
+### 2026-11-19 — Independent identity-photo cleanup command (verification pending)
+- Added `bun run cleanup:verification`, a separate one-shot local task to expire pending/draft ID and selfie files and clear orphaned encrypted files even when the HTTP server is stopped.
+- Reports overdue deletion jobs so an operating-system scheduler can detect failures. This still cannot guarantee deletion while the computer is off; no real user ID uploads are authorized without 24-hour operational controls.
+- CI verification pending; existing API photo cleanup and native checks remain intact.
+
+
 ### 2026-11-19 — Obsolete-file and staff-invitation cleanup (CI verified)
 - Replaced ID/selfie references are cleared and previous encrypted bytes deleted; stale expired drafts clear both former file IDs before any new upload. An orphan-file sweep handles interrupted writes while protecting in-flight uploads.
 - Finalized reviews retain decisions/reviewer audit data but never active photo references. Successful file deletions remove their own queue records, so there is no fallback to old image UUIDs.

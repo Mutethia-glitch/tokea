@@ -62,3 +62,14 @@ All capacity-changing operations lock the session row transactionally. Messages 
 `docker compose -f services/api/compose.local.yml up -d` starts a developer-only PostgreSQL service bound to **127.0.0.1**. Copy the example environment to your own untracked file; do not paste credentials into chat or commit them.
 
 To run migrations and tests, set `DATABASE_URL` in your local shell, then execute `cd services/api && bun install && bun scripts/migrate.mjs && bun run test`. Running the HTTP API additionally requires a configured real JWT provider. GitHub Actions can test the data layer without this provider using isolated temporary accounts and containers.
+
+## Independent local photo-expiry cleanup
+
+Identity uploads are **disabled by default**. For test-only encrypted files, a separate one-shot job can run even if the HTTP server has stopped:
+
+```powershell
+cd C:\Users\promi\tokea\services\api
+bun run cleanup:verification
+```
+
+When enabled with approved, private environment variables and a working local PostgreSQL connection, it expires documents, deletes completed/obsolete encrypted images, scans orphan files, and reports failed/overdue deletion jobs. Schedule the script independently of the API using your operating system's task scheduler, and monitor failures before enabling any real document collection. A PC that is shut down or sleeping cannot uphold a strict 24-hour deadline; production requires an always-on independently monitored cleanup process.

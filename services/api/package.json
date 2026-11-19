@@ -7,7 +7,8 @@
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc --noEmit",
     "test": "vitest run --config ./vitest.config.mts",
-    "start": "node dist/server.js"
+    "start": "node dist/server.js",
+    "cleanup:verification": "bun scripts/cleanup-verification.mjs"
   },
   "engines": {
     "node": ">=22"
