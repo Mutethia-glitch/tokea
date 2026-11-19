@@ -75,8 +75,11 @@ export async function route(req:IncomingMessage,res:ServerResponse){
       const bytes=await readBody(req,5*1024*1024);
       return respond(res,201,await uploadDocument(user,photoPath[1] as "id"|"selfie",bytes));
     }
-    if(method==="POST"&&path==="/v1/verification/submit")
+    if(method==="POST"&&path==="/v1/verification/submit"){
+      const consent=z.object({consent:z.literal(true)}).strict().parse(await parseBody(req));
+      if(!consent.consent)throw new ApiError(400,"Please accept the privacy notice.");
       return respond(res,200,await submitVerification(user));
+    }
 
     if(method==="GET"&&path==="/v1/admin/verifications")
       return respond(res,200,{submissions:await listReviewQueue(user)});

@@ -70,7 +70,8 @@
 - Added invite-by-email code requiring verified email identity and SMTP provider configuration; cannot send emails without provider. Only owner role can invite reviewers; invite token expires in 48 hours and is single-use.
 - Added draft Privacy Policy explaining personal ID/selfie collection, retention, human review, restricted access and review response *target* (5 minutes during staffed hours, not guaranteed).
 - **No hosting/deployment, email delivery, real identity signup, physical device notification or real ID processing enabled.**
-- **Pending:** automated CI, signature/permissions tests, PostgreSQL concurrency and deletion tests, independent expiry worker, DPIA/legal review, physical Android/iOS validation.
+- First CI revealed Expo SDK 58 naming mismatch for Image Picker/File System packages and an old test assumption that unverified users could not browse. Corrected SDK-aligned package versions, revised HTTP authorization test to check browse succeeds and host/requests fail, and added explicit consent enforcement at submission endpoint.
+- **Pending:** rerun CI, PostgreSQL review/deletion tests, reliable expiry worker, DPIA/legal review and physical Android/iOS validation.
 
 
 ### 2026-11-19 — Developer's local Windows backend environment verified
