@@ -28,7 +28,7 @@ export async function enablePhoneNotifications() {
     throw Error("Tokea API connection is not ready yet.");
   }
   if (!(await getAccessToken())) {
-    throw Error("Sign in and verify your age before enabling phone notifications.");
+    throw Error("Sign in before enabling phone notifications.");
   }
   // Only now are we ready to request the system's notification permission.
   if (Platform.OS === "android") {

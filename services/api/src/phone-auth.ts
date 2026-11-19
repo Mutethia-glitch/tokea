@@ -23,7 +23,7 @@ export function hashOtp(phone:string,code:string){return hmac(phone+"|"+code);}
 const hashSession=(token:string)=>hmac("refresh|"+token);
 const refreshLifetime=30*24*60*60*1000;
 
-export async function requestPhoneCode(phone:string){
+export async function requestPhoneCode(phone:string,sourceAddress="local"){
   // Fail closed until SMS and keys are actually configured.
   if(!process.env.AT_USERNAME||!process.env.AT_API_KEY||!process.env.AT_MODE)
     throw new ApiError(503,"SMS provider setup is not complete.");
@@ -32,6 +32,18 @@ export async function requestPhoneCode(phone:string){
   const db=await pool.connect();
   try{
     await db.query("BEGIN");
+    // Limit abusive SMS bursts from one connection as well as from one number.
+    const originHash=hmac("source|"+sourceAddress);
+    const origin=await db.query<{count:number;window_started_at:Date}>(
+      "SELECT count,window_started_at FROM phone_otp_origin_limits WHERE origin_hash=$1 FOR UPDATE",
+      [originHash]);
+    const within=!!origin.rows[0]&&Date.now()-origin.rows[0].window_started_at.getTime()<3_600_000;
+    if(within&&origin.rows[0]!.count>=15)
+      throw new ApiError(429,"Too many sign-in attempts. Please try again later.");
+    await db.query(`INSERT INTO phone_otp_origin_limits(origin_hash,window_started_at,count)
+      VALUES($1,NOW(),1) ON CONFLICT(origin_hash) DO UPDATE
+      SET window_started_at=CASE WHEN $2 THEN phone_otp_origin_limits.window_started_at ELSE NOW() END,
+          count=CASE WHEN $2 THEN phone_otp_origin_limits.count+1 ELSE 1 END`,[originHash,within]);
     const existing=await db.query<{requested_at:Date;hourly_window:Date;hourly_count:number}>(
       "SELECT requested_at,hourly_window,hourly_count FROM phone_login_codes WHERE phone_e164=$1 FOR UPDATE",[phone]);
     const previous=existing.rows[0],now=Date.now();
@@ -82,7 +94,7 @@ export async function verifyPhoneCode(phone:string,code:string){
       SET phone_e164=EXCLUDED.phone_e164 RETURNING id,display_name,age_verified_at`,[phone]);
     const session=await issueSession(db,account.rows[0]!.id);
     await db.query("COMMIT");
-    return {...session,displayName:account.rows[0]!.display_name,
+    return {...session,userId:account.rows[0]!.id,displayName:account.rows[0]!.display_name,
       ageVerified:!!account.rows[0]!.age_verified_at};
   }catch(e){
     await db.query("ROLLBACK").catch(()=>{});

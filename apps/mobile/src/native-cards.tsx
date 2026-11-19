@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
-import { Pressable, Text, View } from "react-native";
+import { ImageBackground, Pressable, Text, View } from "react-native";
+import { DRINK_PHOTOS } from "./drink-photos";
+import { PersonAvatar } from "./person-avatar";
 import { colors, layout } from "./theme";
 import type { NativeSession } from "./sessions";
 
@@ -35,17 +37,24 @@ export function Action({label,onPress,secondary=false,disabled=false}:{
 export function SessionCard({session,onPress}:{
   session:NativeSession;onPress:()=>void;
 }) {
-  const [bg,ink]=bannerColors[session.category]??[colors.brandSoft,colors.brand];
+  const [bg]=bannerColors[session.category]??[colors.brandSoft,colors.brand];
   return <Pressable onPress={onPress} accessibilityRole="button"
     accessibilityLabel={`${session.hostName}: ${session.title}, ${session.category}`}
     style={{backgroundColor:colors.card,borderWidth:1,borderColor:colors.border,
       borderRadius:layout.cardRadius,overflow:"hidden",marginBottom:layout.cardGap}}>
-    <View style={{backgroundColor:bg,paddingHorizontal:20,paddingVertical:16,minHeight:70}}>
-      <Text style={{fontSize:10,textTransform:"uppercase",letterSpacing:2,color:ink}}>Drinks & company</Text>
-      <Text style={{fontSize:20,fontWeight:"700",color:ink,marginTop:4}}>{session.category}</Text>
-    </View>
+    <ImageBackground source={{uri:DRINK_PHOTOS[session.category]}}
+      imageStyle={{resizeMode:"cover"}} style={{backgroundColor:bg,minHeight:120,justifyContent:"flex-end"}}>
+      <View style={{paddingHorizontal:20,paddingVertical:18,backgroundColor:"rgba(30,25,35,0.54)"}}>
+        <Text style={{fontSize:10,textTransform:"uppercase",letterSpacing:2,color:"#FFFFFF"}}>Drinks & company</Text>
+        <Text style={{fontSize:21,fontWeight:"700",color:"#FFFFFF",marginTop:3}}>{session.category}</Text>
+      </View>
+    </ImageBackground>
     <View style={{padding:20}}>
-      <Text style={{color:colors.text,fontSize:16,fontWeight:"700"}}>{session.hostName}</Text>
+      <View style={{flexDirection:"row",alignItems:"center",gap:11}}>
+        <PersonAvatar userId={session.hostId} name={session.hostName} hasPhoto={session.hostHasPhoto}
+          photoVersion={session.hostPhotoVersion} size={44}/>
+        <Text style={{color:colors.text,fontSize:16,fontWeight:"700",flex:1}}>{session.hostName}</Text>
+      </View>
       <Text style={{color:colors.text,fontSize:15,marginTop:8,lineHeight:22}}>{session.title}</Text>
       <View style={{height:1,backgroundColor:colors.border,marginVertical:14}}/>
       <Text style={{color:colors.muted,fontSize:12,lineHeight:20}}>

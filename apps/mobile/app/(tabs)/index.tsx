@@ -5,6 +5,7 @@ import { Heading, Screen } from "@/ui";
 import { colors } from "@/theme";
 import { Action, MessageBox, Pill, SessionCard } from "@/native-cards";
 import { CATEGORIES, listSessions, type Category, type NativeSession } from "@/sessions";
+import { getAccessToken } from "@/api";
 import { getVerificationStatus, type VerificationStatus } from "@/verification";
 
 export default function DiscoverScreen() {
@@ -13,6 +14,7 @@ export default function DiscoverScreen() {
   const [busy,setBusy]=useState(true);
   const [error,setError]=useState<string|null>(null);
   const [verification,setVerification]=useState<VerificationStatus|null>(null);
+  const [signedIn,setSignedIn]=useState(false);
   const refresh=useCallback(async()=>{
     setBusy(true);setError(null);
     try {setSessions((await listSessions(category)).sessions);}
@@ -20,6 +22,7 @@ export default function DiscoverScreen() {
     finally {setBusy(false);}
   },[category]);
   useFocusEffect(useCallback(()=>{
+    void getAccessToken().then(t=>setSignedIn(!!t));
     void refresh();
     void getVerificationStatus().then(setVerification).catch(()=>setVerification(null));
   },[refresh]));
@@ -35,8 +38,13 @@ export default function DiscoverScreen() {
       </View>
       <Heading title="Who's out nearby?" subtitle="Find your people. Share a drink at a public place." />
       <View style={{alignSelf:"flex-start",marginBottom:20}}>
-        <Action label="＋  Host a drink" onPress={()=>router.push(verification?.verified?"/host":"/verification")}/>
+        <Action label="＋  Host a drink"
+          onPress={()=>router.push(!signedIn?"/sign-in":verification?.verified?"/host":"/verification")}/>
       </View>
+      {!signedIn?<View style={{marginBottom:15}}>
+        <MessageBox text="Welcome to Tokea! Sign in to see people hosting drinks and set up your profile."/>
+        <Action label="Sign in with phone" onPress={()=>router.push("/sign-in")}/>
+      </View>:null}
       {verification&&!verification.verified?<MessageBox text="Browse freely while your age is being verified. To host or request to join, upload your ID and a clear selfie in Profile."/>:null}
       <Text style={{fontWeight:"600",color:colors.text,marginBottom:10,fontSize:13}}>Drinks</Text>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{marginBottom:20}}>

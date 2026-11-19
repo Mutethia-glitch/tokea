@@ -2,7 +2,7 @@
 
 **Project:** Tokea (formerly named Explore in early blueprint)  
 **Last updated:** 2026-11-19  
-**Current milestone:** M6 — manual age review and no-fallback photo cleanup source verified in CI (not hosted; real accounts pending)  
+**Current milestone:** M7 — Kenyan OTP, Gmail staff identity, real-photo banners, persistent avatars and push readiness (local-only, CI pending)  
 **Repository:** https://github.com/Mutethia-glitch/tokea  
 **Design source:** https://lovable.dev/projects/20ff86c9-03b7-4e00-b80f-9560791ddbfb
 
@@ -60,6 +60,15 @@
 - Draft privacy and terms effective date: **November 16, 2026**; no public support email yet.
 
 ## Changelog
+
+### 2026-11-19 — M7 provider wiring, photographic session banners and native profile photo persistence
+- Selected Africa's Talking for +254 Kenya OTP. Added server-side SMS code requests/validation, 5-minute expiry, HMAC hashing, retry and origin/phone rate limits, RSA-signed one-hour session JWTs and rotating revocable refresh sessions. App sign-in uses Kenyan-friendly numbers. No fake OTP bypass or actual SMS send until credentials are configured.
+- Staff Google OIDC verifies Google ID tokens (including email_verified, client audience, issuer and per-login nonce) and exchanges them for restricted first-party API JWTs. First owner can be bootstrapped from a verified Gmail identity and may invite further reviewers by Gmail SMTP; non-members cannot access reviews.
+- Replaced native drink-category gradient-only banners with genuine drink/bar photo sources and a documented photo-credit review; card spacing and Lovable-style typography remain consistent. Exact photo delivery and licensing must be checked on devices before publishing.
+- Added separate encrypted persistent profile photo API and native photo picker storing selected copies in app documents (not temporary cache) keyed by user. Locally saved photos persist after app restart; sharing with other users requires configured profile photo backend. Identity-check images remain separate and delete on review/expiry.
+- Prepared local identity-key setup scripts, owner bootstrap, provider settings and native push instructions. No hosting, credential creation or actual push delivery has been performed.
+- **Pending CI, live provider accounts, staff Google OAuth credentials, physical device credentials, photo licensing confirmation and actual handset checks.**
+
 
 ### 2026-11-19 — M7 Kenya SMS OTP provider foundation (CI pending)
 - Selected Africa's Talking SMS API with explicit sandbox/live modes. Added Kenya E.164 phone validation, random six-digit OTP, five-minute expiry, HMAC hashing (no plaintext code storage), throttling, capped attempts, and encrypted/signed first-party JWT access tokens.

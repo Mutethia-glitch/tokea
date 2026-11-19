@@ -63,7 +63,7 @@ export async function route(req:IncomingMessage,res:ServerResponse){
       return respond(res,200,{ok:true,service:"tokea-api"});
     if(method==="POST"&&path==="/v1/auth/request-code"){
       const input=requestCodeSchema.parse(await parseBody(req));
-      return respond(res,200,await requestPhoneCode(input.phone));
+      return respond(res,200,await requestPhoneCode(input.phone,req.socket.remoteAddress??"unknown"));
     }
     if(method==="POST"&&path==="/v1/auth/verify-code"){
       const input=verifyCodeSchema.parse(await parseBody(req));
