@@ -2,7 +2,7 @@
 
 **Project:** Tokea (formerly named Explore in early blueprint)  
 **Last updated:** 2026-11-19  
-**Current milestone:** M7 — Kenyan OTP, Gmail staff identity, real-photo banners, persistent avatars and push readiness (local-only, CI pending)  
+**Current milestone:** M7 — Kenyan OTP, Gmail staff identity, photographic banners, persistent avatars and push foundation CI-verified (local only; providers not connected)  
 **Repository:** https://github.com/Mutethia-glitch/tokea  
 **Design source:** https://lovable.dev/projects/20ff86c9-03b7-4e00-b80f-9560791ddbfb
 
@@ -60,6 +60,13 @@
 - Draft privacy and terms effective date: **November 16, 2026**; no public support email yet.
 
 ## Changelog
+
+### 2026-11-19 — M7 provider and native implementation CI verification
+- **All three jobs passed:** https://github.com/Mutethia-glitch/tokea/actions/runs/44436524432 — API/PostgreSQL 32/32 tests in 9 files, native Android JavaScript export and TypeScript, web design-reference regression checks.
+- Real OTP SMS, Gmail/Google staff identity, photograph rendering on a physical device and phone push/APNs/FCM delivery **have not been end-to-end tested** without provider accounts/credentials and physical app builds.
+- Persistent profile photo is copied to the native app's documents directory; sharing with other users depends on turning on encrypted profile sync. Deleting/replacing avatars does not revive old files.
+- Camera/photo sources in banners are real documentary photography links (not generated icons). Validate Muratina attribution/Commons license and all assets on device before release.
+- No hosting, live ID collection, provider credentials committed or deployment.
 
 ### 2026-11-19 — Privacy wording and M7 native implementation checks
 - Updated the draft policy and native Privacy screen to distinguish optional persistent, member-visible profile photos from ID/selfie photos deleted after manual age review or expiry.

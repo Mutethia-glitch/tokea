@@ -1,10 +1,11 @@
+import type { Category } from "./sessions";
 /** Curated documentary drink photography; no decorative icons in session banners.
  * Unsplash photos are free under unsplash.com/license.
  * Traditional Kenyan "mratina" image is from Wikimedia Commons; credit is documented.
  * External photos are display-only assets, never user identity data.
  */
 const unsplash=(id:string)=>`https://images.unsplash.com/${id}?auto=format&fit=crop&w=960&q=82`;
-export const DRINK_PHOTOS:Record<string,string>={
+export const DRINK_PHOTOS:Record<Category,string>={
   Beer:unsplash("photo-1535958636474-b021ee887b13"),
   Wine:unsplash("photo-1510812431401-41d2bd2722f3"),
   Cocktails:unsplash("photo-1544145945-f90425340c7e"),
