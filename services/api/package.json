@@ -7,7 +7,8 @@
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc --noEmit",
     "test": "vitest run --config ./vitest.config.mts",
-    "start": "node dist/server.js"
+    "start": "node dist/server.js",
+    "cleanup:verification": "bun scripts/cleanup-verification.mjs"
   },
   "engines": {
     "node": ">=22"
@@ -15,11 +16,14 @@
   "dependencies": {
     "jose": "^6.1.0",
     "pg": "^8.16.3",
-    "zod": "^4.1.9"
+    "zod": "^4.1.9",
+    "sharp": "^0.34.4",
+    "nodemailer": "^7.0.10"
   },
   "devDependencies": {
     "@types/node": "^22.16.5",
     "@types/pg": "^8.15.5",
+    "@types/nodemailer": "^7.0.3",
     "tsx": "^4.20.5",
     "typescript": "^5.9.3",
     "vitest": "^4.1.10"

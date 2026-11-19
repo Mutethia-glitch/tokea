@@ -24,7 +24,9 @@ export default function NotificationsScreen() {
     catch { /* Stay in inbox even when marking as read fails. */ }
     setItems((current) => current.map((n) => n.id === item.id ? { ...n, readAt: new Date().toISOString() } : n));
     // Never navigate to an arbitrary destination received from server/push data.
-    if (item.route === "/requests") {
+    if (item.route === "/verification") {
+      router.push("/verification");
+    } else if (item.route === "/requests") {
       router.push("/(tabs)/requests");
     } else {
       const chat = /^\/chats\/([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})$/.exec(item.route);

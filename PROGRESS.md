@@ -2,7 +2,7 @@
 
 **Project:** Tokea (formerly named Explore in early blueprint)  
 **Last updated:** 2026-11-19  
-**Current milestone:** M5 — authenticated session/request/chat HTTP lifecycle verified in CI and local health verified (not hosted)  
+**Current milestone:** M6 — manual age review and no-fallback photo cleanup source verified in CI (not hosted; real accounts pending)  
 **Repository:** https://github.com/Mutethia-glitch/tokea  
 **Design source:** https://lovable.dev/projects/20ff86c9-03b7-4e00-b80f-9560791ddbfb
 
@@ -17,18 +17,18 @@
 | Blueprint and scope | Reviewed | Adults-only Kenya social discovery; no dating, alcohol commerce, payments, or AI matching |
 | Visual design | Approved | Preserve original Lovable tokens, fonts, 448px mobile canvas, 64px nav/header, 20px card padding, 12px card gap |
 | Discover + filters | **M3 verified** | 14 drink categories including Muratina and spirits; grouped hosting/filter controls, themed card banners and mobile browser checks passed |
-| Onboarding + profile | Prototype | Demo-only self declaration and mock OTP; no actual verification |
-| Host/create session | Prototype | Client-side creation/edit/pause/end |
-| Join requests | Prototype | Local simulated acceptance/decline and capacity checks |
-| Session chats | Prototype | Demo-only; access shown after approval, no real messages delivered |
+| Onboarding + profile | **M6 source in review** | Native ID+selfie verification form, detailed clear-photo guidance, consent and status; needs real OTP provider and physical-device tests |
+| Host/create session | **M5 native + API source tested** | Real signed-JWT host endpoint and native form; account provider not yet configured |
+| Join requests | **M5 native + API source tested** | Authenticated requests and server-only host decisions, durable inbox events; no live users yet |
+| Session chats | **M5 native + API source tested** | PostgreSQL messages restricted to accepted members; live realtime and phone notifications pending |
 | Profile + appearance | **M2 photo UX verified** | Browser-local cropped profile photo choose/change/remove, photo persistence and avatar rendering; no server upload |
-| Safety | Preliminary | Block/report demo controls; no server-side enforcement |
+| Safety | **M6 source in review** | Signed-in unverified accounts can browse, but server blocks hosting, joining and chats; ID+selfie encrypted at rest and deletions attempted on review/expiry |
 | React web build | **Verified in CI** | Bun install, TypeScript, Vite/Nitro production build and 16 Vitest tests passed in GitHub Actions run #8 (2026-11-17) |
 | Hosted web demo | **Vercel deployment READY** | https://tokea-demo.vercel.app · SSO protection enabled · browser routes not yet independently smoke-tested |
-| Production backend | **M5 local + CI verified** | PostgreSQL sessions, join requests, chat and notification API compile; 12/12 backend tests passed in GitHub CI and independently on local Windows using PostgreSQL 17. No hosting or deployment. |
+| Production backend | **M6 local-only tests green** | PostgreSQL migrations, signed-JWT routes, staff age reviews, photo deletion and invite access; 24 tests passed before final audit additions. No hosting. |
 | Native push notifications | **M4 code verified, delivery unverified** | Explicit opt-in and Expo token registration, in-app inbox and native notification tap handling; push needs EAS ID, APNs/FCM credentials, real authentication and device testing |
 | Native iOS/Android | **Typecheck + Android JS export passed** | Expo SDK 58 / React Native 0.88 / Expo Router shell in `apps/mobile`; not an installed native build or complete feature UI |
-| Kenya legal review | Required | Final age assurance, privacy policies, licensing/alcohol considerations |
+| Kenya legal review | **Pre-launch blocker** | Updated draft privacy notice for ID/selfie, restricted admin review, metadata and deletion; mandatory DPIA/ODPC legal review and 24h deletion assurance before live collection |
 
 ## Immediate next steps
 
@@ -43,7 +43,9 @@
 - [x] Add regression tests for capacity, approval restrictions, blocking and private chat access.
 - [ ] Confirm hosting/managed PostgreSQL provider, production URLs, OTP/age assurance vendor and EAS project/Apple/Google developer accounts before deployment.
 - [ ] Provision and migrate a private PostgreSQL database; deploy the independent API with a trusted JWT issuer.
-- [ ] Add OTP/age assurance and verified session-token provisioning. Native Discover, Host, Requests, Chat and session-detail screens now consume API contracts, but cannot show live data without sign-in.
+- [ ] Integrate trusted OTP sign-in with verified identity claims. Manual ID+selfie review is being implemented locally; no real uploads until privacy/legal/security readiness.
+- [ ] Configure an owner reviewer identity and SMTP invitation provider securely, test email invitations and one-decision-only protection.
+- [ ] Before any live ID collection: test production-independent 24h deletion including downtime, storage backup exclusion, monitoring, incident handling, human reviewer staffing and Kenya ODPC compliance.
 - [ ] Replace short-interval chat refresh with authenticated realtime transport and controls.
 - [ ] Configure FCM/APNs credentials, build/install Tokea on Android and iOS devices, and verify accepted/declined requests generate OS + in-app notifications.
 - [ ] Implement push receipt checks, delivery monitoring, preferences, user blocking, moderation and safe sign-out/device revocation.
@@ -58,6 +60,52 @@
 - Draft privacy and terms effective date: **November 16, 2026**; no public support email yet.
 
 ## Changelog
+
+### 2026-11-19 — M6 verification and cleanup implementation checkpoint
+- **All three CI jobs passed** at https://github.com/Mutethia-glitch/tokea/actions/runs/44432147253: 25/25 backend tests, migration and local cleanup command smoke, native TS check/Android JS export, no legacy runtime-import audit, and existing reference browser checks.
+- Review access is role-limited, final decisions cannot be overturned, admin invitations are bound to verified email and single-use, and review/expiry triggers durable in-app notifications.
+- Superseded encrypted photo references and successful deletion tombstones are removed; failed deletion jobs remain only while required for retry. The native app clears temporary app-cache photo copies without touching the original gallery.
+- An independent cleanup command supports a separately scheduled job. A reliable **24-hour deletion guarantee**, five-minute review staffing, provider-backed sign-in/email and actual phone push delivery are **NOT operational** without additional configuration and monitoring.
+- **No API/mobile hosting or deployment.** M6 remains a draft PR stacked on M5; root web prototype is retained as approved design reference only.
+
+
+### 2026-11-19 — Keep current photo valid even if old-file cleanup fails (CI verified)
+- Upload expiry now begins when photo intake starts, not after image processing finishes.
+- Upload transactions separate the committed **current** photo from the best-effort cleanup of obsolete files. If deletion fails, the new active photo remains valid and a retry job persists; it cannot accidentally be removed as a fallback.
+- Admin verification decisions similarly remain final/successful even if immediate file deletion fails; cleanup errors are logged for retry.
+- No hosting; no real identity documents accepted.
+
+
+### 2026-11-19 — Independent identity-photo cleanup command (CI verified)
+- Added `bun run cleanup:verification`, a separate one-shot local task to expire pending/draft ID and selfie files and clear orphaned encrypted files even when the HTTP server is stopped.
+- Reports overdue deletion jobs so an operating-system scheduler can detect failures. This still cannot guarantee deletion while the computer is off; no real user ID uploads are authorized without 24-hour operational controls.
+- **Verified:** independent cleanup command smoke ran in GitHub Actions with uploads disabled; encrypted photo replacement/expiry/deletion logic was tested with synthetic images and PostgreSQL.
+
+
+### 2026-11-19 — Obsolete-file and staff-invitation cleanup (CI verified)
+- Replaced ID/selfie references are cleared and previous encrypted bytes deleted; stale expired drafts clear both former file IDs before any new upload. An orphan-file sweep handles interrupted writes while protecting in-flight uploads.
+- Finalized reviews retain decisions/reviewer audit data but never active photo references. Successful file deletions remove their own queue records, so there is no fallback to old image UUIDs.
+- Added `0006_remove_old_photo_refs.sql` to remove any legacy references on finalized cases and `0007_remove_deleted_file_tombstones.sql` to delete historical successful-job rows.
+- Native phone app cleans temporary selected images on replacement, successful submission and screen exit, without deleting the user's original gallery pictures.
+- Admin review UI invalidates image previews after another reviewer completes the case. Consumed and expired admin email invitations are purged periodically.
+- Expanded automated tests to assert superseded images cannot be read, stale drafts are reset without previous IDs, orphan images are removed, and invite tokens are single-use and email-bound.
+- **Verified:** 25/25 backend tests across six files, including eight age-review/deletion/admin tests and a staff access HTTP test. Native Android JS export, native TypeScript, active-code no-legacy-fallback audit and design reference smoke all passed in GitHub Actions #44432147253.
+- **Not hosted; real ID processing and external email/push are disabled pending credentials, privacy/security verification and legal review.**
+
+
+### 2026-11-19 — M6 manual age assurance and reviewer workspace (source in progress)
+- Added native ID and selfie capture/selection screen with clear-photo instructions, explicit consent and account status; Profile links to review and updated privacy notice.
+- Signed-in but unverified people can browse public sessions, profile and notifications. All host/join/request/chat operations remain server-side restricted until age-verified in the database.
+- Added PostgreSQL case records, immutable final reviews, owner/reviewer membership, limited email invites and extended notification kinds; final approved cases set `users.age_verified_at` immediately.
+- Added a local **staff-only** admin workspace with reviewer queue, secure ID/selfie comparison and explicit Verify/Decline controls. Final decisions cannot be overwritten, including by other reviewers.
+- Added server-side image validation and re-encoding (removes EXIF/GPS), private AES-256-GCM storage, 24h case expiry and cleanup timer, plus immediate deletion attempt on review. **Not yet a production 24h deletion guarantee**: independent cleanup monitoring, process uptime and backups must be verified before enabling real uploads.
+- Added invite-by-email code requiring verified email identity and SMTP provider configuration; cannot send emails without provider. Only owner role can invite reviewers; invite token expires in 48 hours and is single-use.
+- Added draft Privacy Policy explaining personal ID/selfie collection, retention, human review, restricted access and review response *target* (5 minutes during staffed hours, not guaranteed). Consent is required before either photo is uploaded; the API records the consent timestamp and requires consent on final submission.
+- **No hosting/deployment, email delivery, real identity signup, physical device notification or real ID processing enabled.**
+- First CI revealed Expo SDK 58 naming mismatch for Image Picker/File System packages and an old test assumption that unverified users could not browse. Corrected SDK-aligned package versions, revised HTTP authorization test to check browse succeeds and host/requests fail, and added explicit consent enforcement at submission endpoint.
+- Automated M6 review tests initially found that final/expired cases retained opaque image references even after file deletion; corrected the database transition to clear image references and queue durable deletion jobs. Restored server-side staff OAuth/PKCE endpoints in the same fix. Retesting.
+- **Pending:** CI rerun, deletion reliability under downtime, DPIA/legal review and physical Android/iOS validation.
+
 
 ### 2026-11-19 — Developer's local Windows backend environment verified
 - User successfully installed Docker Desktop and Bun 1.4.4 on Windows.
@@ -80,6 +128,7 @@
 - Added temporary PostgreSQL integration tests for creating/discovering sessions, join notifications, approvals, chat membership, cancellation and blocking.
 - Corrected host detection for sessions with zero join requests: the server derives `isHost` from the JWT subject rather than whether invitations already exist.
 - Native messages currently refresh on a short interval; full realtime transport, phone push receipts and complete identity/onboarding still outstanding.
+- Made unverified-state Requests and Chats friendly: a plain explanation and a `Check age verification` action replace technical 403 errors. Simplified privacy notice wording for non-technical users.
 - Initial CI exposed a malformed API routing module and a native list-type mismatch; both corrected.
 - **Verified:** GitHub Actions run https://github.com/Mutethia-glitch/tokea/actions/runs/44388261555 passed web design-reference checks, Android JavaScript export, native TS check, PostgreSQL migration, backend compilation and **12 API tests** (4 session/request/chat integrations plus the prior 8 tests).
 - No external service provisioned, no cloud hosting, and no native device push yet.

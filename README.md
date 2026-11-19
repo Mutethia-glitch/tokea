@@ -30,3 +30,9 @@ bun run dev
 Visual reference: original `src/styles.css` tokens and shared components, Instrument Sans / Instrument Serif, 448px mobile shell, 64px header/navigation, 20px content/card padding, 12px card spacing, 44px+ tap targets.
 
 Production architecture remains separately specified: Expo/React Native + Node.js + PostgreSQL/PostGIS, without Supabase. Kenyan privacy/alcohol law review is required before launch.
+
+## Current local-only milestones
+
+The M6 native workflow in `apps/mobile/app/verification.tsx` supports readable ID/selfie photo instructions, explicit consent, human-review status and browsing while pending. The API has an invite-only staff review workspace, immutable first decisions, encrypted image storage, and background deletion for replaced, expired, reviewed or orphaned photos. See [the draft privacy policy](docs/privacy-policy.md) and [local age-review guidance](docs/manual-age-verification.md).
+
+**There is no app/backend deployment in these branches.** Real ID collection remains disabled pending a verified identity provider, secure staff accounts, a configured mail service, dependable photo-deletion monitoring and Kenyan privacy/legal assessment. Existing browser prototype files are kept **as a design reference**, not imported by the native app or API.

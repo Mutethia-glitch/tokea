@@ -5,6 +5,7 @@ import { Heading, Paper, Screen } from "@/ui";
 import { colors } from "@/theme";
 import { Action, MessageBox, Pill } from "@/native-cards";
 import { cancelRequest, decideRequest, listRequests, type NativeRequest } from "@/sessions";
+import { getVerificationStatus } from "@/verification";
 
 export default function RequestsScreen() {
   const [tab,setTab]=useState<"incoming"|"sent">("incoming");
@@ -13,10 +14,14 @@ export default function RequestsScreen() {
   const [busy,setBusy]=useState(true);
   const [sending,setSending]=useState<string|null>(null);
   const [error,setError]=useState<string|null>(null);
+  const [needsVerification,setNeedsVerification]=useState(false);
 
   const load=useCallback(async()=>{
     setBusy(true);setError(null);
     try {
+      const status=await getVerificationStatus();
+      setNeedsVerification(!status.verified);
+      if(!status.verified){setIncoming([]);setSent([]);return;}
       const data=await listRequests();
       setIncoming(data.incoming);setSent(data.sent);
     } catch(e){setIncoming([]);setSent([]);setError(e instanceof Error?e.message:"Unable to load invitations.");}
@@ -36,6 +41,12 @@ export default function RequestsScreen() {
   return <Screen>
     <ScrollView contentContainerStyle={{paddingBottom:48}} showsVerticalScrollIndicator={false}>
       <Heading title="Requests" subtitle="Approve requests to join your sessions and track invitations you've sent."/>
+      {needsVerification?<Paper>
+        <Text style={{color:colors.text,fontWeight:"700",fontSize:16,marginBottom:8}}>Age verification needed</Text>
+        <Text style={{color:colors.muted,lineHeight:21,marginBottom:16}}>You can browse drinks while our team checks your ID and selfie. Requests will be available as soon as your age is approved.</Text>
+        <Action label="Check age verification" onPress={()=>router.push("/verification")}/>
+      </Paper>:null}
+      {!needsVerification?<>
       <View style={{flexDirection:"row",marginBottom:20}}>
         <Pill selected={tab==="incoming"} onPress={()=>setTab("incoming")}>Incoming ({incoming.length})</Pill>
         <Pill selected={tab==="sent"} onPress={()=>setTab("sent")}>Sent ({sent.length})</Pill>
@@ -65,6 +76,7 @@ export default function RequestsScreen() {
           <Action label="Open private chat" onPress={()=>router.push({pathname:"/chats/[id]",params:{id:r.sessionId}})}/>
         </View>:null}
       </Paper>)}
+      </>:null}
     </ScrollView>
   </Screen>;
 }

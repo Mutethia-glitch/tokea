@@ -82,9 +82,31 @@ describe.skipIf(!enabled)("Signed-JWT authenticated HTTP lifecycle on loopback",
     expect((await request("/v1/sessions")).status).toBe(401);
     const invalid = await request("/v1/sessions", "not-a-signed-jwt");
     expect(invalid.status).toBe(401);
+    // Unverified adults can browse while the human review is pending.
     const unverified = await request("/v1/sessions", unverifiedToken);
-    expect(unverified.status).toBe(403);
-    expect(unverified.json.error).toMatch(/Adult age verification required/i);
+    expect(unverified.status).toBe(200);
+    const forbiddenHost = await request("/v1/sessions", unverifiedToken, "POST", {
+      title: "Should not be created",category:"Tea",neighbourhood:"Westlands",
+      guestCapacity:2,startsAt:new Date(Date.now()+3_600_000).toISOString(),
+      endsAt:new Date(Date.now()+7_200_000).toISOString(),
+    });
+    expect(forbiddenHost.status).toBe(403);
+    expect(forbiddenHost.json.error).toMatch(/Age verification required/i);
+    expect((await request("/v1/requests",unverifiedToken)).status).toBe(403);
+    expect((await request("/v1/verification/status",unverifiedToken)).json.status).toBe("not_submitted");
+  });
+
+  it("provides friendly staff sign-in and denies non-admin access to review routes",async()=>{
+    const htmlResponse=await fetch(apiBase+"/admin");
+    expect(htmlResponse.status).toBe(200);
+    const html=await htmlResponse.text();
+    expect(html).toContain("Sign in with your work account");
+    expect(html).toContain("Waiting for review");
+    expect(html).not.toMatch(/paste a signed token/i);
+    expect((await request("/v1/admin/me",applicantToken)).status).toBe(403);
+    expect((await request("/v1/admin/verifications",applicantToken)).status).toBe(403);
+    expect((await request("/v1/admin/invitations",applicantToken,"POST",
+      {email:"someone@tokea.example"})).status).toBe(403);
   });
 
   it("creates and discovers a session with a genuinely verified signature", async () => {

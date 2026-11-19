@@ -27,7 +27,7 @@ export async function api<T>(path: string, method = "GET", body?: object): Promi
   if (!base || !(base.startsWith("https://") || allowedLocal))
     throw Error("Secure Tokea API is not configured. Local HTTP is limited to emulator loopback during development.");
   const accessToken = await getAccessToken();
-  if (!accessToken) throw Error("Sign in and verify your age to connect to Tokea.");
+  if (!accessToken) throw Error("Sign in to Tokea to continue.");
   const response = await fetch(`${base}${path}`, {
     method,
     headers: { Authorization: `Bearer ${accessToken}`, "Content-Type": "application/json" },
