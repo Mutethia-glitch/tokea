@@ -2,8 +2,8 @@
 
 ## Product boundary
 - **Native installed iOS and Android app only. No public customer-facing website.**
-- The **repository's current native design is authoritative**: apps/mobile/src/theme.ts, apps/mobile/src/ui.tsx and established native screens. Preserve brand palette, spacing, shape, touch targets, accessibility and navigation.
-- Do not import, synchronize, regenerate or replace the native design with the older Lovable prototype. Root src/ is archived internal test context, not a design authority.
+- The **design already checked into GitHub is authoritative**. Match the polished session banners, avatars, card layouts and spacing from src/components/tokea/ and src/styles.css when implementing React Native; native palette/components live in apps/mobile/src/theme.ts, apps/mobile/src/ui.tsx and apps/mobile/src/session-card.tsx. Preserve touch targets and accessibility.
+- Do not import, synchronize, regenerate or replace the GitHub design from the separate Lovable project. Root src/ is an internal, checked-in visual reference and regression harness, **not a public website**.
 - Production code lives in apps/mobile/ (Expo/React Native) and services/api/ (Node + PostgreSQL/PostGIS when enabled). Do not introduce Supabase.
 - Do not imply mock SMS, age, GPS, messages, or push are live. No customer data or secrets in source. The app is for adults 18+; phone OTP alone does not establish age.
 

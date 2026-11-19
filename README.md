@@ -2,7 +2,7 @@
 
 Tokea is an **18+ Kenyan social discovery application for iOS and Android**. It helps people discover nearby casual drink meet-ups in public places. Tokea is not a dating app, alcohol marketplace, payment processor or website.
 
-**The design checked into this GitHub repository is the source of truth.** Build new native screens with the existing app's styling in apps/mobile/src/theme.ts, apps/mobile/src/ui.tsx and the approved native screen code. Do not replace it with Lovable output. The historical root web/React prototype remains archived for development context only; it is **not** the product or an approved public website. The protected Vercel URL, if retained, is only an internal legacy demo and must not be presented as the customer app.
+**The design checked into this GitHub repository is the source of truth.** The polished React screens and session-card styling in src/ are the checked-in visual specification, translated into React Native using apps/mobile/src/theme.ts and reusable native components. Do not replace the repository design with a separate Lovable project. The root web/React code is retained as an **internal design reference and regression harness**, not a customer-facing website. The protected Vercel URL, if retained, is only an internal legacy demo.
 
 ## Active implementation
 

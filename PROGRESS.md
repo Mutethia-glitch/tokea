@@ -4,7 +4,7 @@
 **Last updated:** 2026-11-19  
 **Current milestone:** M5 — native Discover read endpoint, setup checklist and copyright source verified in CI; external accounts/real device tests pending  
 **Repository:** https://github.com/Mutethia-glitch/tokea  
-**Design source:** existing GitHub native code in apps/mobile/src/theme.ts and apps/mobile/src/ui.tsx; Lovable is historical only
+**Design source:** checked-in GitHub UX in src/components/tokea and src/styles.css, translated to apps/mobile/src/theme.ts and native components; external Lovable is not authoritative
 
 ## Working agreement
 
@@ -15,7 +15,7 @@
 | Area | Status | Notes |
 | --- | --- | --- |
 | Blueprint and scope | Reviewed | Adults-only Kenya social discovery; no dating, alcohol commerce, payments, or AI matching |
-| Visual design | **Repository is authoritative** | Preserve existing native Tokea palette, spacing and components. Do not replace native design with Lovable. |
+| Visual design | **GitHub repository is authoritative** | Match checked-in GitHub session banners, rounded cards, avatars, colors, spacing; translate to native components, not external Lovable. |
 | Legacy web Discover + filters | **M3 verified (historical)** | 14 drink categories, browser UI checks passed; this is not the customer app |
 | Onboarding + profile | Prototype | Demo-only self declaration and mock OTP; no actual verification |
 | Host/create session | Prototype | Client-side creation/edit/pause/end |
@@ -57,11 +57,17 @@
 - Planned production architecture: **React Native + Expo + TypeScript**, independent **Node.js/TypeScript** API, **PostgreSQL/PostGIS** and appropriately selected storage/notifications.
 - **Do not enable Supabase as backend/database.**
 - No real age, phone, identity, or location verification exists in this prototype. Never imply otherwise.
-- **The current repository-native design is the source of truth** (apps/mobile/src/theme.ts and related native screens); Lovable must not replace it.
+- **The checked-in GitHub design is the source of truth** (src/components/tokea, src/styles.css, apps/mobile/src/theme.ts and related native screens); external Lovable must not replace it.
 - Draft privacy and terms effective date: **November 16, 2026**; no public support email yet. Candidate: support@gettokea.co.ke, subject to actual domain ownership, availability and legal clearance.
 - Copyright attribution in native Profile/About: **© 2026 Tokea. All rights reserved.**
 
 ## Changelog
+
+### 2026-11-19 — M5 native Discover card styling translated from checked-in GitHub design (CI pending)
+- Clarified that the **polished designs already in GitHub** (src/components/tokea and src/styles.css) are the visual source of truth for React Native, rather than either the separate Lovable project or the early placeholder native screens.
+- Added apps/mobile/src/session-card.tsx with 80px drink banners, category-specific soft color fields, host initials/avatar, 24px-radius card surface, 20px padding, and metadata separator patterned after the existing checked-in SessionCard.
+- Native Discover uses this shared card; no dummy live users, fake join actions or website launch were added. Awaiting native Android JS export and TypeScript CI results for this change.
+
 
 ### 2026-11-19 — M5 source CI verified
 - GitHub Actions: https://github.com/Mutethia-glitch/tokea/actions/runs/44538251699 — **all three jobs passed** (native Expo TypeScript and Android JS export; API TypeScript, build, real PostgreSQL integration tests; historical browser regression).

@@ -2,7 +2,7 @@
 
 This is the **only intended customer product**; Tokea is not a website.
 
-The **existing repository native design is authoritative**. Its theme is apps/mobile/src/theme.ts, with shared surfaces in apps/mobile/src/ui.tsx. Do not replace it with the historical Lovable source.
+The **existing GitHub design is authoritative**. Translate checked-in session banners/cards/components from ../../src/components/tokea and ../../src/styles.css into native views, using src/theme.ts, src/ui.tsx and src/session-card.tsx. Do not replace it with the separate Lovable version.
 
 ## Local development
 

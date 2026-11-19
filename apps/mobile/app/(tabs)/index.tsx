@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-native";
 import { router } from "expo-router";
 import { fetchDiscoverSessions, type DiscoverSession } from "@/api";
+import { SessionCard } from "@/session-card";
 import { Heading } from "@/ui";
 import { colors, layout } from "@/theme";
 
@@ -9,12 +10,6 @@ const DRINKS = [
   "All", "Beer", "Wine", "Cocktails", "Muratina", "Whiskey", "Vodka",
   "Gin", "Rum", "Tequila", "Brandy", "Spirits", "Coffee", "Soft drinks", "Tea",
 ];
-
-function displayWhen(value: string) {
-  const date = new Date(value);
-  return Number.isNaN(date.getTime()) ? "Time to be confirmed" :
-    date.toLocaleString("en-KE", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
-}
 
 export default function DiscoverScreen() {
   const [sessions, setSessions] = useState<DiscoverSession[]>([]);
@@ -76,16 +71,7 @@ export default function DiscoverScreen() {
         <Text style={{ color: colors.text, fontWeight: "700", marginBottom: 8 }}>Nothing available yet</Text>
         <Text style={{ color: colors.muted, lineHeight: 22 }}>There are no open sessions for this filter. Try another drink or refresh.</Text>
       </View> : null}
-      {!loading && !error && visible.map((session) => <View key={session.id}
-        style={{ backgroundColor: colors.card, borderColor: colors.border, borderWidth: 1, borderRadius: layout.cardRadius, padding: 20, marginBottom: layout.cardGap }}>
-        <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-          <Text style={{ color: colors.brand, backgroundColor: colors.brandSoft, overflow: "hidden", borderRadius: 13, paddingHorizontal: 12, paddingVertical: 7, fontSize: 12, fontWeight: "700" }}>{session.category}</Text>
-          <Text style={{ color: colors.muted, fontSize: 12 }}>{session.isHost ? "You're hosting" : session.seatsRemaining + " seats left"}</Text>
-        </View>
-        <Text style={{ color: colors.text, fontSize: 19, fontWeight: "700", lineHeight: 25 }}>{session.title}</Text>
-        <Text style={{ color: colors.muted, marginTop: 8, fontSize: 14 }}>Hosted by {session.hostName}</Text>
-        <Text style={{ color: colors.text, marginTop: 12, fontSize: 14 }}>{session.neighbourhood} · {displayWhen(session.startsAt)}</Text>
-      </View>)}
+      {!loading && !error && visible.map((session) => <SessionCard key={session.id} session={session} />)}
       <Text style={{ color: colors.muted, marginTop: 12, lineHeight: 19, fontSize: 12 }}>
         For adults 18+ only. Exact locations are never shown in Discover. Session requests will be added when verified sign-in and the join API are ready.
       </Text>
