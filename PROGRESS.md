@@ -2,7 +2,7 @@
 
 **Project:** Tokea (formerly named Explore in early blueprint)  
 **Last updated:** 2026-11-20  
-**Current milestone:** M5 — native phone OTP, default-off sandbox API and private local smoke-test harness verified in CI; actual backend-to-simulator call pending  
+**Current milestone:** M5 — operator's newer LOCAL backend passed sandbox SMS OTP/login end-to-end; GitHub main OTP implementation and native signed builds remain unverified live  
 **Repository:** https://github.com/Mutethia-glitch/tokea  
 **Design source:** checked-in GitHub UX in src/components/tokea and src/styles.css, translated to apps/mobile/src/theme.ts and native components; external Lovable is not authoritative
 
@@ -36,7 +36,10 @@
 - [x] Verify GitHub-design native Discover card translation — all three CI jobs passed: https://github.com/Mutethia-glitch/tokea/actions/runs/44539052668.
 - [x] Owner confirmed Africa's Talking sandbox, generated sandbox key and simulator number; a direct Postman SMS arrived in the simulator November 20, 2026 (manual evidence, not backend integration).
 - [x] Verify server OTP integration in CI — all 3 jobs passed at https://github.com/Mutethia-glitch/tokea/actions/runs/44626255270.
-- [ ] Complete actual Tokea backend-to-sandbox OTP test using private server-only credentials (manual Postman-to-provider message already succeeded).
+- [x] Operator's **local backend** passed actual Africa's Talking sandbox OTP flow: POST `/v1/auth/request-code` returned `sent: true`; code received in simulator; POST `/v1/auth/verify-code` issued an access token and returned `ageVerified: false` (reported in PowerShell on 2026-11-20). **This was NOT a test of the different OTP routes checked into GitHub main.**
+- [ ] Reconcile operator's local API revision with GitHub main before syncing or changing app/native sign-in. Local API has migrations 0001–0013 and uses `OTP_AUTH_ENABLED`/`AT_*`, `/v1/auth/request-code` and `/v1/auth/verify-code`; GitHub main currently uses `ENABLE_PHONE_OTP`/`AFRICASTALKING_*`, `/v1/auth/phone/start` and `/v1/auth/phone/verify`.
+- [ ] Run end-to-end phone proof through the OTP endpoints **currently on GitHub main** after revision reconciliation; current repo implementation never issues a login token.
+- [ ] Rotate the local PostgreSQL password previously pasted into chat and ensure the new password is used only in private untracked configuration.
 - [ ] Provision dedicated Google admin, Expo/Firebase, Apple Developer and a mail-only Zoho domain; see docs/account-setup.md. **No accounts created by repository changes.**
 - [ ] Confirm Tokea trademark/brand suitability and ownership of the selected mail domain before publishing support contact details.
 
@@ -60,12 +63,19 @@
 - **No customer-facing website.** Native Android/iOS only; the root web project and protected Vercel preview are legacy internal references, not a shipped product.
 - Planned production architecture: **React Native + Expo + TypeScript**, independent **Node.js/TypeScript** API, **PostgreSQL/PostGIS** and appropriately selected storage/notifications.
 - **Do not enable Supabase as backend/database.**
-- Africa's Talking sandbox SMS manual delivery is verified; server-side phone OTP source is added but not yet tested live. **Phone possession is not account authentication or age verification**, and no live age, identity or location verification exists. Never imply otherwise.
+- Africa's Talking sandbox delivery was verified twice by the operator: manually through Postman and through a **newer local backend** that issued login tokens after OTP confirmation. The GitHub main OTP routes are different and were not used in this manual end-to-end test. The local token returned `ageVerified: false`; **phone possession does not establish age, and no adult age assurance is verified**.
 - **The checked-in GitHub design is the source of truth** (src/components/tokea, src/styles.css, apps/mobile/src/theme.ts and related native screens); external Lovable must not replace it.
 - Draft privacy and terms effective date: **November 16, 2026**; no public support email yet. Candidate: support@gettokea.co.ke, subject to actual domain ownership, availability and legal clearance.
 - Copyright attribution in native Profile/About: **© 2026 Tokea. All rights reserved.**
 
 ## Changelog
+
+### 2026-11-20 — Operator confirmed local API → Africa's Talking sandbox OTP → login token
+- User tested local PostgreSQL 18 API (`http://127.0.0.1:4400`): `GET /healthz` returned `ok: true`; 13 migrations applied; backend built and started successfully.
+- Operator's local API `POST /v1/auth/request-code` returned `{sent:true}` after a previous 503 was resolved by configuring local SMS settings. The code arrived in Africa's Talking simulator; `POST /v1/auth/verify-code` returned an access token (`Authentication successful: True`) and `ageVerified: False`.
+- **Important branch drift:** operator's local API contains 13 migrations and `phone-auth.ts`, `kenya-sms.ts`, `local-identity.ts`, account-token issuing routes, while GitHub main has the separate `phone-otp.ts` proof-only adapter. These are not the same tested program. Do NOT overwrite local code or claim GitHub main's OTP/login E2E was tested. Reconcile revisions and preserve local work before any merge.
+- User previously pasted their PostgreSQL password in chat: rotate it privately. The verified phone is not evidence of 18+ age verification, and no signed native app or production phone SMS was tested.
+
 
 ### 2026-11-20 — Native and private SMS-test harness CI verified
 - New native phone number/OTP screen: https://github.com/Mutethia-glitch/tokea/actions/runs/44627229682 — all 3 jobs PASSED, including Kenyan phone-format tests and Android JS export/typecheck.
