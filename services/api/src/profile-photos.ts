@@ -1,5 +1,5 @@
 import { createCipheriv,createDecipheriv,randomBytes,randomUUID } from "node:crypto";
-import { mkdir, readFile, writeFile, rm } from "node:fs/promises";
+import { mkdir, readFile, writeFile, rm, readdir, stat } from "node:fs/promises";
 import { join,resolve } from "node:path";
 import sharp from "sharp";
 import { pool } from "./db.js";
@@ -65,11 +65,12 @@ export async function saveMyAvatar(userId:string,image:Buffer){
     if(!r.rows[0])throw new ApiError(404,"Profile not found.");
     old=r.rows[0].avatar_file_key;
     await db.query("UPDATE users SET avatar_file_key=$2,avatar_updated_at=NOW() WHERE id=$1",[userId,file]);
+    if(old)await db.query("INSERT INTO profile_photo_deletions(file_key) VALUES($1) ON CONFLICT DO NOTHING",[old]);
     await db.query("COMMIT");
     committed=true;
   }catch(e){await db.query("ROLLBACK").catch(()=>{});await rm(filePath(file),{force:true});throw e;}
   finally{db.release();}
-  if(committed&&old)await rm(filePath(old),{force:true}).catch(()=>{});
+  if(committed)await drainProfilePhotoDeletions().catch(()=>{});
   return {saved:true};
 }
 export async function readUserAvatar(userId:string){
@@ -88,8 +89,46 @@ export async function removeMyAvatar(userId:string){
     if(!r.rows[0])throw new ApiError(404,"Profile not found.");
     old=r.rows[0].avatar_file_key;
     await db.query("UPDATE users SET avatar_file_key=NULL,avatar_updated_at=NOW() WHERE id=$1",[userId]);
+    if(old)await db.query("INSERT INTO profile_photo_deletions(file_key) VALUES($1) ON CONFLICT DO NOTHING",[old]);
     await db.query("COMMIT");
   }catch(e){await db.query("ROLLBACK");throw e;}finally{db.release();}
-  if(old)await rm(filePath(old),{force:true}).catch(()=>{});
+  await drainProfilePhotoDeletions().catch(()=>{});
   return {removed:true};
 }
+/** Explicitly remove old photo blobs; keep retry references only for failures. */
+export async function drainProfilePhotoDeletions(){
+  if(process.env.PROFILE_PHOTOS_ENABLED!=="true")return 0;
+  const tasks=await pool.query<{file_key:string}>(
+    "SELECT file_key FROM profile_photo_deletions ORDER BY created_at ASC LIMIT 100");
+  let cleaned=0;
+  for(const job of tasks.rows){
+    try{
+      await rm(filePath(job.file_key),{force:true});
+      await pool.query("DELETE FROM profile_photo_deletions WHERE file_key=$1",[job.file_key]);
+      cleaned++;
+    }catch{
+      await pool.query("UPDATE profile_photo_deletions SET attempts=attempts+1 WHERE file_key=$1",[job.file_key]);
+    }
+  }
+  return cleaned;
+}
+/** Remove only orphan photos that are older than the upload grace window. */
+export async function sweepProfilePhotoOrphans(){
+  if(process.env.PROFILE_PHOTOS_ENABLED!=="true")return 0;
+  await mkdir(directory,{recursive:true,mode:0o700});
+  const live=await pool.query<{key:string}>(`SELECT avatar_file_key AS key FROM users
+    WHERE avatar_file_key IS NOT NULL UNION SELECT file_key AS key FROM profile_photo_deletions`);
+  const known=new Set(live.rows.map(r=>r.key));
+  let deleted=0;
+  for(const item of await readdir(directory,{withFileTypes:true})){
+    if(!item.isFile()||!item.name.endsWith(".enc"))continue;
+    const key=item.name.slice(0,-4);
+    if(!validKey.test(key)||known.has(key))continue;
+    const info=await stat(filePath(key));
+    if(Date.now()-info.mtimeMs<10*60*1000)continue;
+    await rm(filePath(key),{force:true});
+    deleted++;
+  }
+  return deleted;
+}
+

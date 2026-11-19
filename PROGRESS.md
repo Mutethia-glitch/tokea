@@ -61,6 +61,13 @@
 
 ## Changelog
 
+### 2026-11-19 — Persistent avatar cleanup and no-old-photo fallback
+- Persistent profile photos are encrypted separately from short-lived ID/selfie reviews. On replacement or removal, old avatar keys are queued in PostgreSQL and removed from the active user record transactionally.
+- Successful deletion removes the obsolete file key; failed deletions stay queued and retry. An orphan-file cleanup also removes encrypted avatar files left by interrupted uploads.
+- Updated PostgreSQL integration test checks that overwriting a profile photo does not leave a successful-deletion tombstone. CI pending.
+- No hosting/deployment or live user uploads.
+
+
 ### 2026-11-19 — M7 provider wiring, photographic session banners and native profile photo persistence
 - Selected Africa's Talking for +254 Kenya OTP. Added server-side SMS code requests/validation, 5-minute expiry, HMAC hashing, retry and origin/phone rate limits, RSA-signed one-hour session JWTs and rotating revocable refresh sessions. App sign-in uses Kenyan-friendly numbers. No fake OTP bypass or actual SMS send until credentials are configured.
 - Staff Google OIDC verifies Google ID tokens (including email_verified, client audience, issuer and per-login nonce) and exchanges them for restricted first-party API JWTs. First owner can be bootstrapped from a verified Gmail identity and may invite further reviewers by Gmail SMTP; non-members cannot access reviews.

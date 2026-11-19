@@ -40,6 +40,9 @@ describe.skipIf(!enabled)("Persistent encrypted profile image",()=>{
     const key=await pool.query<{avatar_file_key:string}>(
       "SELECT avatar_file_key FROM users WHERE id=$1",[id]);
     expect(key.rows[0]!.avatar_file_key).not.toBe(oldKey.rows[0]!.avatar_file_key);
+    const obsolete=await pool.query<{n:number}>(`SELECT COUNT(*)::int AS n
+      FROM profile_photo_deletions WHERE file_key=$1`,[oldKey.rows[0]!.avatar_file_key]);
+    expect(obsolete.rows[0]!.n).toBe(0);
     await profile.removeMyAvatar(id);
     expect((await profile.getMyProfile(id)).hasPhoto).toBe(false);
     await expect(profile.readUserAvatar(id)).rejects.toMatchObject({status:404});
