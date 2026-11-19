@@ -1,5 +1,5 @@
 import { pool } from "../src/db.js";
-const email=process.argv[2]?.trim().toLowerCase();
+const email=process.argv.slice(2).find(a=>a.includes("@"))?.trim().toLowerCase();
 if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
   console.error("Usage: bun scripts/bootstrap-owner.mjs YOUR_VERIFIED_GOOGLE_EMAIL");
   process.exit(1);

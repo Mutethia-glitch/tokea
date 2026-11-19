@@ -61,6 +61,13 @@
 
 ## Changelog
 
+### 2026-11-19 — Privacy wording and M7 native implementation checks
+- Updated the draft policy and native Privacy screen to distinguish optional persistent, member-visible profile photos from ID/selfie photos deleted after manual age review or expiry.
+- Documented Kenya phone-number use via Africa's Talking for OTP, Gmail/Google staff email and authentication, and optional push-device token processing.
+- **CI verified:** GitHub Actions #44436310087 passed all three jobs (API/PostgreSQL tests, native Android JS export, web/reference build and smoke). The phone and photo integrations use synthetic local data; real provider delivery and installed physical devices are not verified.
+- No hosting or deployment; outside provider accounts are not yet configured.
+
+
 ### 2026-11-19 — Persistent avatar cleanup and no-old-photo fallback
 - Persistent profile photos are encrypted separately from short-lived ID/selfie reviews. On replacement or removal, old avatar keys are queued in PostgreSQL and removed from the active user record transactionally.
 - Successful deletion removes the obsolete file key; failed deletions stay queued and retry. An orphan-file cleanup also removes encrypted avatar files left by interrupted uploads.

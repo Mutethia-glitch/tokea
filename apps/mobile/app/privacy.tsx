@@ -5,12 +5,14 @@ import { Heading, Screen } from "@/ui";
 import { colors } from "@/theme";
 export default function PrivacyScreen(){
   const paragraphs=[
+    ["Phone sign-in","We'll use your Kenyan mobile number to send a one-time sign-in code through Africa's Talking. We don't store the code itself, only a secure short-lived check."],
+    ["Profile picture","Your optional profile picture and display name are visible to other members. Your chosen picture is saved on your device, so it stays when you close the app. When syncing is enabled, a protected copy is stored for your account until you remove or change it. This is different from your private ID and selfie photos."],
     ["What we collect","We'll ask for a clear photo of your government-issued ID, showing your date of birth, and a selfie. A trained team member checks that you are 18 or older and that the ID belongs to you. We don't use facial-recognition software to make the decision."],
     ["Why","Age verification is required before hosting, requesting to join or entering session chats. You may browse public session listings and view your own profile while your account is unverified."],
     ["Who can see your photos","Only approved members of our review team can see your ID and selfie while reviewing them. Photos are encrypted, are not shown on your profile and won't appear on drink sessions. We keep a record of the decision and review date."],
     ["When photos are deleted","Our plan is to delete both photos as soon as the review is finished or when 24 hours have passed, whichever comes first. Before launch, we must prove that this works reliably even when a system fails. We are not yet collecting real ID photos."],
     ["Review updates","We aim to review within five minutes when our team is available, but it can take longer. We'll notify you when a decision is made. A finished review can't be changed by another reviewer. If we can't verify your photos, you can submit clearer ones in a new application."],
-    ["Notifications","We send in-app review-submitted and review-result notifications. Phone push alerts require optional device permission and functioning platform delivery."],
+    ["Notifications","We send in-app review-submitted and review-result updates. If you enable phone notifications, we store a device token and send alerts through Expo, Android and iPhone notification services. You can disable permission on your phone."],
     ["Your rights","You may request access, correction, deletion or information about how your data is handled in accordance with applicable Kenyan data-protection law. Contact and operational rights-request channels will be published before launch."],
     ["Current status","This is the policy for the planned native product, currently under local development; production identity collection has not been enabled. Legal and security review must be completed before real people are asked to upload identification."],
   ];

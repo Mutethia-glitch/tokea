@@ -8,6 +8,18 @@
 
 Tokea is intended only for people aged 18 or older in Kenya. A signed-in account that has not completed age verification may browse available public sessions and manage its own profile. Hosting a session, sending or accepting joining requests and participating in private session chats require a successful age review.
 
+## Account sign-in, profile pictures and notifications
+
+To sign in, Tokea collects a Kenyan mobile number and sends a one-time code through Africa's Talking, a third-party SMS provider. SMS delivery requires sharing the destination mobile number and code with the provider. Tokea stores a cryptographic hash of the temporary code, not the plaintext code, and keeps limited throttling and account-session records to prevent abuse. Login sessions can be revoked.
+
+Your chosen display name and **optional public profile photo** are shown to other signed-in members on your sessions. A copy is retained in your device's persistent Tokea storage until you remove it, sign out and use account-specific data as applicable, or uninstall the app. If you enable backend photo sync, a resized, encrypted copy is stored separately from age-verification documents and remains until you change/remove it or request deletion under applicable retention rules. Profile photos are **not** subject to the 24-hour ID-photo deletion rule, because they are voluntary profile content. Originals in your phone's gallery are not removed.
+
+If you opt in to phone notifications, Tokea stores an Expo push device token and may relay notifications through Expo, Firebase Cloud Messaging (Android), and Apple Push Notification service (iOS). Notification text is designed not to include the raw private chat or ID photo. You can turn off system notification permission and revoke a device token.
+
+For staff account management, administrator invitations are sent through Gmail SMTP to the invited email address. Administrators authenticate using Google sign-in; the service verifies the Google email and records the staff role and review audit trail.
+
+All these are planned/local-only processing flows. Live provider credentials and externally reachable endpoints have not been activated or approved for production.
+
 ## Personal information we collect for age verification
 
 To verify that you are an adult, Tokea requests (a) a clear picture of a government-issued photo identity document with a visible date of birth and (b) a clear selfie of the person applying. An authorized human reviewer visually checks that the date of birth shows 18+ and that the face reasonably matches the document. We do not need to retain an ID number in a separate searchable profile field or produce a facial-recognition template. We may also retain a limited review record: your account ID, submission time, review status, reviewer identifier, decision date, and any decline reason.
