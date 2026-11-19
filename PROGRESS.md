@@ -67,6 +67,7 @@
 - Replaced native drink-category gradient-only banners with genuine drink/bar photo sources and a documented photo-credit review; card spacing and Lovable-style typography remain consistent. Exact photo delivery and licensing must be checked on devices before publishing.
 - Added separate encrypted persistent profile photo API and native photo picker storing selected copies in app documents (not temporary cache) keyed by user. Locally saved photos persist after app restart; sharing with other users requires configured profile photo backend. Identity-check images remain separate and delete on review/expiry.
 - Prepared local identity-key setup scripts, owner bootstrap, provider settings and native push instructions. No hosting, credential creation or actual push delivery has been performed.
+- CI initially caught a PostgreSQL client typing overload in the refresh-session helper. Fixed it and rerunning API type checks and integration tests.
 - **Pending CI, live provider accounts, staff Google OAuth credentials, physical device credentials, photo licensing confirmation and actual handset checks.**
 
 

@@ -1,5 +1,6 @@
 import { createHmac, randomBytes, randomInt, timingSafeEqual } from "node:crypto";
 import { z } from "zod";
+import type { PoolClient } from "pg";
 import { pool } from "./db.js";
 import { ApiError } from "./auth.js";
 import { issueLocalAccessToken } from "./local-identity.js";
@@ -66,7 +67,7 @@ export async function requestPhoneCode(phone:string,sourceAddress="local"){
     return {sent:true,message:"Check your messages. Your six-digit code expires in 5 minutes."};
   }catch(e){await db.query("ROLLBACK");throw e;}finally{db.release();}
 }
-async function issueSession(db:Awaited<ReturnType<typeof pool.connect>>,id:string){
+async function issueSession(db:PoolClient,id:string){
   const accessToken=await issueLocalAccessToken(id);
   const refreshToken=randomBytes(48).toString("base64url");
   await db.query("INSERT INTO phone_refresh_sessions(token_hash,user_id,expires_at) VALUES($1,$2,$3)",
