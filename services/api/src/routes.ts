@@ -2,7 +2,8 @@ import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { z } from "zod";
-import { authenticateIdentity, requireVerifiedAdult, ApiError } from "./auth.js";
+import { authenticateIdentity, requireVerifiedAdult, requireAdmin, ApiError } from "./auth.js";
+import { loginConfig, exchangeCode, exchangeSchema } from "./admin-login.js";
 import { decideJoinRequest } from "./decisions.js";
 import { getInbox, markInboxRead } from "./inbox.js";
 import { registerDevice, unregisterDevice } from "./devices.js";
@@ -63,7 +64,15 @@ export async function route(req:IncomingMessage,res:ServerResponse){
       return await adminAsset(res,"admin.js");
     if(method==="GET"&&path==="/admin/admin.css")
       return await adminAsset(res,"admin.css");
+    if(method==="GET"&&path==="/v1/admin/auth/config")
+      return respond(res,200,loginConfig());
+    if(method==="POST"&&path==="/v1/admin/auth/exchange"){
+      const payload=exchangeSchema.parse(await parseBody(req));
+      return respond(res,200,await exchangeCode(payload.code,payload.verifier));
+    }
     const user=await authenticateIdentity(req.headers);
+    if(method==="GET"&&path==="/v1/admin/me")
+      return respond(res,200,{role:await requireAdmin(user)});
 
     if(method==="GET"&&path==="/v1/verification/status")
       return respond(res,200,await getVerificationStatus(user.id));

@@ -71,7 +71,8 @@
 - Added draft Privacy Policy explaining personal ID/selfie collection, retention, human review, restricted access and review response *target* (5 minutes during staffed hours, not guaranteed). Consent is required before either photo is uploaded; the API records the consent timestamp and requires consent on final submission.
 - **No hosting/deployment, email delivery, real identity signup, physical device notification or real ID processing enabled.**
 - First CI revealed Expo SDK 58 naming mismatch for Image Picker/File System packages and an old test assumption that unverified users could not browse. Corrected SDK-aligned package versions, revised HTTP authorization test to check browse succeeds and host/requests fail, and added explicit consent enforcement at submission endpoint.
-- **Pending:** rerun CI, PostgreSQL review/deletion tests, reliable expiry worker, DPIA/legal review and physical Android/iOS validation.
+- Automated M6 review tests initially found that final/expired cases retained opaque image references even after file deletion; corrected the database transition to clear image references and queue durable deletion jobs. Restored server-side staff OAuth/PKCE endpoints in the same fix. Retesting.
+- **Pending:** CI rerun, deletion reliability under downtime, DPIA/legal review and physical Android/iOS validation.
 
 
 ### 2026-11-19 — Developer's local Windows backend environment verified

@@ -54,8 +54,8 @@ export async function uploadDocument(user:AuthenticatedUser,kind:"id"|"selfie",b
     old=kind==="id"?row.id_file_key:row.selfie_file_key;
     const column=kind==="id"?"id_file_key":"selfie_file_key";
     await db.query(`UPDATE age_verification_cases SET ${column}=$1,consent_at=COALESCE(consent_at,NOW()) WHERE id=$2 AND status='draft'`,[fileKey,row.id]);
+    if(old)await db.query("INSERT INTO verification_photo_deletions(file_key) VALUES($1) ON CONFLICT DO NOTHING",[old]);
     await db.query("COMMIT");
-    if(old)await removePhoto(old).catch(e=>console.error("Photo cleanup failed",e));
     return {received:true,kind};
   } catch(e) {
     await db.query("ROLLBACK");
@@ -113,7 +113,8 @@ export async function decideVerification(admin:AuthenticatedUser,id:string,decis
     if(c.status!=="pending"||c.expires_at.getTime()<=Date.now())
       throw new ApiError(409,"This case is closed, expired or already reviewed. Final decisions cannot be changed.");
     const result=await db.query(`UPDATE age_verification_cases
-      SET status=$1,reviewed_by=$2,reviewed_at=NOW(),decline_reason=$3
+      SET status=$1,reviewed_by=$2,reviewed_at=NOW(),decline_reason=$3,
+          id_file_key=NULL,selfie_file_key=NULL
       WHERE id=$4 AND status='pending' RETURNING id`,
       [decision.decision,admin.id,decision.reason??null,id]);
     if(!result.rowCount)throw new ApiError(409,"Already reviewed.");
@@ -124,34 +125,54 @@ export async function decideVerification(admin:AuthenticatedUser,id:string,decis
       approved?"Your age is verified":"Age verification not approved",
       approved?"Your account is verified. You can now host and join drinks.":"Your submission could not be verified. Check your profile for details.",
       "/verification");
+    for(const file of [c.id_file_key,c.selfie_file_key]){
+      if(file)await db.query("INSERT INTO verification_photo_deletions(file_key) VALUES($1) ON CONFLICT DO NOTHING",[file]);
+    }
     await db.query("COMMIT");
-    idKey=c.id_file_key;selfieKey=c.selfie_file_key;
   }catch(e){await db.query("ROLLBACK");throw e;}finally{db.release();}
-  await Promise.allSettled([removePhoto(idKey),removePhoto(selfieKey)]);
+  await drainPhotoDeletionQueue();
   return {status:decision.decision,final:true};
 }
-/** Run on server startup and every minute. Block file access after expiration even if worker is delayed. */
-export async function purgeExpiredVerificationPhotos() {
+/** Persisted deletion jobs are retried after service restart. */
+export async function drainPhotoDeletionQueue(){
   if(process.env.VERIFICATION_UPLOADS_ENABLED!=="true")return 0;
-  const expired=await pool.query<ReviewCase>(
-    "SELECT * FROM age_verification_cases WHERE expires_at<=NOW() ORDER BY expires_at ASC LIMIT 300");
-  for(const c of expired.rows){
-    if(["draft","pending"].includes(c.status)){
-      const db=await pool.connect();
-      try {
-        await db.query("BEGIN");
-        const changed=await db.query<{user_id:string;status:string}>(`UPDATE age_verification_cases
-          SET status='expired' WHERE id=$1 AND status IN ('draft','pending') AND expires_at<=NOW()
-          RETURNING user_id,status`,[c.id]);
-        if(changed.rowCount){
-          await enqueueNotice(db,c.user_id,"verification_expired","Age verification expired",
-            "The review window expired before completion. Please upload new clear photos.","/verification");
-        }
-        await db.query("COMMIT");
-      }catch(e){await db.query("ROLLBACK");throw e;}finally{db.release();}
+  const r=await pool.query<{file_key:string}>(`SELECT file_key FROM verification_photo_deletions
+    WHERE deleted_at IS NULL ORDER BY created_at ASC LIMIT 300`);
+  let done=0;
+  for(const row of r.rows){
+    try{
+      await removePhoto(row.file_key);
+      await pool.query("UPDATE verification_photo_deletions SET deleted_at=NOW(),last_error=NULL WHERE file_key=$1",
+        [row.file_key]);
+      done++;
+    }catch(e){
+      await pool.query("UPDATE verification_photo_deletions SET attempts=attempts+1,last_error=$2 WHERE file_key=$1",
+        [row.file_key,e instanceof Error?e.message.slice(0,240):"Deletion failed"]);
     }
-    // Repeated cleanup is idempotent; finalized records retain only opaque references, no images.
-    await Promise.all([removePhoto(c.id_file_key),removePhoto(c.selfie_file_key)]);
   }
-  return expired.rows.length;
+  return done;
+}
+/** Expire all pending/draft images at 24 hours and queue secure deletion atomically. */
+export async function purgeExpiredVerificationPhotos(){
+  if(process.env.VERIFICATION_UPLOADS_ENABLED!=="true")return 0;
+  const db=await pool.connect();let expired=0;
+  try{
+    await db.query("BEGIN");
+    const cases=await db.query<ReviewCase>(`SELECT * FROM age_verification_cases
+      WHERE status IN ('draft','pending') AND expires_at<=NOW()
+      ORDER BY expires_at ASC FOR UPDATE SKIP LOCKED LIMIT 300`);
+    for(const c of cases.rows){
+      await db.query(`UPDATE age_verification_cases
+        SET status='expired',id_file_key=NULL,selfie_file_key=NULL WHERE id=$1`,[c.id]);
+      for(const key of [c.id_file_key,c.selfie_file_key]){
+        if(key)await db.query("INSERT INTO verification_photo_deletions(file_key) VALUES($1) ON CONFLICT DO NOTHING",[key]);
+      }
+      await enqueueNotice(db,c.user_id,"verification_expired","Age review expired",
+        "Your review period ended. You can send new photos for another review.","/verification");
+      expired++;
+    }
+    await db.query("COMMIT");
+  }catch(e){await db.query("ROLLBACK");throw e;}finally{db.release();}
+  await drainPhotoDeletionQueue();
+  return expired;
 }
