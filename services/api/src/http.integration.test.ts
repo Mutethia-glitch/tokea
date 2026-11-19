@@ -96,6 +96,19 @@ describe.skipIf(!enabled)("Signed-JWT authenticated HTTP lifecycle on loopback",
     expect((await request("/v1/verification/status",unverifiedToken)).json.status).toBe("not_submitted");
   });
 
+  it("provides friendly staff sign-in and denies non-admin access to review routes",async()=>{
+    const htmlResponse=await fetch(apiBase+"/admin");
+    expect(htmlResponse.status).toBe(200);
+    const html=await htmlResponse.text();
+    expect(html).toContain("Sign in with your work account");
+    expect(html).toContain("Waiting for review");
+    expect(html).not.toMatch(/paste a signed token/i);
+    expect((await request("/v1/admin/me",applicantToken)).status).toBe(403);
+    expect((await request("/v1/admin/verifications",applicantToken)).status).toBe(403);
+    expect((await request("/v1/admin/invitations",applicantToken,"POST",
+      {email:"someone@tokea.example"})).status).toBe(403);
+  });
+
   it("creates and discovers a session with a genuinely verified signature", async () => {
     const created = await request("/v1/sessions", hostToken, "POST", {
       title: "Muratina conversation at a public venue",

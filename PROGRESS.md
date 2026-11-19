@@ -2,7 +2,7 @@
 
 **Project:** Tokea (formerly named Explore in early blueprint)  
 **Last updated:** 2026-11-19  
-**Current milestone:** M6 — manual age verification, encrypted photo expiry and admin reviews (in development; not hosted)  
+**Current milestone:** M6 — manual age review, encrypted photo expiry and stale-reference cleanup CI-verified locally (not hosted)  
 **Repository:** https://github.com/Mutethia-glitch/tokea  
 **Design source:** https://lovable.dev/projects/20ff86c9-03b7-4e00-b80f-9560791ddbfb
 
@@ -18,14 +18,14 @@
 | Visual design | Approved | Preserve original Lovable tokens, fonts, 448px mobile canvas, 64px nav/header, 20px card padding, 12px card gap |
 | Discover + filters | **M3 verified** | 14 drink categories including Muratina and spirits; grouped hosting/filter controls, themed card banners and mobile browser checks passed |
 | Onboarding + profile | **M6 source in review** | Native ID+selfie verification form, detailed clear-photo guidance, consent and status; needs real OTP provider and physical-device tests |
-| Host/create session | Prototype | Client-side creation/edit/pause/end |
-| Join requests | Prototype | Local simulated acceptance/decline and capacity checks |
-| Session chats | Prototype | Demo-only; access shown after approval, no real messages delivered |
+| Host/create session | **M5 native + API source tested** | Real signed-JWT host endpoint and native form; account provider not yet configured |
+| Join requests | **M5 native + API source tested** | Authenticated requests and server-only host decisions, durable inbox events; no live users yet |
+| Session chats | **M5 native + API source tested** | PostgreSQL messages restricted to accepted members; live realtime and phone notifications pending |
 | Profile + appearance | **M2 photo UX verified** | Browser-local cropped profile photo choose/change/remove, photo persistence and avatar rendering; no server upload |
 | Safety | **M6 source in review** | Signed-in unverified accounts can browse, but server blocks hosting, joining and chats; ID+selfie encrypted at rest and deletions attempted on review/expiry |
 | React web build | **Verified in CI** | Bun install, TypeScript, Vite/Nitro production build and 16 Vitest tests passed in GitHub Actions run #8 (2026-11-17) |
 | Hosted web demo | **Vercel deployment READY** | https://tokea-demo.vercel.app · SSO protection enabled · browser routes not yet independently smoke-tested |
-| Production backend | **M5 local + CI verified** | PostgreSQL sessions, join requests, chat and notification API compile; 12/12 backend tests passed in GitHub CI and independently on local Windows using PostgreSQL 17. No hosting or deployment. |
+| Production backend | **M6 local-only tests green** | PostgreSQL migrations, signed-JWT routes, staff age reviews, photo deletion and invite access; 24 tests passed before final audit additions. No hosting. |
 | Native push notifications | **M4 code verified, delivery unverified** | Explicit opt-in and Expo token registration, in-app inbox and native notification tap handling; push needs EAS ID, APNs/FCM credentials, real authentication and device testing |
 | Native iOS/Android | **Typecheck + Android JS export passed** | Expo SDK 58 / React Native 0.88 / Expo Router shell in `apps/mobile`; not an installed native build or complete feature UI |
 | Kenya legal review | **Pre-launch blocker** | Updated draft privacy notice for ID/selfie, restricted admin review, metadata and deletion; mandatory DPIA/ODPC legal review and 24h deletion assurance before live collection |
@@ -61,13 +61,14 @@
 
 ## Changelog
 
-### 2026-11-19 — Obsolete-file and staff-invitation cleanup (CI pending)
+### 2026-11-19 — Obsolete-file and staff-invitation cleanup (CI verified)
 - Replaced ID/selfie references are cleared and previous encrypted bytes deleted; stale expired drafts clear both former file IDs before any new upload. An orphan-file sweep handles interrupted writes while protecting in-flight uploads.
 - Finalized reviews retain decisions/reviewer audit data but never active photo references. Successful file deletions remove their own queue records, so there is no fallback to old image UUIDs.
 - Added `0006_remove_old_photo_refs.sql` to remove any legacy references on finalized cases and `0007_remove_deleted_file_tombstones.sql` to delete historical successful-job rows.
 - Native phone app cleans temporary selected images on replacement, successful submission and screen exit, without deleting the user's original gallery pictures.
 - Admin review UI invalidates image previews after another reviewer completes the case. Consumed and expired admin email invitations are purged periodically.
 - Expanded automated tests to assert superseded images cannot be read, stale drafts are reset without previous IDs, orphan images are removed, and invite tokens are single-use and email-bound.
+- **Verified:** 24/24 backend tests including eight age-review/deletion/administrator cases; native Android JS export, native TS checks and web reference smoke passed in GitHub Actions #44431059848. Additional admin-screen and no-legacy-import audits are pending this commit's CI.
 - **Not hosted; real ID processing and external email/push are disabled pending credentials, privacy/security verification and legal review.**
 
 

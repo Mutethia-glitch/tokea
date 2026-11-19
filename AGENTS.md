@@ -18,3 +18,10 @@ On **every major feature, UX change, architectural decision, meaningful bug fix,
 - Run `bun run typecheck`, `bun run build` and `bun run test` where available, or clearly record why they could not run.
 - Check that mobile screens share the original Lovable spacing, header and bottom-nav dimensions, and that interactions have no dead controls.
 - Keep request-to-chat authorization and capacity rules in mind. Demo client-side enforcement is **not** adequate for production.
+
+## Active-code cleanup policy
+- Treat `apps/mobile/` and `services/api/` as the active application and service source. The archived root `src/` web app remains only an **approved design reference** until its remaining visual assets are ported and accepted.
+- **Never fall back** to the old Lovable demo store, browser-local mock accounts or web sessions in native mobile/backend code. The `scripts/audit-active-references.mjs` CI check prohibits runtime imports of the archived web prototype.
+- When replacing or retiring any file, remove all references and unused copies in the same commit. Replacements of identity photos must destroy the prior encrypted file, clear the database reference and remove a completed deletion job.
+- Keep active migrations and security tests: they protect existing databases, and deleting them would make the app untestable. Retain only metadata necessary for human-review auditing, not finalized ID photo file IDs.
+- Maintain the prohibition on production hosting/deployment until explicitly approved by the user.

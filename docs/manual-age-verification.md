@@ -10,6 +10,12 @@
 - Document images are validated and re-encoded to JPEG, losing embedded metadata, and AES-256-GCM encrypted in a private local directory. On replacement, review completion or 24h expiry, obsolete photo file IDs are cleared and files deleted. Successful deletions also remove file IDs from the deletion queue. Orphaned files are swept periodically with a short in-flight upload grace window.
 - **No real images may be collected until production-grade deletion uptime, key management, backup exclusion, legal review and incident procedures are demonstrated.** Environment defaults keep uploads disabled.
 
+## Old-photo and code-reference cleanup
+- Superseded, declined, approved and expired case images are never used as fallback input. Active case records retain only the current draft/pending photo IDs. Once deletion succeeds, the deletion queue's record is also removed.
+- `0006_remove_old_photo_refs.sql` clears previously finalized photo references. `0007_remove_deleted_file_tombstones.sql` removes old completed-deletion records. Both leave audit decisions intact.
+- An orphan-file scan removes encrypted images without active SQL references after a brief upload-grace period. The native picker deletes temporary app-cache files on replacement, successful submission and screen exit (never original gallery photos).
+- Archived web prototype sources remain a deliberate visual reference, but the native app/API are checked to have no runtime import fallback to that prototype.
+
 ## Configure local development safely
 - Continue using PostgreSQL at `127.0.0.1:5433`. Run `bun scripts/migrate.mjs` in `services/api` after pulling this branch.
 - User sign-in must be backed by a real JWT issuer with JWKS, issuer and audience config. A JWT's `sub` must match an existing, active `users.id`. **Do not create a fake production sign-in bypass.**
