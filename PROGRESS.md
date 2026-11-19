@@ -2,7 +2,7 @@
 
 **Project:** Tokea (formerly named Explore in early blueprint)  
 **Last updated:** 2026-11-19  
-**Current milestone:** M5 — native read-only Discover API and provider setup checklist added (verification pending)  
+**Current milestone:** M5 — native Discover read endpoint, setup checklist and copyright source verified in CI; external accounts/real device tests pending  
 **Repository:** https://github.com/Mutethia-glitch/tokea  
 **Design source:** existing GitHub native code in apps/mobile/src/theme.ts and apps/mobile/src/ui.tsx; Lovable is historical only
 
@@ -25,14 +25,14 @@
 | Safety | Preliminary | Block/report demo controls; no server-side enforcement |
 | React web build | **Verified in CI** | Bun install, TypeScript, Vite/Nitro production build and 16 Vitest tests passed in GitHub Actions run #8 (2026-11-17) |
 | Hosted web demo | **Vercel deployment READY** | https://tokea-demo.vercel.app · SSO protection enabled · browser routes not yet independently smoke-tested |
-| Production backend | **M4 verified; M5 changes pending CI** | Node 22 API, PostgreSQL, host-only transactional decisions, inbox, push queue; read-only /v1/sessions added with integration assertions; not deployed |
+| Production backend | **M5 source verified in CI** | Node 22 API, PostgreSQL, host-only transactional decisions, inbox, push queue; read-only /v1/sessions added with integration assertions; not deployed |
 | Native push notifications | **M4 code verified, delivery unverified** | Explicit opt-in and Expo token registration, in-app inbox and native notification tap handling; push needs EAS ID, APNs/FCM credentials, real authentication and device testing |
-| Native iOS/Android | **M4 native shell verified; M5 changes pending CI** | Expo SDK 58 / React Native 0.88; authenticated read-only Discover screen and app copyright/about screens added; no installed native build or full feature UI |
+| Native iOS/Android | **M5 source verified in CI** | Expo SDK 58 / React Native 0.88; authenticated read-only Discover screen and app copyright/about screens added; no installed native build or full feature UI |
 | Kenya legal review | Required | Final age assurance, privacy policies, licensing/alcohol considerations |
 
 ## Immediate next steps
 
-- [ ] Review GitHub Actions for M5 native/API changes; this commit has not yet been verified by CI.
+- [x] Review GitHub Actions for M5 native/API changes — all three CI jobs passed: https://github.com/Mutethia-glitch/tokea/actions/runs/44538251699.
 - [ ] Provision owner-controlled Africa's Talking sandbox, dedicated Google admin, Expo/Firebase, Apple Developer and a mail-only Zoho domain; see docs/account-setup.md. **No account has been created by this code change.**
 - [ ] Confirm Tokea trademark/brand suitability and ownership of the selected mail domain before publishing support contact details.
 
@@ -62,6 +62,12 @@
 - Copyright attribution in native Profile/About: **© 2026 Tokea. All rights reserved.**
 
 ## Changelog
+
+### 2026-11-19 — M5 source CI verified
+- GitHub Actions: https://github.com/Mutethia-glitch/tokea/actions/runs/44538251699 — **all three jobs passed** (native Expo TypeScript and Android JS export; API TypeScript, build, real PostgreSQL integration tests; historical browser regression).
+- Confirms M5 read-only discovery query and integration assertions compile/pass. This is **not** proof of a signed native install, real OTP/age verification, API deployment, SMS delivery, Apple build or phone push.
+- External service account creation and mail-domain registration remain pending owner action; no credentials were installed or published.
+
 
 ### 2026-11-19 — M5 native-only scope, provider checklist, copyright and read-only Discover (verification pending)
 - User reconfirmed that Tokea is an installed Android/iOS application **without a public website**; existing GitHub native UI is the design source, not Lovable. Updated agent/contributor documentation accordingly.
