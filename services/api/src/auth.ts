@@ -1,6 +1,7 @@
 import { createRemoteJWKSet, jwtVerify } from "jose";
 import type { IncomingHttpHeaders } from "node:http";
 import { pool } from "./db.js";
+import { verifyLocalAccessToken } from "./local-identity.js";
 
 export class ApiError extends Error {
   constructor(public status: number, message: string) { super(message); }
@@ -15,14 +16,17 @@ const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-
 export type AuthenticatedUser={ id:string;email:string|null;emailVerified:boolean;ageVerified:boolean };
 /** Always verify real signatures. Being signed in is independent of having passed age review. */
 export async function authenticateIdentity(headers: IncomingHttpHeaders): Promise<AuthenticatedUser> {
-  if (!jwks || !issuer || !audience) throw new ApiError(503, "Identity provider not configured.");
+  const local=process.env.OTP_AUTH_ENABLED==="true";
+  if (!local && (!jwks || !issuer || !audience)) throw new ApiError(503, "Identity provider not configured.");
   const authorization = headers.authorization;
   if (!authorization?.startsWith("Bearer ")) throw new ApiError(401, "Authentication required.");
   let userId: string;let email:string|null=null;let emailVerified=false;
   try {
-    const { payload } = await jwtVerify(authorization.slice(7), jwks, {
-      issuer, audience, algorithms: ["RS256", "ES256"], clockTolerance: 5,
-    });
+    const payload=local
+      ? await verifyLocalAccessToken(authorization.slice(7))
+      : (await jwtVerify(authorization.slice(7), jwks!, {
+          issuer:issuer!,audience:audience!,algorithms:["RS256","ES256"],clockTolerance:5,
+        })).payload;
     if (typeof payload.sub !== "string" || !uuid.test(payload.sub)) throw Error("Invalid subject");
     userId = payload.sub;
     email = typeof payload.email === "string" ? payload.email.toLowerCase() : null;

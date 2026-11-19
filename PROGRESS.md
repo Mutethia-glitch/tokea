@@ -61,6 +61,13 @@
 
 ## Changelog
 
+### 2026-11-19 — M7 Kenya SMS OTP provider foundation (CI pending)
+- Selected Africa's Talking SMS API with explicit sandbox/live modes. Added Kenya E.164 phone validation, random six-digit OTP, five-minute expiry, HMAC hashing (no plaintext code storage), throttling, capped attempts, and encrypted/signed first-party JWT access tokens.
+- Added revocable, rotating 30-day refresh sessions and /v1/auth code-request/verify/refresh/sign-out endpoints. A verified phone does **not** mark the person age-verified; ID+selfie review remains separate.
+- RSA signing keys and SMS secrets are local-only and must not be committed. OTP login fails closed when credentials are missing; sandbox messages are not live handset delivery.
+- Next: native sign-in form, Gmail-backed admin Google sign-in mapping, photo banners/profile persistence and push receipt checks. No hosting or deployment.
+
+
 ### 2026-11-19 — M6 verification and cleanup implementation checkpoint
 - **All three CI jobs passed** at https://github.com/Mutethia-glitch/tokea/actions/runs/44432147253: 25/25 backend tests, migration and local cleanup command smoke, native TS check/Android JS export, no legacy runtime-import audit, and existing reference browser checks.
 - Review access is role-limited, final decisions cannot be overturned, admin invitations are bound to verified email and single-use, and review/expiry triggers durable in-app notifications.

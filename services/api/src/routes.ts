@@ -4,6 +4,8 @@ import type { IncomingMessage, ServerResponse } from "node:http";
 import { z } from "zod";
 import { authenticateIdentity, requireVerifiedAdult, requireAdmin, ApiError } from "./auth.js";
 import { loginConfig, exchangeCode, exchangeSchema } from "./admin-login.js";
+import { requestCodeSchema,verifyCodeSchema,refreshSchema,
+  requestPhoneCode,verifyPhoneCode,refreshPhoneSession,revokePhoneSession } from "./phone-auth.js";
 import { decideJoinRequest } from "./decisions.js";
 import { getInbox, markInboxRead } from "./inbox.js";
 import { registerDevice, unregisterDevice } from "./devices.js";
@@ -58,6 +60,22 @@ export async function route(req:IncomingMessage,res:ServerResponse){
     const path=url.pathname;
     if(method==="GET"&&path==="/healthz")
       return respond(res,200,{ok:true,service:"tokea-api"});
+    if(method==="POST"&&path==="/v1/auth/request-code"){
+      const input=requestCodeSchema.parse(await parseBody(req));
+      return respond(res,200,await requestPhoneCode(input.phone));
+    }
+    if(method==="POST"&&path==="/v1/auth/verify-code"){
+      const input=verifyCodeSchema.parse(await parseBody(req));
+      return respond(res,200,await verifyPhoneCode(input.phone,input.code));
+    }
+    if(method==="POST"&&path==="/v1/auth/refresh"){
+      const input=refreshSchema.parse(await parseBody(req));
+      return respond(res,200,await refreshPhoneSession(input.refreshToken));
+    }
+    if(method==="POST"&&path==="/v1/auth/sign-out"){
+      const input=refreshSchema.parse(await parseBody(req));
+      return respond(res,200,await revokePhoneSession(input.refreshToken));
+    }
     if(method==="GET"&&path==="/admin")
       return await adminAsset(res,"index.html");
     if(method==="GET"&&path==="/admin/admin.js")
