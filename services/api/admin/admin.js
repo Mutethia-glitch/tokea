@@ -49,6 +49,9 @@ function signOut(){
 async function loadQueue(){
   $("state").textContent="Loading applications…";
   const data=await api("/v1/admin/verifications");
+  if(selected && !data.submissions.some(item=>item.id===selected)){
+    cleanupImages();$("review").hidden=true;selected="";
+  }
   $("queue").replaceChildren();
   $("state").textContent=data.submissions.length?
     data.submissions.length+" application(s) waiting for review.":"No applications waiting. You're all caught up!";
@@ -125,6 +128,10 @@ async function returnFromLogin(){
 $("connect").onclick=()=>void beginLogin();
 $("refresh").onclick=()=>loadQueue().catch(e=>$("state").textContent=e.message);
 $("sign-out").onclick=signOut;
+setInterval(()=>{
+  if(token && !$("workspace").hidden)void loadQueue()
+    .catch(e=>{$("state").textContent=e.message;});
+},20_000);
 $("approve").onclick=()=>void decide("verified");
 $("decline").onclick=()=>void decide("declined");
 $("close").onclick=()=>{cleanupImages();$("review").hidden=true;selected="";};

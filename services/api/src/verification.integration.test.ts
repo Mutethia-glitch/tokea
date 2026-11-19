@@ -1,4 +1,4 @@
-import { randomBytes, randomUUID } from "node:crypto";
+import { createHash, randomBytes, randomUUID } from "node:crypto";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -156,6 +156,27 @@ describe.skipIf(!enabled)("Human age review, secure photos, and immutable staff 
     expect(Number(queue.rows[0]?.total)).toBe(0);
     const inbox=await (await import("./inbox.js")).getInbox(expiredId);
     expect(inbox.some(x=>x.kind==="verification_expired")).toBe(true);
+  });
+
+  it("accepts staff invitations only for the addressed verified email, once",async()=>{
+    const {acceptAdminInvite,sendAdminInvite}=await import("./admin-invites.js");
+    const invitee=randomUUID();
+    await localPool.query("INSERT INTO users(id,display_name) VALUES($1,'Invited reviewer')",[invitee]);
+    const token=randomBytes(32).toString("base64url");
+    const hash=createHash("sha256").update(token).digest("hex");
+    await localPool.query(`INSERT INTO admin_invitations(email,token_hash,invited_by)
+      VALUES('reviewer@tokea.example',$1,$2)`,[hash,ownerId]);
+    const verified={...actor(invitee),email:"reviewer@tokea.example",emailVerified:true};
+    await expect(acceptAdminInvite({...verified,emailVerified:false},token))
+      .rejects.toMatchObject({status:403});
+    await expect(acceptAdminInvite({...verified,email:"wrong@tokea.example"},token))
+      .rejects.toMatchObject({status:403});
+    expect(await acceptAdminInvite(verified,token)).toMatchObject({accepted:true,role:"reviewer"});
+    await expect(acceptAdminInvite(verified,token)).rejects.toMatchObject({status:403});
+    const roles=await localPool.query<{role:string}>(`SELECT role FROM admin_memberships WHERE user_id=$1`,[invitee]);
+    expect(roles.rows[0]?.role).toBe("reviewer");
+    await expect(sendAdminInvite(actor(reviewerId),"another@tokea.example"))
+      .rejects.toMatchObject({status:403});
   });
 
   it("restarts an expired draft without retaining old ID or selfie references",async()=>{

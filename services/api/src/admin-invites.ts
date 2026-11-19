@@ -65,3 +65,10 @@ export async function acceptAdminInvite(actor:AuthenticatedUser,token:string) {
     return {accepted:true,role:"reviewer"};
   }catch(e){await db.query("ROLLBACK");throw e;}finally{db.release();}
 }
+
+/** Remove consumed and expired invitation secrets; accepted staff memberships remain. */
+export async function purgeFinishedInvitations(){
+  const result=await pool.query(
+    "DELETE FROM admin_invitations WHERE accepted_at IS NOT NULL OR expires_at<=NOW()");
+  return result.rowCount??0;
+}

@@ -4,6 +4,7 @@ import { route } from "./routes.js";
 import { processPushBatch } from "./worker.js";
 import { prepareStore } from "./private-photos.js";
 import { purgeExpiredVerificationPhotos } from "./verification.js";
+import { purgeFinishedInvitations } from "./admin-invites.js";
 
 const port=Number(process.env.PORT||"4400");
 if(process.env.VERIFICATION_UPLOADS_ENABLED==="true")await prepareStore();
@@ -23,9 +24,13 @@ if(process.env.VERIFICATION_UPLOADS_ENABLED==="true"){
   photoCleanup=setInterval(()=>void purgeExpiredVerificationPhotos()
     .catch(e=>console.error("Identity document expiration cleanup error",e)),30_000);
 }
+void purgeFinishedInvitations().catch(e=>console.error("Invite cleanup error",e));
+const inviteCleanup=setInterval(()=>void purgeFinishedInvitations()
+  .catch(e=>console.error("Invite cleanup error",e)),60_000);
 async function stop(){
   if(worker)clearInterval(worker);
   if(photoCleanup)clearInterval(photoCleanup);
+  clearInterval(inviteCleanup);
   server.close();
   await pool.end();
 }

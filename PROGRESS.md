@@ -61,6 +61,16 @@
 
 ## Changelog
 
+### 2026-11-19 — Obsolete-file and staff-invitation cleanup (CI pending)
+- Replaced ID/selfie references are cleared and previous encrypted bytes deleted; stale expired drafts clear both former file IDs before any new upload. An orphan-file sweep handles interrupted writes while protecting in-flight uploads.
+- Finalized reviews retain decisions/reviewer audit data but never active photo references. Successful file deletions remove their own queue records, so there is no fallback to old image UUIDs.
+- Added `0006_remove_old_photo_refs.sql` to remove any legacy references on finalized cases and `0007_remove_deleted_file_tombstones.sql` to delete historical successful-job rows.
+- Native phone app cleans temporary selected images on replacement, successful submission and screen exit, without deleting the user's original gallery pictures.
+- Admin review UI invalidates image previews after another reviewer completes the case. Consumed and expired admin email invitations are purged periodically.
+- Expanded automated tests to assert superseded images cannot be read, stale drafts are reset without previous IDs, orphan images are removed, and invite tokens are single-use and email-bound.
+- **Not hosted; real ID processing and external email/push are disabled pending credentials, privacy/security verification and legal review.**
+
+
 ### 2026-11-19 — M6 manual age assurance and reviewer workspace (source in progress)
 - Added native ID and selfie capture/selection screen with clear-photo instructions, explicit consent and account status; Profile links to review and updated privacy notice.
 - Signed-in but unverified people can browse public sessions, profile and notifications. All host/join/request/chat operations remain server-side restricted until age-verified in the database.
