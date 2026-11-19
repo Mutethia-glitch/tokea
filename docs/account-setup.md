@@ -14,17 +14,17 @@ Brand name: **Tokea**. Do not use tokea.com as the email domain without confirme
 
 ## 1. Africa's Talking — Kenyan phone OTP delivery
 
-- [ ] Register an account at https://africastalking.com and enable 2FA if available.
-- [ ] Create an application called **Tokea Development**; open the **Sandbox** environment.
-- [ ] Get sandbox username/API key from the dashboard and use the Africa's Talking simulator for test numbers and SMS.
-- [ ] Validate API request/response paths and rate limits from the API server. Never include API keys in the mobile bundle.
+- [x] **Owner confirmed Africa's Talking account and access to Sandbox dashboard**. Enable 2FA if available and retain recovery controls.
+- [x] Access the existing Africa's Talking **Sandbox** application (application name Sandbox, username sandbox). No additional Tokea-named sandbox is required.
+- [x] Owner reports sandbox API key generated and Kenyan simulator number registered; manual Postman SMS visibly arrived in the simulator on **November 20, 2026**. Do not store these credentials in GitHub.
+- [ ] Validate the new server-side OTP endpoints against an actual private deployed/local Tokea API and Africa's Talking sandbox. Manual direct Postman-to-provider SMS has worked; GitHub CI mocks network calls. Never include API keys in the mobile bundle.
 - [ ] Before real user trials, finish live account verification, Kenyan SMS enablement, approved sender arrangements and billing.
-- [ ] Integrate server-side code issuance and checking with expiry, one-time use, per-number/IP rate limits, abuse detection, resend cooldowns, and logs that do not contain OTP values.
+- [x] Add source code for random server-side six-digit OTP, HMAC storage, expiry, one-time use, per-number/request-source limits and resend cooldown. [ ] Confirm the full flow against the real sandbox with private server credentials; add deployment-grade proxy-aware abuse controls and retention cleanup.
 - [ ] Select a separate **real age-assurance method**. SMS ownership or an 18+ checkbox alone does not verify age.
 
 Provider docs: https://help.africastalking.com/en/articles/1170660-how-do-i-get-started-on-the-africa-s-talking-sandbox
 
-Expected API secrets, only once an integration is built: AFRICASTALKING_USERNAME, AFRICASTALKING_API_KEY, AFRICASTALKING_SENDER_ID. Keep unset until needed and never commit real values.
+API environment values: AFRICASTALKING_ENV=sandbox, AFRICASTALKING_USERNAME=sandbox, AFRICASTALKING_API_KEY and a separate unique OTP_HMAC_SECRET. Sender ID for live traffic remains subject to provider approval. Never commit any secret.
 
 ## 2. Google admin and invitation sending
 

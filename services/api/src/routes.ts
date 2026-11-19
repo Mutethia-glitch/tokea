@@ -4,6 +4,7 @@ import { authenticate, ApiError } from "./auth.js";
 import { decideJoinRequest } from "./decisions.js";
 import { getInbox, markInboxRead } from "./inbox.js";
 import { getDiscoverSessions } from "./sessions.js";
+import { requestPhoneOtp, verifyPhoneOtp } from "./phone-otp.js";
 import { registerDevice, unregisterDevice } from "./devices.js";
 
 const decisionSchema = z.object({ decision: z.enum(["accepted", "declined"]) }).strict();
@@ -29,6 +30,8 @@ async function parseBody(req: IncomingMessage) {
   try { return JSON.parse(Buffer.concat(chunks).toString("utf8")); }
   catch { throw new ApiError(400, "Invalid JSON."); }
 }
+const startOtpSchema = z.object({ phone: z.string().max(20) }).strict();
+const verifyOtpSchema = z.object({ challengeId: z.string().uuid(), code: z.string().regex(/^[0-9]{6}$/) }).strict();
 const uuid = "[0-9a-fA-F-]{36}";
 
 export async function route(req: IncomingMessage, res: ServerResponse) {
@@ -36,6 +39,19 @@ export async function route(req: IncomingMessage, res: ServerResponse) {
     const method = req.method ?? "GET";
     const pathname = new URL(req.url ?? "/", "http://localhost").pathname;
     if (method === "GET" && pathname === "/healthz") return respond(res, 200, { ok: true, service: "tokea-api" });
+    // Public endpoints for proof of phone possession; not account login or age verification.
+    if (method === "POST" && pathname === "/v1/auth/phone/start") {
+      const { phone } = startOtpSchema.parse(await parseBody(req));
+      // Peer socket address is intentionally used instead of spoofable X-Forwarded-For.
+      // Trust-proxy configuration for production must be completed before rollout.
+      const requester = req.socket.remoteAddress;
+      if (!requester) throw new ApiError(503, "Request source unavailable.");
+      return respond(res, 202, await requestPhoneOtp(phone, requester));
+    }
+    if (method === "POST" && pathname === "/v1/auth/phone/verify") {
+      const { challengeId, code } = verifyOtpSchema.parse(await parseBody(req));
+      return respond(res, 200, await verifyPhoneOtp(challengeId, code));
+    }
     const userId = await authenticate(req.headers);
 
     if (method === "GET" && pathname === "/v1/sessions")

@@ -1,8 +1,8 @@
 # Tokea — Development Progress
 
 **Project:** Tokea (formerly named Explore in early blueprint)  
-**Last updated:** 2026-11-19  
-**Current milestone:** M5 — authenticated native Discover with GitHub-native visual cards, API and copyright verified in CI; external providers/real devices pending  
+**Last updated:** 2026-11-20  
+**Current milestone:** M5 — Africa's Talking sandbox SMS manually confirmed; server OTP challenge implementation added (verification pending in CI)  
 **Repository:** https://github.com/Mutethia-glitch/tokea  
 **Design source:** checked-in GitHub UX in src/components/tokea and src/styles.css, translated to apps/mobile/src/theme.ts and native components; external Lovable is not authoritative
 
@@ -17,7 +17,7 @@
 | Blueprint and scope | Reviewed | Adults-only Kenya social discovery; no dating, alcohol commerce, payments, or AI matching |
 | Visual design | **GitHub repository is authoritative** | Match checked-in GitHub session banners, rounded cards, avatars, colors, spacing; translate to native components, not external Lovable. |
 | Legacy web Discover + filters | **M3 verified (historical)** | 14 drink categories, browser UI checks passed; this is not the customer app |
-| Onboarding + profile | Prototype | Demo-only self declaration and mock OTP; no actual verification |
+| Onboarding + profile | Prototype | Legacy web mock OTP remains demo-only; standalone server-side phone OTP source added but not yet connected to native account/JWT/age verification |
 | Host/create session | Prototype | Client-side creation/edit/pause/end |
 | Join requests | Prototype | Local simulated acceptance/decline and capacity checks |
 | Session chats | Prototype | Demo-only; access shown after approval, no real messages delivered |
@@ -25,7 +25,7 @@
 | Safety | Preliminary | Block/report demo controls; no server-side enforcement |
 | React web build | **Verified in CI** | Bun install, TypeScript, Vite/Nitro production build and 16 Vitest tests passed in GitHub Actions run #8 (2026-11-17) |
 | Hosted web demo | **Vercel deployment READY** | https://tokea-demo.vercel.app · SSO protection enabled · browser routes not yet independently smoke-tested |
-| Production backend | **M5 source verified in CI** | Node 22 API, PostgreSQL, host-only transactional decisions, inbox, push queue; read-only /v1/sessions added with integration assertions; not deployed |
+| Production backend | **M5 read-only API verified; OTP challenge code pending CI** | PostgreSQL-backed single-use phone OTP endpoints added for Africa's Talking sandbox; these are not login, JWT issuance or 18+ verification. Not deployed |
 | Native push notifications | **M4 code verified, delivery unverified** | Explicit opt-in and Expo token registration, in-app inbox and native notification tap handling; push needs EAS ID, APNs/FCM credentials, real authentication and device testing |
 | Native iOS/Android | **M5 source verified in CI** | Expo SDK 58 / React Native 0.88; authenticated read-only Discover screen and app copyright/about screens added; no installed native build or full feature UI |
 | Kenya legal review | Required | Final age assurance, privacy policies, licensing/alcohol considerations |
@@ -34,7 +34,9 @@
 
 - [x] Review GitHub Actions for M5 native/API changes — all three CI jobs passed: https://github.com/Mutethia-glitch/tokea/actions/runs/44538251699.
 - [x] Verify GitHub-design native Discover card translation — all three CI jobs passed: https://github.com/Mutethia-glitch/tokea/actions/runs/44539052668.
-- [ ] Provision owner-controlled Africa's Talking sandbox, dedicated Google admin, Expo/Firebase, Apple Developer and a mail-only Zoho domain; see docs/account-setup.md. **No account has been created by this code change.**
+- [x] Owner confirmed Africa's Talking sandbox, generated sandbox key and simulator number; a direct Postman SMS arrived in the simulator November 20, 2026 (manual evidence, not backend integration).
+- [ ] Verify server OTP integration in CI and then with the actual sandbox using private server-only credentials.
+- [ ] Provision dedicated Google admin, Expo/Firebase, Apple Developer and a mail-only Zoho domain; see docs/account-setup.md. **No accounts created by repository changes.**
 - [ ] Confirm Tokea trademark/brand suitability and ownership of the selected mail domain before publishing support contact details.
 
 - [x] Verify Bun dependency install, TypeScript check, production build and automated tests in CI (16/16 tests passed).
@@ -57,12 +59,21 @@
 - **No customer-facing website.** Native Android/iOS only; the root web project and protected Vercel preview are legacy internal references, not a shipped product.
 - Planned production architecture: **React Native + Expo + TypeScript**, independent **Node.js/TypeScript** API, **PostgreSQL/PostGIS** and appropriately selected storage/notifications.
 - **Do not enable Supabase as backend/database.**
-- No real age, phone, identity, or location verification exists in this prototype. Never imply otherwise.
+- Africa's Talking sandbox SMS manual delivery is verified; server-side phone OTP source is added but not yet tested live. **Phone possession is not account authentication or age verification**, and no live age, identity or location verification exists. Never imply otherwise.
 - **The checked-in GitHub design is the source of truth** (src/components/tokea, src/styles.css, apps/mobile/src/theme.ts and related native screens); external Lovable must not replace it.
 - Draft privacy and terms effective date: **November 16, 2026**; no public support email yet. Candidate: support@gettokea.co.ke, subject to actual domain ownership, availability and legal clearance.
 - Copyright attribution in native Profile/About: **© 2026 Tokea. All rights reserved.**
 
 ## Changelog
+
+### 2026-11-20 — Africa's Talking simulator delivery confirmed; Tokea server OTP foundation (CI pending)
+- Owner provided screenshot of **Tokea test message received in Africa's Talking SMS simulator** after sending through Postman. This is proof of sandbox transport, not secure OTP flow or live mobile delivery.
+- Added backend sandbox SMS adapter for Africa's Talking, six-digit cryptographically random phone OTP challenge issuance and confirmation, HMAC-only database persistence, five-minute expiry, five-attempt lockout, one-minute cooldown and per-phone/request-source hourly limits. Sender response validation checks provider recipient acceptance codes.
+- Public phone proof routes `POST /v1/auth/phone/start` and `POST /v1/auth/phone/verify` return a challenge and a non-authenticated phone verification result, respectively. They **never issue JWTs or mark users age-verified**; real identity onboarding remains blocked.
+- Added `0002_phone_otp.sql`, sequential migrations, unit/integration test coverage with mocked provider transport and isolated PostgreSQL. **CI verification pending**; no real API test with the private sandbox key has occurred.
+- Updated backend environment example, setup guide and progress status. Provider secrets remain outside the public GitHub repository.
+- Remaining production blockers include trusted proxy IP configuration/abuse controls, retention cleanup, real verified accounts/JWT issuer, actual age assurance, EAS/FCM/APNs device builds and proof of phone push.
+
 
 ### 2026-11-19 — M5 GitHub-design card translation verified in CI
 - GitHub Actions: https://github.com/Mutethia-glitch/tokea/actions/runs/44539052668 — **all three jobs PASSED**: native Expo TypeScript/Android JS export; API compilation/PostgreSQL integration tests; archived web browser regressions.
