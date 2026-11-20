@@ -4,6 +4,7 @@ import { router } from "expo-router";
 import { Heading, Screen } from "@/ui";
 import { Action, MessageBox } from "@/native-cards";
 import { colors } from "@/theme";
+import { TokeaLogo } from "@/branding";
 import { completeLogin, normalizeKenyanPhone, requestLoginCode } from "@/phone-login";
 
 export default function SignInScreen(){
@@ -35,8 +36,9 @@ export default function SignInScreen(){
   }
   return <Screen><KeyboardAvoidingView style={{flex:1}} behavior={Platform.OS==="ios"?"padding":undefined}>
     <ScrollView contentContainerStyle={{paddingBottom:56}}>
-      <View style={{alignSelf:"flex-start",marginBottom:16}}>
+      <View style={{flexDirection:"row",alignItems:"center",justifyContent:"space-between",marginBottom:16}}>
         <Action secondary label="‹  Back" onPress={()=>stage==="code"?setStage("phone"):router.back()}/>
+        <TokeaLogo size={22}/>
       </View>
       <Heading title={stage==="phone"?"Welcome to Tokea":"Enter your sign-in code"}
         subtitle={stage==="phone"?"Find your people. Share a drink. Sign in with your Kenyan mobile number.":

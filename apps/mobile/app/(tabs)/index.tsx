@@ -3,6 +3,7 @@ import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-nati
 import { router, useFocusEffect } from "expo-router";
 import { Heading, Screen } from "@/ui";
 import { colors } from "@/theme";
+import { TokeaLogo } from "@/branding";
 import { Action, MessageBox, Pill, SessionCard } from "@/native-cards";
 import { CATEGORIES, listSessions, type Category, type NativeSession } from "@/sessions";
 import { getAccessToken } from "@/api";
@@ -14,7 +15,7 @@ export default function DiscoverScreen() {
   const [busy,setBusy]=useState(true);
   const [error,setError]=useState<string|null>(null);
   const [verification,setVerification]=useState<VerificationStatus|null>(null);
-  const [signedIn,setSignedIn]=useState(false);
+  const [signedIn,setSignedIn]=useState<boolean|null>(null);
   const refresh=useCallback(async()=>{
     setBusy(true);setError(null);
     try {setSessions((await listSessions(category)).sessions);}
@@ -22,15 +23,23 @@ export default function DiscoverScreen() {
     finally {setBusy(false);}
   },[category]);
   useFocusEffect(useCallback(()=>{
-    void getAccessToken().then(t=>setSignedIn(!!t));
-    void refresh();
-    void getVerificationStatus().then(setVerification).catch(()=>setVerification(null));
+    let mounted=true;
+    void getAccessToken().then(t=>{
+      if(!mounted)return;
+      if(!t){setSignedIn(false);router.replace("/welcome");return;}
+      setSignedIn(true);
+      void refresh();
+      void getVerificationStatus().then(s=>{if(mounted)setVerification(s);})
+        .catch(()=>{if(mounted)setVerification(null);});
+    }).catch(()=>{if(mounted){setSignedIn(false);router.replace("/welcome");}});
+    return ()=>{mounted=false;};
   },[refresh]));
+  if(signedIn!==true)return <Screen><ActivityIndicator color={colors.brand} style={{marginTop:32}}/></Screen>;
 
   return <Screen>
     <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{paddingBottom:48}}>
       <View style={{flexDirection:"row",alignItems:"center",justifyContent:"space-between",marginBottom:24,gap:12}}>
-        <Text style={{fontSize:27,color:colors.brand,fontWeight:"700"}}>tokea</Text>
+        <TokeaLogo size={27}/>
         <Pressable onPress={()=>router.push("/notifications")} accessibilityRole="button" accessibilityLabel="Open notifications"
           style={{borderColor:colors.border,borderWidth:1,borderRadius:30,minHeight:44,paddingHorizontal:12,justifyContent:"center"}}>
           <Text style={{color:colors.text,fontSize:12}}>Notifications</Text>

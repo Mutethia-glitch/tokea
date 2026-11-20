@@ -2,7 +2,7 @@ name: Tokea prototype checks
 
 on:
   push:
-    branches: [main]
+    branches: [main, feat/kenya-otp-gmail-photos-push-local]
   pull_request:
 
 jobs:

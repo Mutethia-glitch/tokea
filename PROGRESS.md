@@ -1,10 +1,10 @@
 # Tokea — Development Progress
 
 **Project:** Tokea (formerly named Explore in early blueprint)  
-**Last updated:** 2026-11-19  
-**Current milestone:** M7 — Kenyan OTP, Gmail staff identity, photographic banners, persistent avatars and push foundation CI-verified (local only; providers not connected)  
+**Last updated:** 2026-11-20  
+**Current milestone:** M7 sandbox OTP login & native debug APK built locally; welcome/branding/age guidance repairs committed, emulator recheck pending
 **Repository:** https://github.com/Mutethia-glitch/tokea  
-**Design source:** https://lovable.dev/projects/20ff86c9-03b7-4e00-b80f-9560791ddbfb
+**Design source:** GitHub checked-in approved preview (`src/components/tokea/onboarding.tsx`, `bits.tsx`, `src/styles.css`), not the older Lovable prototype
 
 ## Working agreement
 
@@ -17,7 +17,7 @@
 | Blueprint and scope | Reviewed | Adults-only Kenya social discovery; no dating, alcohol commerce, payments, or AI matching |
 | Visual design | Approved | Preserve original Lovable tokens, fonts, 448px mobile canvas, 64px nav/header, 20px card padding, 12px card gap |
 | Discover + filters | **M3 verified** | 14 drink categories including Muratina and spirits; grouped hosting/filter controls, themed card banners and mobile browser checks passed |
-| Onboarding + profile | **M6 source in review** | Native ID+selfie verification form, detailed clear-photo guidance, consent and status; needs real OTP provider and physical-device tests |
+| Onboarding + profile | **M7 UI corrected in source, awaiting device recheck** | Preview-style welcome, stand-alone 18+ notice, paired-glass mark, age guide in bullet rows rather than literal backslash-n |
 | Host/create session | **M5 native + API source tested** | Real signed-JWT host endpoint and native form; account provider not yet configured |
 | Join requests | **M5 native + API source tested** | Authenticated requests and server-only host decisions, durable inbox events; no live users yet |
 | Session chats | **M5 native + API source tested** | PostgreSQL messages restricted to accepted members; live realtime and phone notifications pending |
@@ -25,12 +25,19 @@
 | Safety | **M6 source in review** | Signed-in unverified accounts can browse, but server blocks hosting, joining and chats; ID+selfie encrypted at rest and deletions attempted on review/expiry |
 | React web build | **Verified in CI** | Bun install, TypeScript, Vite/Nitro production build and 16 Vitest tests passed in GitHub Actions run #8 (2026-11-17) |
 | Hosted web demo | **Vercel deployment READY** | https://tokea-demo.vercel.app · SSO protection enabled · browser routes not yet independently smoke-tested |
-| Production backend | **M6 local-only tests green** | PostgreSQL migrations, signed-JWT routes, staff age reviews, photo deletion and invite access; 24 tests passed before final audit additions. No hosting. |
+| Production backend | **M7 sandbox OTP/login verified locally** | PostgreSQL 18, 13 migrations, API health ok; SMS received in AT sandbox and OTP verified to JWT; ageVerified=false. Not production |
 | Native push notifications | **M4 code verified, delivery unverified** | Explicit opt-in and Expo token registration, in-app inbox and native notification tap handling; push needs EAS ID, APNs/FCM credentials, real authentication and device testing |
-| Native iOS/Android | **Typecheck + Android JS export passed** | Expo SDK 58 / React Native 0.88 / Expo Router shell in `apps/mobile`; not an installed native build or complete feature UI |
+| Native iOS/Android | **Local Android debug APK built (owner report, 2026-11-20)** | Emulator screenshots show age screen before UI changes; new revision not yet tested on emulator. iOS and push unverified |
 | Kenya legal review | **Pre-launch blocker** | Updated draft privacy notice for ID/selfie, restricted admin review, metadata and deletion; mandatory DPIA/ODPC legal review and 24h deletion assurance before live collection |
 
 ## Immediate next steps
+
+- [x] Owner tested Africa's Talking sandbox OTP end-to-end via **M7** local API, with SMS delivered to simulator and JWT issued after verification (`ageVerified=false`).
+- [x] Owner reported **BUILD SUCCESSFUL** of Android debug APK and provided emulator screenshot of age screen, prior to these UI changes.
+- [x] Fix literal backslash-n on ID/selfie guidance using proper bullet rows; restore paired-glass icon and preview welcome; adult card contains **only** "For adults 18+ only".
+- [ ] Confirm updated feature-branch CI, user reloads Metro and visually verifies native welcome, sign-in and verification.
+- [ ] Actual custom launcher icon: user sent an inline image, but a standalone accessible image file was not available in conversation storage. Request the exact original PNG so it can be resized and configured as Expo iOS/Android icon. Do **not** substitute a screenshot or invented mark.
+- [ ] Compare feature branch with divergent main before any merge; preserve local changes.
 
 - [x] Verify Bun dependency install, TypeScript check, production build and automated tests in CI (16/16 tests passed).
 - [x] Verify TanStack Router routes (`/requests`, `/chats`, `/chats/$id`, `/profile`) with smoke tests.
@@ -59,7 +66,27 @@
 - Original Lovable styles and shared UI components are the design source of truth.
 - Draft privacy and terms effective date: **November 16, 2026**; no public support email yet.
 
+## HANDOVER — read first (2026-11-20)
+
+**Repository/branch:** `Mutethia-glitch/tokea`; active working branch `feat/kenya-otp-gmail-photos-push-local` (old head `cea3767`), NOT divergent `main` (feature ahead 29, behind 10 at last compare). User has Windows checkout `C:\\Users\\promi\\tokea`; keep using M7 branch. `main` has different OTP endpoints and migrations. Do not reset or merge blindly. User's local changes: `services/api/compose.local.yml` modified by one line, `services/api/bun.lock` untracked and private `.env.local` ignored; do not overwrite them. `AGENTS.md` requires updating `PROGRESS.md` in each major commit.
+
+**Product/visual authority:** native Android/iOS Kenya social discovery for 18+ only; NO customer website, Supabase, demo sign-in or mock native accounts. User requires native UI closely follow the **GitHub checked-in approved preview**. Reference `src/components/tokea/onboarding.tsx` for landing hero ("Find your people. Share a drink."), rounded adult notice and purple Get started; `src/components/tokea/bits.tsx` for two-glass icon beside lowercase `tokea`; `src/styles.css` for actual Instrument fonts and design tokens. Older Lovable is NOT authority. User screenshot exposed literal `\\n` in age-verification instructions; this commit replaces the broken string with proper line-separated bullets. User explicitly said the **adult notice card must contain ONLY "For adults 18+ only"**, with nothing below that line within the card. New `apps/mobile/app/welcome.tsx`, `src/branding.tsx`, updates sign-in/age/Discover. Platform serif fallback is still not exact Instrument Serif; check licensed font bundling and actual emulator spacing. The most recent user added an inline image for the **launcher icon**, but no standalone image was available to retrieve. Obtain original uploaded PNG before changing `apps/mobile/app.json` launcher icons. Do not claim it is implemented.
+
+**Verified local stack:** Windows 11 Intel i5 ~16GB RAM, Bun 1.4.4, Temurin Java 17, Android emulator running. Native build first failed confirmed JVM native OOM in `android/hs_err_pid2944.log`; second failed Ninja mkdir on long reanimated C++ build path. User installed Android SDK CMake 3.31.6 / Ninja 1.12.1, ran Gradle `--no-daemon --max-workers=1`, reported `BUILD SUCCESSFUL` and shared age-form screenshot. Source changes in current commit have NOT been device-validated; iOS and pushes not tested. Avoid unnecessary Gradle rebuilds: JS UI changes can update via Metro restart/reload on dev APK.
+
+**Local backend:** PostgreSQL 18 127.0.0.1:5432, database `tokea_dev`, role `tokea_app`; 13 migrations applied. M7 API healthz `http://127.0.0.1:4400/healthz` ok, server started `bun --env-file=.env.local dist/server.js` from `services/api`. M7 auth `POST /v1/auth/request-code`, `POST /v1/auth/verify-code`, `OTP_AUTH_ENABLED=true`, `AT_MODE=sandbox`, `AT_USERNAME=sandbox`, private `AT_API_KEY` and `OTP_HMAC_SECRET`. Tokea backend successfully sent OTP to Africa's Talking sandbox simulator, verified user's six digits and returned auth token plus `ageVerified=false`. Not production SMS, age or ID validation. Do not enable private ID upload or expose keys. User previously pasted real-looking DB password: encourage rotation privately; never repeat/commit secrets. Do not touch separate SentinelX school databases.
+
+**Next actions:** Confirm GitHub Actions feature-branch build. User should pull the committed update on same branch (`git pull --ff-only origin feat/kenya-otp-gmail-photos-push-local`; only if local state still compatible), `cd apps/mobile; bun run typecheck`, restart Metro `bunx expo start --dev-client --localhost -c`. Emulator `.env.local`: `EXPO_PUBLIC_API_URL=http://10.0.2.2:4400` and `EXPO_PUBLIC_ALLOW_LOOPBACK_HTTP=true` (local emulator only, NEVER physical/production). Check welcome route from signed-out Discover, logo parity, adult notice and bullets. Actual native OTP login and restricted unverified account flow still require emulator checks. Don't treat an API 200 or push enqueue as actual age verification or device delivery. Continue recording milestone status and handover in this file.
+
 ## Changelog
+
+### 2026-11-20 — Native welcome, paired-glass mark, age guidance, handover
+- Added screenshot/approved-preview inspired welcome layout with standalone adult notice, no demo bypass.
+- Added reusable two-glass logo to native welcome, Discover, phone sign-in and ID review.
+- Rendered six age-photo guidelines as real bullet rows; removed visible literal backslash-n.
+- Signed-out Discover redirects to welcome while protected session remains gated; enabled CI trigger for feature branch.
+- Documented local sandbox OTP verification and owner-reported Android APK success; custom launcher artwork still pending accessible original asset.
+
 
 ### 2026-11-19 — M7 provider and native implementation CI verification
 - **All three jobs passed:** https://github.com/Mutethia-glitch/tokea/actions/runs/44436524432 — API/PostgreSQL 32/32 tests in 9 files, native Android JavaScript export and TypeScript, web design-reference regression checks.
