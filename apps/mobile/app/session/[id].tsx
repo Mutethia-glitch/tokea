@@ -3,6 +3,7 @@ import { ActivityIndicator, Alert, ScrollView, Text, TextInput, View } from "rea
 import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
 import { Heading, Screen } from "@/ui";
 import { colors } from "@/theme";
+import { displayCopy } from "@/display-copy";
 import { Action, MessageBox, Pill } from "@/native-cards";
 import { listRequests, loadSession, requestToJoin, type NativeRequest, type NativeSession } from "@/sessions";
 import { getVerificationStatus } from "@/verification";
@@ -49,9 +50,9 @@ export default function SessionDetailsScreen() {
       <View style={{alignSelf:"flex-start",marginBottom:14}}><Action label="‹  Back" secondary onPress={()=>router.back()}/></View>
       {busy?<ActivityIndicator color={colors.brand}/>:null}
       {error?<MessageBox text={error}/>:null}
-      {session?<><Heading title={session.title} subtitle={`${session.category} · ${session.neighbourhood}`}/>
+      {session?<><Heading title={session.title} subtitle={`${displayCopy(session.category)} · ${displayCopy(session.neighbourhood)}`}/>
         <View style={{backgroundColor:colors.card,borderWidth:1,borderColor:colors.border,borderRadius:24,padding:20,marginBottom:18}}>
-          <Text style={{color:colors.text,fontSize:16,fontWeight:"700"}}>Hosted by {session.hostName}</Text>
+          <Text style={{color:colors.text,fontSize:16,fontWeight:"700"}}>Hosted by {displayCopy(session.hostName)}</Text>
           <Text style={{color:colors.muted,marginTop:10,fontSize:13}}>Starts {new Date(session.startsAt).toLocaleString("en-KE")}</Text>
           <Text style={{color:colors.muted,marginTop:6,fontSize:13}}>{session.seatsLeft} of {session.guestCapacity} guest seats left</Text>
           <Text style={{color:colors.muted,marginTop:12,lineHeight:20,fontSize:13}}>

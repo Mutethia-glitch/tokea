@@ -73,3 +73,11 @@ bun run cleanup:verification
 ```
 
 When enabled with approved, private environment variables and a working local PostgreSQL connection, it expires documents, deletes completed/obsolete encrypted images, scans orphan files, and reports failed/overdue deletion jobs. Schedule the script independently of the API using your operating system's task scheduler, and monitor failures before enabling any real document collection. A PC that is shut down or sleeping cannot uphold a strict 24-hour deadline; production requires an always-on independently monitored cleanup process.
+
+## M7 local account and staff identity
+
+Use `bun run identity:keygen` to generate an untracked RSA signing key in `services/api/.local-secrets`. Configure `OTP_AUTH_ENABLED=true`, a securely generated `OTP_HMAC_SECRET`, `AUTH_PRIVATE_KEY_FILE`, and Africa's Talking sandbox or live credentials **locally**, never in Git. Every SMS code is six digits and expires in five minutes; five incorrect tries invalidate the challenge. The server issues a one-hour JWT and a rotating 30-day refresh token only after the code matches. **SMS delivery is unverified until real provider credentials and a handset are used.**
+
+Gmail staff invites use `smtp.gmail.com` with TLS and a dedicated account's app password if available. A Google OAuth client is separately needed for staff sign-in; Gmail SMTP credentials alone do not authenticate administrators. Configure the Google Client ID/Secret and loopback redirect URI, then use `bun run admin:bootstrap -- YOUR_VERIFIED_GOOGLE_EMAIL` once to prepare the owner. Invitations are single-use and role-gated.
+
+Persistent profile photos use `PROFILE_PHOTOS_ENABLED`, `PROFILE_PHOTO_DIR`, and a separate 32-byte `PROFILE_PHOTO_KEY_BASE64`. They are encrypted independently of temporary ID/selfie photos. Do not enable real profile uploads until backup, retention, privacy controls and access are reviewed.

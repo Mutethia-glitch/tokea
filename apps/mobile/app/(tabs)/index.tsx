@@ -3,8 +3,10 @@ import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-nati
 import { router, useFocusEffect } from "expo-router";
 import { Heading, Screen } from "@/ui";
 import { colors } from "@/theme";
+import { TokeaLogo } from "@/branding";
 import { Action, MessageBox, Pill, SessionCard } from "@/native-cards";
 import { CATEGORIES, listSessions, type Category, type NativeSession } from "@/sessions";
+import { getAccessToken } from "@/api";
 import { getVerificationStatus, type VerificationStatus } from "@/verification";
 
 export default function DiscoverScreen() {
@@ -13,6 +15,7 @@ export default function DiscoverScreen() {
   const [busy,setBusy]=useState(true);
   const [error,setError]=useState<string|null>(null);
   const [verification,setVerification]=useState<VerificationStatus|null>(null);
+  const [signedIn,setSignedIn]=useState<boolean|null>(null);
   const refresh=useCallback(async()=>{
     setBusy(true);setError(null);
     try {setSessions((await listSessions(category)).sessions);}
@@ -20,14 +23,23 @@ export default function DiscoverScreen() {
     finally {setBusy(false);}
   },[category]);
   useFocusEffect(useCallback(()=>{
-    void refresh();
-    void getVerificationStatus().then(setVerification).catch(()=>setVerification(null));
+    let mounted=true;
+    void getAccessToken().then(t=>{
+      if(!mounted)return;
+      if(!t){setSignedIn(false);router.replace("/welcome");return;}
+      setSignedIn(true);
+      void refresh();
+      void getVerificationStatus().then(s=>{if(mounted)setVerification(s);})
+        .catch(()=>{if(mounted)setVerification(null);});
+    }).catch(()=>{if(mounted){setSignedIn(false);router.replace("/welcome");}});
+    return ()=>{mounted=false;};
   },[refresh]));
+  if(signedIn!==true)return <Screen><ActivityIndicator color={colors.brand} style={{marginTop:32}}/></Screen>;
 
   return <Screen>
     <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{paddingBottom:48}}>
       <View style={{flexDirection:"row",alignItems:"center",justifyContent:"space-between",marginBottom:24,gap:12}}>
-        <Text style={{fontSize:27,color:colors.brand,fontWeight:"700"}}>tokea</Text>
+        <TokeaLogo size={27}/>
         <Pressable onPress={()=>router.push("/notifications")} accessibilityRole="button" accessibilityLabel="Open notifications"
           style={{borderColor:colors.border,borderWidth:1,borderRadius:30,minHeight:44,paddingHorizontal:12,justifyContent:"center"}}>
           <Text style={{color:colors.text,fontSize:12}}>Notifications</Text>
@@ -35,8 +47,13 @@ export default function DiscoverScreen() {
       </View>
       <Heading title="Who's out nearby?" subtitle="Find your people. Share a drink at a public place." />
       <View style={{alignSelf:"flex-start",marginBottom:20}}>
-        <Action label="＋  Host a drink" onPress={()=>router.push(verification?.verified?"/host":"/verification")}/>
+        <Action label="＋  Host a drink"
+          onPress={()=>router.push(!signedIn?"/sign-in":verification?.verified?"/host":"/verification")}/>
       </View>
+      {!signedIn?<View style={{marginBottom:15}}>
+        <MessageBox text="Welcome to Tokea! Sign in to see people hosting drinks and set up your profile."/>
+        <Action label="Sign in with phone" onPress={()=>router.push("/sign-in")}/>
+      </View>:null}
       {verification&&!verification.verified?<MessageBox text="Browse freely while your age is being verified. To host or request to join, upload your ID and a clear selfie in Profile."/>:null}
       <Text style={{fontWeight:"600",color:colors.text,marginBottom:10,fontSize:13}}>Drinks</Text>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{marginBottom:20}}>

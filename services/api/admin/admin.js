@@ -29,14 +29,16 @@ async function beginLogin(){
     if(!cfg.authorizeUrl)throw Error(cfg.error||"Team sign-in isn't available yet. Please contact the Tokea owner.");
     const verifier=asBase64Url(crypto.getRandomValues(new Uint8Array(32)));
     const state=asBase64Url(crypto.getRandomValues(new Uint8Array(20)));
+    const nonce=asBase64Url(crypto.getRandomValues(new Uint8Array(20)));
     const challenge=asBase64Url(new Uint8Array(await crypto.subtle.digest("SHA-256",new TextEncoder().encode(verifier))));
-    sessionStorage.setItem("tokea_staff_oauth",JSON.stringify({verifier,state,expires:Date.now()+300_000}));
+    sessionStorage.setItem("tokea_staff_oauth",JSON.stringify({verifier,state,nonce,expires:Date.now()+300_000}));
     const url=new URL(cfg.authorizeUrl);
     url.searchParams.set("client_id",cfg.clientId);
     url.searchParams.set("response_type","code");
     url.searchParams.set("redirect_uri",cfg.redirectUri);
     url.searchParams.set("scope",cfg.scope||"openid email");
     url.searchParams.set("state",state);
+    url.searchParams.set("nonce",nonce);
     url.searchParams.set("code_challenge",challenge);
     url.searchParams.set("code_challenge_method","S256");
     location.assign(url.toString());
@@ -119,7 +121,7 @@ async function returnFromLogin(){
     throw Error("Sign-in expired. Please try again.");
   const response=await fetch("/v1/admin/auth/exchange",{
     method:"POST",headers:{"content-type":"application/json"},
-    body:JSON.stringify({code,verifier:attempt.verifier}),cache:"no-store"});
+    body:JSON.stringify({code,verifier:attempt.verifier,nonce:attempt.nonce}),cache:"no-store"});
   const result=await response.json();
   if(!response.ok||!result.accessToken)throw Error(result.error||"Sign-in could not be completed.");
   token=result.accessToken;

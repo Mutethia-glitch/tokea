@@ -3,6 +3,7 @@ import { ActivityIndicator, FlatList, Pressable, RefreshControl, Text, View } fr
 import { router } from "expo-router";
 import { fetchInbox, markNotificationRead, type InboxItem } from "@/api";
 import { colors, layout } from "@/theme";
+import { displayCopy } from "@/display-copy";
 
 export default function NotificationsScreen() {
   const [items, setItems] = useState<InboxItem[]>([]);
@@ -45,11 +46,11 @@ export default function NotificationsScreen() {
         <Text style={{ color: colors.muted, marginTop: 20, lineHeight: 23 }}>{error ?? "No notifications yet."}</Text>}
       renderItem={({ item }) => <Pressable onPress={() => void openItem(item)}
         accessibilityRole="button"
-        accessibilityLabel={`${item.title}: ${item.body}`}
+        accessibilityLabel={`${displayCopy(item.title)}: ${displayCopy(item.body)}`}
         style={{ backgroundColor: colors.card, padding: 18, borderWidth: 1, borderColor: colors.border,
           borderRadius: 20, marginBottom: 12, opacity: item.readAt ? 0.7 : 1 }}>
-        <Text style={{ color: colors.text, fontWeight: item.readAt ? "500" : "700", fontSize: 16 }}>{item.title}</Text>
-        <Text style={{ color: colors.muted, marginTop: 6, lineHeight: 20 }}>{item.body}</Text>
+        <Text style={{ color: colors.text, fontWeight: item.readAt ? "500" : "700", fontSize: 16 }}>{displayCopy(item.title)}</Text>
+        <Text style={{ color: colors.muted, marginTop: 6, lineHeight: 20 }}>{displayCopy(item.body)}</Text>
         <Text style={{ color: colors.muted, marginTop: 7, fontSize: 12 }}>{new Date(item.createdAt).toLocaleString()}</Text>
       </Pressable>}
     />

@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { colors, layout } from "./theme";
+import { displayCopy } from "./display-copy";
 
 export function Screen({ children }: { children: ReactNode }) {
   return <View style={styles.screen}><View style={styles.content}>{children}</View></View>;
@@ -8,8 +9,8 @@ export function Screen({ children }: { children: ReactNode }) {
 
 export function Heading({ title, subtitle }: { title: string; subtitle?: string }) {
   return <View style={{ marginBottom: 20 }}>
-    <Text style={styles.title}>{title}</Text>
-    {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
+    <Text style={styles.title}>{displayCopy(title)}</Text>
+    {subtitle ? <Text style={styles.subtitle}>{displayCopy(subtitle)}</Text> : null}
   </View>;
 }
 

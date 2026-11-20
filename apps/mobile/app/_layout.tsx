@@ -16,6 +16,8 @@ export default function RootLayout() {
   return (
     <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.background } }}>
       <Stack.Screen name="(tabs)" />
+      <Stack.Screen name="welcome" options={{headerShown:false}}/>
+      <Stack.Screen name="sign-in" options={{headerShown:false}}/>
       <Stack.Screen name="verification" options={{ headerShown:false }}/>
       <Stack.Screen name="privacy" options={{ headerShown:false }}/>
       <Stack.Screen name="notifications" options={{ headerShown: true, title: "Notifications", headerTintColor: colors.brand }} />

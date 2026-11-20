@@ -3,6 +3,7 @@ import { ActivityIndicator, ScrollView, Text } from "react-native";
 import { router, useFocusEffect } from "expo-router";
 import { Heading, Paper, Screen } from "@/ui";
 import { colors } from "@/theme";
+import { displayCopy } from "@/display-copy";
 import { Action, MessageBox } from "@/native-cards";
 import { listRequests, type NativeRequest } from "@/sessions";
 import { getVerificationStatus } from "@/verification";
@@ -39,9 +40,9 @@ export default function ChatsScreen() {
     {error?<MessageBox text={error}/>:null}
     {!busy&&!error&&!needsVerification&&chats.length===0?<MessageBox text="When a host accepts a join request, its private chat appears here."/>:null}
     {chats.map(item=><Paper key={item.sessionId}>
-      <Text style={{fontWeight:"700",fontSize:15,color:colors.text}}>{item.title}</Text>
+      <Text style={{fontWeight:"700",fontSize:15,color:colors.text}}>{displayCopy(item.title)}</Text>
       <Text style={{fontSize:12,color:colors.muted,marginTop:8,marginBottom:14}}>
-        {item.category} · {item.neighbourhood} · Approved members only
+        {displayCopy(item.category)} · {displayCopy(item.neighbourhood)} · Approved members only
       </Text>
       <Action label="Open chat" onPress={()=>router.push({pathname:"/chats/[id]",params:{id:item.sessionId}})}/>
     </Paper>)}

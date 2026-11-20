@@ -3,6 +3,7 @@ import { ActivityIndicator, ScrollView, Text, View } from "react-native";
 import { router, useFocusEffect } from "expo-router";
 import { Heading, Paper, Screen } from "@/ui";
 import { colors } from "@/theme";
+import { displayCopy } from "@/display-copy";
 import { Action, MessageBox, Pill } from "@/native-cards";
 import { cancelRequest, decideRequest, listRequests, type NativeRequest } from "@/sessions";
 import { getVerificationStatus } from "@/verification";
@@ -55,14 +56,14 @@ export default function RequestsScreen() {
       {error?<MessageBox text={error}/>:null}
       {!busy&&!error&&records.length===0?<MessageBox text={tab==="incoming"?"No incoming requests yet.":"You haven't requested to join a session yet."}/>:null}
       {records.map(r=><Paper key={r.id}>
-        <Text style={{fontWeight:"700",fontSize:15,color:colors.text}}>{r.title}</Text>
+        <Text style={{fontWeight:"700",fontSize:15,color:colors.text}}>{displayCopy(r.title)}</Text>
         <Text style={{color:colors.muted,fontSize:12,marginTop:5}}>
-          {r.category} · {r.neighbourhood} · {r.partySize} {r.partySize===1?"person":"people"}
+          {displayCopy(r.category)} · {displayCopy(r.neighbourhood)} · {r.partySize} {r.partySize===1?"person":"people"}
         </Text>
         <Text style={{color:colors.text,marginTop:12,fontSize:14}}>
-          {tab==="incoming"?`${r.applicantName} wants to join`:`Hosted by ${r.hostName}`}
+          {tab==="incoming"?`${displayCopy(r.applicantName)} wants to join`:`Hosted by ${displayCopy(r.hostName)}`}
         </Text>
-        {r.intro?<Text style={{color:colors.muted,marginTop:6,fontSize:13}}>{r.intro}</Text>:null}
+        {r.intro?<Text style={{color:colors.muted,marginTop:6,fontSize:13}}>{displayCopy(r.intro)}</Text>:null}
         <Text style={{fontSize:12,color:r.status==="accepted"?colors.success:colors.muted,
           fontWeight:"700",marginTop:10,textTransform:"capitalize"}}>{r.status}</Text>
         {r.status==="pending"&&tab==="incoming"?<View style={{marginTop:14,flexDirection:"row",gap:10}}>

@@ -5,9 +5,18 @@ import { router, useFocusEffect } from "expo-router";
 import { Heading, Paper, Screen } from "@/ui";
 import { Action, MessageBox } from "@/native-cards";
 import { colors } from "@/theme";
+import { TokeaLogo } from "@/branding";
 import { getVerificationStatus, submitAgeReview, uploadIdentityPhoto, type VerificationStatus } from "@/verification";
 import { releasePickedIdentityPhoto } from "@/temporary-identity-photos";
 
+const AGE_TIPS=[
+  "Use a valid government-issued photo ID showing your date of birth.",
+  "Place the entire ID in the frame. Every corner, the face and date of birth must be visible and legible.",
+  "Use bright, even lighting. Avoid glare, blur, reflections and shadows.",
+  "For your selfie, face the camera directly; remove sunglasses or face coverings.",
+  "Only upload photos of your own ID and face. Avoid filters and screenshots.",
+  "JPG, PNG or WebP; up to 5 MB each.",
+] as const;
 type Selected={uri:string;mimeType:string}|null;
 export default function VerifyAgeScreen(){
   const [status,setStatus]=useState<VerificationStatus|null>(null);
@@ -76,7 +85,10 @@ export default function VerifyAgeScreen(){
   const pending=status?.status==="pending";
   const showForm=!approved&&!pending;
   return <Screen><ScrollView contentContainerStyle={{paddingBottom:70}} showsVerticalScrollIndicator={false}>
-    <View style={{alignSelf:"flex-start",marginBottom:14}}><Action secondary label="‹  Back" onPress={()=>router.back()}/></View>
+    <View style={{flexDirection:"row",alignItems:"center",justifyContent:"space-between",marginBottom:14}}>
+      <Action secondary label="‹  Back" onPress={()=>router.back()}/>
+      <TokeaLogo size={22}/>
+    </View>
     <Heading title="Verify your age" subtitle="For adults 18+ only. Confirm your age to host a drink or request to join one."/>
     {loading?<ActivityIndicator color={colors.brand}/>:null}
     {error?<MessageBox text={error}/>:null}
@@ -95,7 +107,12 @@ export default function VerifyAgeScreen(){
     {status?.status==="expired"?<MessageBox text="Your previous photos expired and were removed from the review queue. Please take new pictures."/>:null}
     {showForm&&!loading?<><Paper>
       <Text style={{fontSize:17,fontWeight:"700",color:colors.text,marginBottom:12}}>Before you take your pictures</Text>
-      <Text style={{color:colors.muted,lineHeight:23}}>• Use a valid government-issued photo ID showing your date of birth.\n• Place the entire ID in the frame. Every corner, the face and date of birth must be visible and legible.\n• Use bright, even lighting. Avoid glare, blur, reflections and shadows.\n• For your selfie, face the camera directly; remove sunglasses or face coverings.\n• Only upload photos of your own ID and face. Avoid filters and screenshots.\n• JPG, PNG or WebP; up to 5 MB each.</Text>
+      <View style={{gap:9}}>
+        {AGE_TIPS.map(tip=><View key={tip} style={{flexDirection:"row",alignItems:"flex-start",gap:8}}>
+          <Text style={{color:colors.muted,lineHeight:23}}>{"•"}</Text>
+          <Text style={{flex:1,color:colors.muted,lineHeight:23}}>{tip}</Text>
+        </View>)}
+      </View>
     </Paper>
     <Paper>
       <Text style={{fontSize:16,fontWeight:"700",color:colors.text,marginBottom:12}}>1. Photo of your ID</Text>
