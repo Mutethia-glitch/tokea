@@ -2,7 +2,7 @@
 
 **Project:** Tokea (formerly named Explore in early blueprint)  
 **Last updated:** 2026-11-20  
-**Current milestone:** M7 sandbox OTP login & native debug APK built locally; welcome/branding/age guidance repairs committed, emulator recheck pending
+**Current milestone:** M7 sandbox OTP login & native debug APK built locally; welcome/branding/age guidance fixes passed GitHub CI; emulator recheck pending
 **Repository:** https://github.com/Mutethia-glitch/tokea  
 **Design source:** GitHub checked-in approved preview (`src/components/tokea/onboarding.tsx`, `bits.tsx`, `src/styles.css`), not the older Lovable prototype
 
@@ -17,7 +17,7 @@
 | Blueprint and scope | Reviewed | Adults-only Kenya social discovery; no dating, alcohol commerce, payments, or AI matching |
 | Visual design | Approved | Preserve original Lovable tokens, fonts, 448px mobile canvas, 64px nav/header, 20px card padding, 12px card gap |
 | Discover + filters | **M3 verified** | 14 drink categories including Muratina and spirits; grouped hosting/filter controls, themed card banners and mobile browser checks passed |
-| Onboarding + profile | **M7 UI corrected in source, awaiting device recheck** | Preview-style welcome, stand-alone 18+ notice, paired-glass mark, age guide in bullet rows rather than literal backslash-n |
+| Onboarding + profile | **M7 UI corrected, CI passed, awaiting device recheck** | Preview-style welcome, stand-alone 18+ notice, paired-glass mark, age guide in bullet rows rather than literal backslash-n |
 | Host/create session | **M5 native + API source tested** | Real signed-JWT host endpoint and native form; account provider not yet configured |
 | Join requests | **M5 native + API source tested** | Authenticated requests and server-only host decisions, durable inbox events; no live users yet |
 | Session chats | **M5 native + API source tested** | PostgreSQL messages restricted to accepted members; live realtime and phone notifications pending |
@@ -35,7 +35,8 @@
 - [x] Owner tested Africa's Talking sandbox OTP end-to-end via **M7** local API, with SMS delivered to simulator and JWT issued after verification (`ageVerified=false`).
 - [x] Owner reported **BUILD SUCCESSFUL** of Android debug APK and provided emulator screenshot of age screen, prior to these UI changes.
 - [x] Fix literal backslash-n on ID/selfie guidance using proper bullet rows; restore paired-glass icon and preview welcome; adult card contains **only** "For adults 18+ only".
-- [ ] Confirm updated feature-branch CI, user reloads Metro and visually verifies native welcome, sign-in and verification.
+- [x] Feature-branch UI commit `122e8f2` passed all three GitHub CI jobs (native Expo Android JS export/typecheck, API integration checks, design-reference web tests): https://github.com/Mutethia-glitch/tokea/actions/runs/44660227149 and https://github.com/Mutethia-glitch/tokea/actions/runs/44660233793.
+- [ ] User reloads Metro and visually verifies updated native welcome, sign-in, age review and navigation; CI is source validation, not an on-device UI test.
 - [ ] Actual custom launcher icon: user sent an inline image, but a standalone accessible image file was not available in conversation storage. Request the exact original PNG so it can be resized and configured as Expo iOS/Android icon. Do **not** substitute a screenshot or invented mark.
 - [ ] Compare feature branch with divergent main before any merge; preserve local changes.
 
@@ -76,7 +77,7 @@
 
 **Local backend:** PostgreSQL 18 127.0.0.1:5432, database `tokea_dev`, role `tokea_app`; 13 migrations applied. M7 API healthz `http://127.0.0.1:4400/healthz` ok, server started `bun --env-file=.env.local dist/server.js` from `services/api`. M7 auth `POST /v1/auth/request-code`, `POST /v1/auth/verify-code`, `OTP_AUTH_ENABLED=true`, `AT_MODE=sandbox`, `AT_USERNAME=sandbox`, private `AT_API_KEY` and `OTP_HMAC_SECRET`. Tokea backend successfully sent OTP to Africa's Talking sandbox simulator, verified user's six digits and returned auth token plus `ageVerified=false`. Not production SMS, age or ID validation. Do not enable private ID upload or expose keys. User previously pasted real-looking DB password: encourage rotation privately; never repeat/commit secrets. Do not touch separate SentinelX school databases.
 
-**Next actions:** Confirm GitHub Actions feature-branch build. User should pull the committed update on same branch (`git pull --ff-only origin feat/kenya-otp-gmail-photos-push-local`; only if local state still compatible), `cd apps/mobile; bun run typecheck`, restart Metro `bunx expo start --dev-client --localhost -c`. Emulator `.env.local`: `EXPO_PUBLIC_API_URL=http://10.0.2.2:4400` and `EXPO_PUBLIC_ALLOW_LOOPBACK_HTTP=true` (local emulator only, NEVER physical/production). Check welcome route from signed-out Discover, logo parity, adult notice and bullets. Actual native OTP login and restricted unverified account flow still require emulator checks. Don't treat an API 200 or push enqueue as actual age verification or device delivery. Continue recording milestone status and handover in this file.
+**CI result:** Commit `122e8f2` completed both push and PR workflows; all native-foundation, API-foundation and build-and-test jobs were successful (runs 44660227149 / 44660233793). These checks do NOT confirm pixel-perfect matching or in-app OTP on an emulator. **Next actions:** User should pull the committed update on same branch (`git pull --ff-only origin feat/kenya-otp-gmail-photos-push-local`; only if local state still compatible), `cd apps/mobile; bun run typecheck`, restart Metro `bunx expo start --dev-client --localhost -c`. Emulator `.env.local`: `EXPO_PUBLIC_API_URL=http://10.0.2.2:4400` and `EXPO_PUBLIC_ALLOW_LOOPBACK_HTTP=true` (local emulator only, NEVER physical/production). Check welcome route from signed-out Discover, logo parity, adult notice and bullets. Actual native OTP login and restricted unverified account flow still require emulator checks. Don't treat an API 200 or push enqueue as actual age verification or device delivery. Continue recording milestone status and handover in this file.
 
 ## Changelog
 
