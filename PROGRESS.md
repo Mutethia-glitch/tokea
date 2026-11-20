@@ -2,7 +2,7 @@
 
 **Project:** Tokea (formerly named Explore in early blueprint)  
 **Last updated:** 2026-11-20  
-**Current milestone:** M7 native UI copy hardened; exact user-supplied icon vector + deterministic PNG generation and Expo icon configuration; GitHub CI passed; user's local Android SDK path fix supplied but rebuild/on-device check pending.
+**Current milestone:** M7 PAUSED at Windows local Git synchronization blocker. GitHub feature-branch native/API/web CI passes; local Android device revalidation and icon rebuild remain pending. **No code changes requested while paused.**
 **Repository:** https://github.com/Mutethia-glitch/tokea  
 **Design source:** GitHub checked-in approved preview (`src/components/tokea/onboarding.tsx`, `bits.tsx`, `src/styles.css`), not the older Lovable prototype
 
@@ -15,7 +15,7 @@
 | Area | Status | Notes |
 | --- | --- | --- |
 | Blueprint and scope | Reviewed | Adults-only Kenya social discovery; no dating, alcohol commerce, payments, or AI matching |
-| Visual design | Approved | Preserve original Lovable tokens, fonts, 448px mobile canvas, 64px nav/header, 20px card padding, 12px card gap |
+| Visual design | Approved | Authoritative design is GitHub checked-in preview (not historical Lovable prototype); preserve typography, paired-glass icon, purple CTA, padding and card spacing. Welcome age card must contain only `For adults 18+ only` |
 | Discover + filters | **M3 verified** | 14 drink categories including Muratina and spirits; grouped hosting/filter controls, themed card banners and mobile browser checks passed |
 | Onboarding + profile | **M7 revised, device recheck pending** | Preview style welcome; adult-only card contains exactly one line; escaped server text normalized for display; ID bullet rows; paired-glass logo now uses owner-supplied vector asset |
 | Host/create session | **M5 native + API source tested** | Real signed-JWT host endpoint and native form; account provider not yet configured |
@@ -31,6 +31,10 @@
 | Kenya legal review | **Pre-launch blocker** | Updated draft privacy notice for ID/selfie, restricted admin review, metadata and deletion; mandatory DPIA/ODPC legal review and 24h deletion assurance before live collection |
 
 ## Immediate next steps
+
+- [ ] **PAUSED BY OWNER (2026-11-20):** Safely reconcile Windows checkout with updated M7 feature branch before any build. See the `PAUSED — local Git synchronization` section and handover below. Do not discard local tracked/untracked files.
+- [ ] Once resumed, inspect incoming asset collision and protected local modifications; back them up, selectively stash tracked changes and fast-forward Git with no automatic stash pop.
+- [ ] After successful sync, repair local Android SDK path, regenerate icon resources, run native copy/type checks, and rebuild/review emulator launcher and UI. This has **not** happened on owner's latest checkout.
 
 - [x] Owner tested Africa's Talking sandbox OTP end-to-end via **M7** local API, with SMS delivered to simulator and JWT issued after verification (`ageVerified=false`).
 - [x] Owner reported **BUILD SUCCESSFUL** of Android debug APK and provided emulator screenshot of age screen, prior to these UI changes.
@@ -63,11 +67,47 @@
 - The checked-in web project is **only an editable prototype**, not a shipped native app.
 - Planned production architecture: **React Native + Expo + TypeScript**, independent **Node.js/TypeScript** API, **PostgreSQL/PostGIS** and appropriately selected storage/notifications.
 - **Do not enable Supabase as backend/database.**
-- No real age, phone, identity, or location verification exists in this prototype. Never imply otherwise.
-- Original Lovable styles and shared UI components are the design source of truth.
+- **Sandbox phone possession was verified** via owner's M7 local backend + Africa's Talking simulator (JWT issued, `ageVerified=false`). This is not production phone service or proof of age/identity/location; adult verification, production uploads, physical-device OTP and push delivery are unverified.
+- The **approved GitHub checked-in** preview (`src/components/tokea/`, `src/styles.css`) is the design source of truth; Lovable is historical and may not override it.
 - Draft privacy and terms effective date: **November 16, 2026**; no public support email yet.
 
+## PAUSED — local Git synchronization (2026-11-20)
+
+**Owner's explicit instruction:** Pause active Tokea development now; preserve all local work. This documentation-only update is made directly to the **M7 feature branch** so future AIs can resume. Do not attempt additional code, Gradle, deployment, or physical-device testing until owner asks to continue.
+
+**Blocking error:** A scripted `git pull --ff-only origin feat/kenya-otp-gmail-photos-push-local` aborted with `Git pull failed. Preserve local changes before proceeding.` The original Git diagnostic lines immediately above “Aborting” were not supplied. The owner subsequently ran safe inspection commands from `C:\Users\promi\tokea`; `git status -sb` showed:
+
+```text
+## feat/kenya-otp-gmail-photos-push-local...origin/feat/kenya-otp-gmail-photos-push-local [behind 2]
+ M PROGRESS.md
+ M apps/mobile/app.json
+ M apps/mobile/tsconfig.json
+ M services/api/compose.local.yml
+?? apps/mobile/android/
+?? apps/mobile/assets/
+?? apps/mobile/bun.lock
+?? services/api/bun.lock
+```
+
+This status is **the owner's reported local snapshot, before this GitHub documentation commit**; the remote therefore has at least one additional commit that their PC has not fetched. **GitHub and the owner's Windows checkout are NOT in sync.** The tracked edits include a locally modified `PROGRESS.md` (which may contain additional notes), manually modified Expo `app.json`, Expo-generated `tsconfig.json`, and a potentially sensitive `compose.local.yml`. Untracked `apps/mobile/android/` contains actual generated native Android project and existing native build resources; `apps/mobile/assets/` may contain owner-supplied icon/other assets that overlap incoming tracked source `assets/tokea-app-icon.svg`. Both Bun lock files are untracked. **Do not assume any are disposable**. `git stash list` was empty. CRLF conversion warnings are informational, not proof of cause.
+
+**Likely cause (unconfirmed until original Git error is seen):** The pull conflicts with tracked local changes to `PROGRESS.md`/`app.json` and/or local untracked `apps/mobile/assets/` files that the incoming commit would create; do not state a definitive cause. The GitHub feature branch currently includes `apps/mobile/assets/tokea-app-icon.svg`, generated-icon script, native copy formatter and docs, and ignores generated Android/PNG resources. Local files are still older or locally modified.
+
+**Safe resume plan — do not execute while paused:**
+1. Confirm `git branch --show-current`, `git status -sb`, `git log -1 --oneline`; separately inspect `git diff -- PROGRESS.md apps/mobile/app.json apps/mobile/tsconfig.json services/api/compose.local.yml` and list local `apps/mobile/assets/` **filenames only**. Do not share secrets from Compose/other files.
+2. Create a timestamped backup **outside the repo** (e.g. `$HOME\tokea-local-backup\resume-...`) with copies of all four modified tracked files, relevant original/derived icon assets, both Bun locks and any unique local notes. Keep the generated `android/` project intact in place (or back it up if a risky operation is proposed). Sensitive configs are never uploaded to GitHub.
+3. Only after backup, preserve the four tracked edits via a **pathspec-limited stash** (no `-u`; it could include a very large generated `android/` tree or sensitive files). Before pulling, check for filename collisions against the incoming tracked `apps/mobile/assets/tokea-app-icon.svg`; move only the colliding untracked file to the private backup if necessary, not the entire directory. Prefer a reviewed, manual process; never blanket `git clean -fd`, `git reset --hard`, or `expo prebuild --clean`.
+4. `git fetch origin`, then `git pull --ff-only origin feat/kenya-otp-gmail-photos-push-local` when the worktree is safe. **Do not automatically `git stash pop`**: inspect the saved diffs and selectively reapply legitimate local settings without overwriting the newer `PROGRESS.md`, `app.json` icons or Expo generated files.
+5. Verify `apps/mobile/.env.local` is private and remains unchanged. With backend still available and local SDK configured, `cd apps/mobile; bun install; bun run generate:icons; bun run test:copy; bun run typecheck`. Fix Android SDK location via `$env:ANDROID_HOME=$env:LOCALAPPDATA+'\\Android\\Sdk'` and `apps/mobile/android/local.properties` `sdk.dir=...` (use forward slashes). **Do not commit local.properties**.
+6. Rebuild Android resources for launcher image only after sync and SDK fix, using earlier successful Gradle settings (`--no-daemon --max-workers=1`). Confirm emulator launcher shows intended purple icon, welcome matches checked-in preview, card shows **only “For adults 18+ only”**, age tips have no raw `\\n`, and complete real native OTP sign-in before marking M7 mobile E2E passed. Rendered icon SVG/PNG should be visually compared with the owner's supplied original PNG; equivalence is not yet verified.
+7. Continue age-security/verification review only after these basics; **never enable live ID uploads before legal, privacy, data-retention, reviewer-role and deletion controls are verified**. Keep `PROGRESS.md` current in each substantive commit. No branch switches, destructive operations or production deployments without explicit need.
+
+**Evidence before pause:** On owner's PC earlier, local PostgreSQL 18 migrations 0001–0013 and API health check passed; Africa's Talking sandbox OTP was delivered, verified, and returned an auth token with `ageVerified=false`. Android build succeeded once after Java OOM/CMake Windows-long-path issues, and emulator showed the older age-review screen. More recent local build hit `SDK location not found`. GitHub **M7 feature commit `9497a4f`** passed native, API and web/reference jobs: https://github.com/Mutethia-glitch/tokea/actions/runs/44663118120 and https://github.com/Mutethia-glitch/tokea/actions/runs/44663123621. None of those CI results proves the new app icon or latest welcome screen has been validated on the owner's emulator.
+
 ## HANDOVER — read first (2026-11-20)
+
+**MOST RECENT — PAUSED:** Read `PAUSED — local Git synchronization (2026-11-20)` above **before** following the historical handover. The owner specifically asked to stop building and document the blocker. The latest local status has four tracked edits + three untracked directories/filesets; Git pull is aborted. Older advice below to immediately pull or prebuild is **superseded** until the conflict is safely resolved. This is a GitHub-only documentation commit; it does not alter the owner's Windows files. Keep original local design, assets, files, branch, database and API secrets safe.
+
 
 **Latest update:** The exact Tokea icon IS now available: source `apps/mobile/assets/tokea-app-icon.svg`, from user's purple square with two white glasses. `scripts/generate-icons.mjs` uses development-only `sharp` to generate 4 gitignored PNG outputs (`icon.png`, `adaptive-icon.png`, `monochrome-icon.png`, `brand-mark.png`). `app.json` wires Expo/iOS/Android icons; `src/branding.tsx` renders the same derived glass mark. Run `cd apps/mobile; bun install; bun run generate:icons; bun run test:copy; bun run typecheck` before prebuild. CI also generates icons before Expo export. Source PNG as provided by user is visually equivalent to vector, but device raster result still needs visual verification. Any older handover sentence claiming icon missing is historical and superseded.
 **Escaped copy:** `src/display-copy.ts` fixes literal escaped newlines/tabs in native Text presentation including request/session/chat/notification content; age instructions have individual bullets. Test script `bun run test:copy` guards against regressions. Do not display raw code/JSON or substitute web mock data in native.
@@ -85,6 +125,13 @@
 **CI result:** Commit `122e8f2` completed both push and PR workflows; all native-foundation, API-foundation and build-and-test jobs were successful (runs 44660227149 / 44660233793). These checks do NOT confirm pixel-perfect matching or in-app OTP on an emulator. **Next actions:** User should pull the committed update on same branch (`git pull --ff-only origin feat/kenya-otp-gmail-photos-push-local`; only if local state still compatible), `cd apps/mobile; bun run typecheck`, restart Metro `bunx expo start --dev-client --localhost -c`. Emulator `.env.local`: `EXPO_PUBLIC_API_URL=http://10.0.2.2:4400` and `EXPO_PUBLIC_ALLOW_LOOPBACK_HTTP=true` (local emulator only, NEVER physical/production). Check welcome route from signed-out Discover, logo parity, adult notice and bullets. Actual native OTP login and restricted unverified account flow still require emulator checks. Don't treat an API 200 or push enqueue as actual age verification or device delivery. Continue recording milestone status and handover in this file.
 
 ## Changelog
+
+### 2026-11-20 — Owner-requested pause and local pull blocker documented
+- No code, app assets or environment files were changed in this update. Recorded owner's exact Windows `git status -sb`, tracked edits, untracked `android/`, `assets/`, mobile/API Bun locks, and empty stash list.
+- Local pull failed with `Aborting` and a scripted error, but original Git diagnostic conflict lines are unavailable; exact cause still needs checking. Local checkout was two commits behind prior to this documentation-only remote change.
+- Established protective backup, selective stash, collision inspection and fast-forward process for **when** user resumes; do not force merge, reset or delete local native folders.
+- Latest feature CI on commit `9497a4f` was green for native foundation, API and web checks. Local current APK, icon rendering, native OTP and SDK path still need owner-side retesting.
+- Handover and next steps refreshed; project intentionally paused at M7.
 
 ### 2026-11-20 — M7 icon, escaped text and local SDK build fix
 - The user provided the final 1024px purple/white paired-glass icon and matching `tokea-app-icon.svg`. Source vector is added to the repo; build-only `sharp` generator creates standard PNG, transparent adaptive foreground, monochrome themed icon and inline purple brand mark. Expo app config updated to refer to generated images; dependency is development-only and does not change app runtime.
