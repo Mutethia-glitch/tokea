@@ -3,6 +3,7 @@ import { ActivityIndicator, FlatList, KeyboardAvoidingView, Platform, Text, Text
 import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
 import { Action, MessageBox } from "@/native-cards";
 import { colors, layout } from "@/theme";
+import { displayCopy } from "@/display-copy";
 import { listMessages, sendMessage, type NativeMessage } from "@/sessions";
 
 export default function SessionChat() {
@@ -51,8 +52,8 @@ export default function SessionChat() {
         ListEmptyComponent={!busy&&!error?<Text style={{color:colors.muted}}>Say hello to your group.</Text>:undefined}
         renderItem={({item})=><View style={{alignSelf:"flex-start",maxWidth:"95%",backgroundColor:colors.card,
           borderWidth:1,borderColor:colors.border,padding:15,borderRadius:18}}>
-          <Text style={{color:colors.brand,fontWeight:"700",fontSize:12}}>{item.authorName}</Text>
-          <Text style={{color:colors.text,marginTop:6,fontSize:14,lineHeight:21}}>{item.text}</Text>
+          <Text style={{color:colors.brand,fontWeight:"700",fontSize:12}}>{displayCopy(item.authorName)}</Text>
+          <Text style={{color:colors.text,marginTop:6,fontSize:14,lineHeight:21}}>{displayCopy(item.text)}</Text>
           <Text style={{fontSize:11,color:colors.muted,marginTop:8}}>
             {new Date(item.createdAt).toLocaleTimeString("en-KE",{hour:"numeric",minute:"2-digit"})}
           </Text>

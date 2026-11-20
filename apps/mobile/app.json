@@ -8,11 +8,16 @@
     "userInterfaceStyle": "automatic",
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.tokea.social"
+      "bundleIdentifier": "com.tokea.social",
+      "icon": "./assets/icon.png"
     },
     "android": {
       "package": "com.tokea.social",
-      "edgeToEdgeEnabled": true
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#7048D9",
+        "monochromeImage": "./assets/monochrome-icon.png"
+      }
     },
     "plugins": [
       [
@@ -36,6 +41,7 @@
       "eas": {
         "projectId": "SET_REAL_EAS_PROJECT_ID_BEFORE_PUSH_TESTING"
       }
-    }
+    },
+    "icon": "./assets/icon.png"
   }
 }

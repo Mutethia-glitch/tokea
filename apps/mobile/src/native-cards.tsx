@@ -3,6 +3,7 @@ import { ImageBackground, Pressable, Text, View } from "react-native";
 import { DRINK_PHOTOS } from "./drink-photos";
 import { PersonAvatar } from "./person-avatar";
 import { colors, layout } from "./theme";
+import { displayCopy } from "./display-copy";
 import type { NativeSession } from "./sessions";
 
 const bannerColors:Record<string,[string,string]>={
@@ -53,12 +54,12 @@ export function SessionCard({session,onPress}:{
       <View style={{flexDirection:"row",alignItems:"center",gap:11}}>
         <PersonAvatar userId={session.hostId} name={session.hostName} hasPhoto={session.hostHasPhoto}
           photoVersion={session.hostPhotoVersion} size={44}/>
-        <Text style={{color:colors.text,fontSize:16,fontWeight:"700",flex:1}}>{session.hostName}</Text>
+        <Text style={{color:colors.text,fontSize:16,fontWeight:"700",flex:1}}>{displayCopy(session.hostName)}</Text>
       </View>
-      <Text style={{color:colors.text,fontSize:15,marginTop:8,lineHeight:22}}>{session.title}</Text>
+      <Text style={{color:colors.text,fontSize:15,marginTop:8,lineHeight:22}}>{displayCopy(session.title)}</Text>
       <View style={{height:1,backgroundColor:colors.border,marginVertical:14}}/>
       <Text style={{color:colors.muted,fontSize:12,lineHeight:20}}>
-        {session.neighbourhood} · {new Date(session.startsAt).toLocaleString("en-KE",
+        {displayCopy(session.neighbourhood)} · {new Date(session.startsAt).toLocaleString("en-KE",
           {month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}
       </Text>
       <Text style={{color:colors.muted,fontSize:12,marginTop:4}}>{session.seatsLeft} seats left · View details</Text>
@@ -67,6 +68,6 @@ export function SessionCard({session,onPress}:{
 }
 export function MessageBox({text}:{text:string}) {
   return <View style={{padding:16,backgroundColor:colors.brandSoft,borderRadius:18,marginBottom:16}}>
-    <Text style={{fontSize:13,color:colors.text,lineHeight:20}}>{text}</Text>
+    <Text style={{fontSize:13,color:colors.text,lineHeight:20}}>{displayCopy(text)}</Text>
   </View>;
 }

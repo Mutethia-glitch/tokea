@@ -55,3 +55,9 @@ apps/mobile/google-services.json
 apps/mobile/GoogleService-Info.plist
 *.jks
 *.keystore
+
+# Deterministic Tokea icon PNGs are generated from the checked-in SVG before Metro/prebuild.
+apps/mobile/assets/icon.png
+apps/mobile/assets/adaptive-icon.png
+apps/mobile/assets/monochrome-icon.png
+apps/mobile/assets/brand-mark.png

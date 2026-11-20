@@ -100,5 +100,9 @@ jobs:
         run: bun install
       - name: Typecheck native app
         run: bun run typecheck
+      - name: Verify native display-copy and welcome constraints
+        run: bun run test:copy
+      - name: Generate exact Tokea app icon assets
+        run: bun run generate:icons
       - name: Validate Expo Android JS bundle
         run: bunx expo export --platform android --output-dir .expo-dist

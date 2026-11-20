@@ -2,7 +2,7 @@
 
 **Project:** Tokea (formerly named Explore in early blueprint)  
 **Last updated:** 2026-11-20  
-**Current milestone:** M7 sandbox OTP login & native debug APK built locally; welcome/branding/age guidance fixes passed GitHub CI; emulator recheck pending
+**Current milestone:** M7 native UI copy hardened; exact user-supplied icon vector + deterministic PNG generation and Expo icon configuration; GitHub CI for this update pending; user local Android SDK path currently broken and fix provided.
 **Repository:** https://github.com/Mutethia-glitch/tokea  
 **Design source:** GitHub checked-in approved preview (`src/components/tokea/onboarding.tsx`, `bits.tsx`, `src/styles.css`), not the older Lovable prototype
 
@@ -17,7 +17,7 @@
 | Blueprint and scope | Reviewed | Adults-only Kenya social discovery; no dating, alcohol commerce, payments, or AI matching |
 | Visual design | Approved | Preserve original Lovable tokens, fonts, 448px mobile canvas, 64px nav/header, 20px card padding, 12px card gap |
 | Discover + filters | **M3 verified** | 14 drink categories including Muratina and spirits; grouped hosting/filter controls, themed card banners and mobile browser checks passed |
-| Onboarding + profile | **M7 UI corrected, CI passed, awaiting device recheck** | Preview-style welcome, stand-alone 18+ notice, paired-glass mark, age guide in bullet rows rather than literal backslash-n |
+| Onboarding + profile | **M7 revised, device recheck pending** | Preview style welcome; adult-only card contains exactly one line; escaped server text normalized for display; ID bullet rows; paired-glass logo now uses owner-supplied vector asset |
 | Host/create session | **M5 native + API source tested** | Real signed-JWT host endpoint and native form; account provider not yet configured |
 | Join requests | **M5 native + API source tested** | Authenticated requests and server-only host decisions, durable inbox events; no live users yet |
 | Session chats | **M5 native + API source tested** | PostgreSQL messages restricted to accepted members; live realtime and phone notifications pending |
@@ -27,7 +27,7 @@
 | Hosted web demo | **Vercel deployment READY** | https://tokea-demo.vercel.app · SSO protection enabled · browser routes not yet independently smoke-tested |
 | Production backend | **M7 sandbox OTP/login verified locally** | PostgreSQL 18, 13 migrations, API health ok; SMS received in AT sandbox and OTP verified to JWT; ageVerified=false. Not production |
 | Native push notifications | **M4 code verified, delivery unverified** | Explicit opt-in and Expo token registration, in-app inbox and native notification tap handling; push needs EAS ID, APNs/FCM credentials, real authentication and device testing |
-| Native iOS/Android | **Local Android debug APK built (owner report, 2026-11-20)** | Emulator screenshots show age screen before UI changes; new revision not yet tested on emulator. iOS and push unverified |
+| Native iOS/Android | **Owner's local APK built before current icon update** | Android CMake/Ninja fixes achieved BUILD SUCCESSFUL, then user hit Gradle SDK location not found after config changes; corrected Android SDK path instructions supplied. New PNG assets require generation + prebuild + rebuild |
 | Kenya legal review | **Pre-launch blocker** | Updated draft privacy notice for ID/selfie, restricted admin review, metadata and deletion; mandatory DPIA/ODPC legal review and 24h deletion assurance before live collection |
 
 ## Immediate next steps
@@ -36,8 +36,8 @@
 - [x] Owner reported **BUILD SUCCESSFUL** of Android debug APK and provided emulator screenshot of age screen, prior to these UI changes.
 - [x] Fix literal backslash-n on ID/selfie guidance using proper bullet rows; restore paired-glass icon and preview welcome; adult card contains **only** "For adults 18+ only".
 - [x] Feature-branch UI commit `122e8f2` passed all three GitHub CI jobs (native Expo Android JS export/typecheck, API integration checks, design-reference web tests): https://github.com/Mutethia-glitch/tokea/actions/runs/44660227149 and https://github.com/Mutethia-glitch/tokea/actions/runs/44660233793.
-- [ ] User reloads Metro and visually verifies updated native welcome, sign-in, age review and navigation; CI is source validation, not an on-device UI test.
-- [ ] Actual custom launcher icon: user sent an inline image, but a standalone accessible image file was not available in conversation storage. Request the exact original PNG so it can be resized and configured as Expo iOS/Android icon. Do **not** substitute a screenshot or invented mark.
+- [ ] User regenerates icons and rebuilds installed Android APK, confirms app launcher and updated native screens (CI cannot verify emulator rendering or physical SMS).
+- [x] Owner-supplied original paired-glass icon source obtained as SVG; checked in as `apps/mobile/assets/tokea-app-icon.svg` and wired through `sharp` generator to iOS, Android adaptive, monochrome icons and branded header. PNGs are reproducible and gitignored. [ ] CI and actual launcher icon on emulator still require verification.
 - [ ] Compare feature branch with divergent main before any merge; preserve local changes.
 
 - [x] Verify Bun dependency install, TypeScript check, production build and automated tests in CI (16/16 tests passed).
@@ -69,6 +69,11 @@
 
 ## HANDOVER — read first (2026-11-20)
 
+**Latest update:** The exact Tokea icon IS now available: source `apps/mobile/assets/tokea-app-icon.svg`, from user's purple square with two white glasses. `scripts/generate-icons.mjs` uses development-only `sharp` to generate 4 gitignored PNG outputs (`icon.png`, `adaptive-icon.png`, `monochrome-icon.png`, `brand-mark.png`). `app.json` wires Expo/iOS/Android icons; `src/branding.tsx` renders the same derived glass mark. Run `cd apps/mobile; bun install; bun run generate:icons; bun run test:copy; bun run typecheck` before prebuild. CI also generates icons before Expo export. Source PNG as provided by user is visually equivalent to vector, but device raster result still needs visual verification. Any older handover sentence claiming icon missing is historical and superseded.
+**Escaped copy:** `src/display-copy.ts` fixes literal escaped newlines/tabs in native Text presentation including request/session/chat/notification content; age instructions have individual bullets. Test script `bun run test:copy` guards against regressions. Do not display raw code/JSON or substitute web mock data in native.
+**Latest owner blocker:** After earlier successful Android debug APK, Gradle now reports Android `SDK location not found`. Windows user SDK previously confirmed at `$env:LOCALAPPDATA\\Android\\Sdk`; write ignored `apps/mobile/android/local.properties` with forward slashes, set session `ANDROID_HOME` and `ANDROID_SDK_ROOT` to that folder. Do not commit absolute user paths. Preserve local `android/` and secrets, avoid `expo prebuild --clean` or deletion. Re-run icon generation/prebuild, then low-worker Gradle build.
+
+
 **Repository/branch:** `Mutethia-glitch/tokea`; active working branch `feat/kenya-otp-gmail-photos-push-local` (old head `cea3767`), NOT divergent `main` (feature ahead 29, behind 10 at last compare). User has Windows checkout `C:\\Users\\promi\\tokea`; keep using M7 branch. `main` has different OTP endpoints and migrations. Do not reset or merge blindly. User's local changes: `services/api/compose.local.yml` modified by one line, `services/api/bun.lock` untracked and private `.env.local` ignored; do not overwrite them. `AGENTS.md` requires updating `PROGRESS.md` in each major commit.
 
 **Product/visual authority:** native Android/iOS Kenya social discovery for 18+ only; NO customer website, Supabase, demo sign-in or mock native accounts. User requires native UI closely follow the **GitHub checked-in approved preview**. Reference `src/components/tokea/onboarding.tsx` for landing hero ("Find your people. Share a drink."), rounded adult notice and purple Get started; `src/components/tokea/bits.tsx` for two-glass icon beside lowercase `tokea`; `src/styles.css` for actual Instrument fonts and design tokens. Older Lovable is NOT authority. User screenshot exposed literal `\\n` in age-verification instructions; this commit replaces the broken string with proper line-separated bullets. User explicitly said the **adult notice card must contain ONLY "For adults 18+ only"**, with nothing below that line within the card. New `apps/mobile/app/welcome.tsx`, `src/branding.tsx`, updates sign-in/age/Discover. Platform serif fallback is still not exact Instrument Serif; check licensed font bundling and actual emulator spacing. The most recent user added an inline image for the **launcher icon**, but no standalone image was available to retrieve. Obtain original uploaded PNG before changing `apps/mobile/app.json` launcher icons. Do not claim it is implemented.
@@ -80,6 +85,13 @@
 **CI result:** Commit `122e8f2` completed both push and PR workflows; all native-foundation, API-foundation and build-and-test jobs were successful (runs 44660227149 / 44660233793). These checks do NOT confirm pixel-perfect matching or in-app OTP on an emulator. **Next actions:** User should pull the committed update on same branch (`git pull --ff-only origin feat/kenya-otp-gmail-photos-push-local`; only if local state still compatible), `cd apps/mobile; bun run typecheck`, restart Metro `bunx expo start --dev-client --localhost -c`. Emulator `.env.local`: `EXPO_PUBLIC_API_URL=http://10.0.2.2:4400` and `EXPO_PUBLIC_ALLOW_LOOPBACK_HTTP=true` (local emulator only, NEVER physical/production). Check welcome route from signed-out Discover, logo parity, adult notice and bullets. Actual native OTP login and restricted unverified account flow still require emulator checks. Don't treat an API 200 or push enqueue as actual age verification or device delivery. Continue recording milestone status and handover in this file.
 
 ## Changelog
+
+### 2026-11-20 — M7 icon, escaped text and local SDK build fix
+- The user provided the final 1024px purple/white paired-glass icon and matching `tokea-app-icon.svg`. Source vector is added to the repo; build-only `sharp` generator creates standard PNG, transparent adaptive foreground, monochrome themed icon and inline purple brand mark. Expo app config updated to refer to generated images; dependency is development-only and does not change app runtime.
+- Added `display-copy.ts` and applied at major native presentation boundaries (API messages, inbox, session/request/chat titles, UI headings). It converts literal escaped backslash-n / backslash-t into proper display whitespace. Preserves the original stored text. Age instructions already render six real bullet rows. Added a regression script to enforce these requirements and the one-line adult-only card; CI generates PNG assets before Expo JS export.
+- Owner reports new Gradle failure: `SDK location not found` (missing ANDROID_HOME or `android/local.properties`). Supplied Windows PowerShell fix to set SDK home and ignored `sdk.dir`. This failure is local environment configuration, not a Kotlin/TypeScript error. Rebuild/verify launcher after applying fix.
+- This change was implemented on active feature branch only; no secrets, no database modifications, no hosting. Post-change CI and on-device review pending.
+
 
 ### 2026-11-20 — Native welcome, paired-glass mark, age guidance, handover
 - Added screenshot/approved-preview inspired welcome layout with standalone adult notice, no demo bypass.

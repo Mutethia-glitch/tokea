@@ -1,11 +1,14 @@
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { router } from "expo-router";
+import { useEffect } from "react";
+import { getAccessToken } from "@/api";
 import { TokeaLogo, displaySerif } from "@/branding";
 import { Screen } from "@/ui";
 import { colors } from "@/theme";
 
 /** Real onboarding mirrors checked-in preview; no fake demo-account bypass. */
 export default function WelcomeScreen(){
+  useEffect(()=>{let active=true;void getAccessToken().then(t=>{if(active&&t)router.replace("/(tabs)");});return()=>{active=false;};},[]);
   return <Screen><ScrollView showsVerticalScrollIndicator={false}
     contentContainerStyle={{flexGrow:1,paddingTop:20,paddingBottom:42}}>
     <TokeaLogo/>
